@@ -25,8 +25,6 @@ export class IngredientsRepository {
          order: { column: 'nutrient_id', direction: 'ASC' }
       });
 
-      console.log(content)
-
       // make sure all nutrientRows have been found, if any are missing set them to 0
       if (!content[0] || content[0].nutrient_id != 203) { content.splice(0, 0, { nutrient_id: '203', value: '0' } ); }
       if (!content[1] || content[1].nutrient_id != 204) content.splice(1, 0, { nutrient_id: '204', value: '0' } );

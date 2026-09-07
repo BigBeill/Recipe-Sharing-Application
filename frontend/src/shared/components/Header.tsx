@@ -18,9 +18,9 @@ interface LinePositionType {
    duration: number,
 }
 
-const UNDERLINE_SPEED = 900;         // px per second
-const UNDERLINE_MIN_DURATION = 0.15;  // seconds
-const UNDERLINE_MAX_DURATION = 0.6; // seconds
+const UNDERLINE_SPEED = 900;
+const UNDERLINE_MIN_DURATION = 0.15;
+const UNDERLINE_MAX_DURATION = 0.6;
 
 const withDuration = (
    previous: LinePositionType,
@@ -51,7 +51,7 @@ export default function Header() {
          ...(authId !== null ? [{ name: 'Social', href: '/users' }] : []),
          { name: 'About Project', href: '/about' },
       ],
-      [ 
+      [
          ...(authId !== null ? 
             [{ name: 'Profile', href: `/users/${ authId }` }]
          : 

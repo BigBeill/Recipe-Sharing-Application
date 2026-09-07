@@ -1,7 +1,7 @@
 
 export interface AuthTokensType {
    accessToken: string;
-   refreshToken?: string;
+   refreshToken: string;
 }
 
 export interface AuthResultType {

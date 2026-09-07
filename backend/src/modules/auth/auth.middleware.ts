@@ -9,7 +9,6 @@ export const authenticateMiddleware = new Elysia({ name: 'authenticate' }).deriv
    { as: 'scoped' },
    async ({ cookie: { accessToken } }): Promise<{ authId?: string }> => {
       const token = accessToken?.value as string;
-      console.log("auth token grabbed:", token);
       if (!token) { return { authId: undefined } }
       
       try {

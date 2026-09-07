@@ -17,7 +17,7 @@ export function createAuthService(api: TypeAuthApi) {
 
       login: (params: TypeAuthServiceLoginParams): Promise<{ _id: string }> => {
          checkValidPassword(params.password);
-         return api.login(params);
+         return api.login({ name: params.name, password: params.password, rememberMe: params.rememberMe });
       },
 
       logout: (): Promise<void> => {

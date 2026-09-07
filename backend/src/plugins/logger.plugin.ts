@@ -10,7 +10,7 @@ export const logger = new Elysia({ name: 'logger' })
       set.headers['x-request-id'] = id;
 
       const path = new URL(request.url).pathname;
-      console.log(`---> [${id}] ${request.method} ${path}`);
+      console.log(`---> [${ id }] ${ request.method } ${ path } @ ${ formatTimestamp() }`);
    })
    .onError(({ request, code, error }) => {
       const m = meta.get(request);
@@ -23,3 +23,18 @@ export const logger = new Elysia({ name: 'logger' })
       console.log(`${ set.status?.toString()[0] === '2' ? '\x1b[32m' : '\x1b[33m' }<--- [${ m?.id ?? '????' }] ${ set.status ?? '' } ${ ms }ms ${ path }\x1b[0m`);
    })
    .as('global');
+
+
+
+function formatTimestamp(date = new Date()): string {
+  const pad = (n: number, len = 2) => String(n).padStart(len, "0");
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate()),
+    pad(date.getHours()),
+    pad(date.getMinutes()),
+    pad(date.getSeconds()),
+    pad(date.getMilliseconds(), 3),
+  ].join(":");
+}

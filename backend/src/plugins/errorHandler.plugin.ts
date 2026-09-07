@@ -1,5 +1,5 @@
 import { Elysia, ValidationError } from 'elysia';
-import { AppError } from '../types/error.types';
+import { AppError } from '../common/types/error.types';
 
 export const errorHandler = new Elysia({ name: 'error-handler' })
    .onError(({ error, code, set }) => {

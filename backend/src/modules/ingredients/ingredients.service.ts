@@ -31,9 +31,7 @@ export class IngredientsService {
 
       if (!includeNutrition) { return ingredient; }
       else {
-         console.log(ingredient);
          const nutrition = await this.repository.getBaseNutrition(ingredient._id);
-         console.log(nutrition);
          return { ...ingredient, nutrition }
       }
    }
@@ -73,7 +71,7 @@ export class IngredientsService {
       const [ingredient, conversion] = await Promise.all([
          this.repository.getIngredient(record._id),
          this.repository.getConversion(record._id, record.portion._id).catch((error) => {
-            console.log(error);
+            console.error(error);
             return null;
          }),
       ]);

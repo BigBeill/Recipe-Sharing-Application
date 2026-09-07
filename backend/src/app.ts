@@ -1,7 +1,7 @@
 import { Elysia } from 'elysia';
 import { corsConfig } from './config/cors';
-import { errorHandler } from './common/middleware/errorHandler';
-import { logger } from './common/middleware/logger';
+import { errorHandler } from './plugins/errorHandler.plugin';
+import { logger } from './plugins/logger.plugin';
 import { authController } from './modules/auth/auth.controller';
 import { usersController } from './modules/users/users.controller';
 import removeMongooseNoise from './common/utils/removeMongooseNoise';
@@ -10,8 +10,12 @@ import { imagesController } from './modules/images/images.controller';
 import { recipesController } from './modules/recipes/recipes.controller';
 import { jwksPlugin } from './modules/auth/jwk.plugin';
 import { cookieConfig } from './config/cookies';
+import { circuitBreaker } from './plugins/circuitBreaker.plugin';
+import { ipRateLimit } from './plugins/ipRateLimit.plugin';
 
 export const app = new Elysia({ normalize: false, cookie: cookieConfig })
+   .use(circuitBreaker({ limit: 2000, windowMs: 10_000, cooldownMs: 30_000 }))
+   .use(ipRateLimit({ limit: 100, windowMs: 10_000 }))
    .use(errorHandler)
    .use(jwksPlugin)
    .mapResponse({ as: 'global' }, ({ responseValue }) => {
