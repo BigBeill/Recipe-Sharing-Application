@@ -36,10 +36,9 @@ export function createAuthService(api: TypeAuthApi) {
          return api.requestPasswordReset(params);
       },
 
-      resetPassword: (params: Omit<TypeAuthServiceResetPasswordParams, 'password'> & { passwordOne: string, passwordTwo: string }) => {
-         checkValidPassword(params.passwordOne);
-         if (params.passwordOne !== params.passwordTwo) { throw new Error("Passwords do not match!"); }
-         return api.resetPassword({password: params.passwordOne, token: params.token});
+      resetPassword: (params: TypeAuthServiceResetPasswordParams) => {
+         checkValidPassword(params.password);
+         return api.resetPassword(params);
       },
 
    }

@@ -3,7 +3,7 @@
 import styles from './recipePage.module.scss';
 import { RecipeType } from "../domain/recipes.types";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
-import { ComponentPropsWithoutRef, Ref, useImperativeHandle, useRef, useState } from "react";
+import { ComponentPropsWithoutRef, Ref, useRef } from "react";
 import Notebook, { NotebookPage } from "@/shared/components/Notebook";
 import { Fullscreen } from "@/shared/components/Fullscreen";
 import NutritionList from '@/features/ingredients/components/NutritionList';

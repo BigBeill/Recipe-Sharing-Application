@@ -10,7 +10,7 @@ export async function sendPasswordResetEmail(toEmail: string, resetToken: string
    const { data, error } = await resend.emails.send({
       from: "no-reply@big-beills-kitchen.ca",
       to: toEmail,
-      subject: "Password Reset - Big Beill's Greenhouse",
+      subject: "Password Reset - Big Beill's Kitchen",
       html,
    });
    

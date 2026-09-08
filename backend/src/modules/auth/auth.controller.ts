@@ -95,7 +95,7 @@ export const authController = new Elysia({ prefix: '/auth' })
          try { await service.requestPasswordReset(email); }
          // catch not found errors and return as if it was a success (prevents an enumeration attack)
          catch (error) { if (!(error instanceof NotFoundError)) { throw error; } }
-         set.status = 201;
+         set.status = 204;
          return;
       },
       {
@@ -106,7 +106,7 @@ export const authController = new Elysia({ prefix: '/auth' })
       async ({ set, body }) => {
          const { password, token } = body;
          await service.resetPassword(password, token);
-         set.status = 201;
+         set.status = 204;
          return;
       },
       {
@@ -141,7 +141,7 @@ export const authController = new Elysia({ prefix: '/auth' })
          await service.removeRefreshToken(refreshToken.value);
          accessToken.remove();
          refreshToken.remove();
-         set.status = 201;
+         set.status = 204;
          return;
       },
       {

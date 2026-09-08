@@ -15,15 +15,20 @@ export function useServiceMutation<TInput, TOutput>(mutationFunction: (input: TI
    const mutationFunctionRef = useRef(mutationFunction);
    useEffect(() => { mutationFunctionRef.current = mutationFunction; });
 
+   // assign a unique id to each request and track the id of the most recent one as a ref
+   // if the client sends out multiple requests from this tool, all but the most recent request will be dropped
    const requestIdRef = useRef(0);
 
    // returns data both directly and indirectly in case await is needed
    const send = useCallback((input: TInput): Promise<TOutput> => {
+
+      // save a new requestId and compare with the Ref later
       const requestId = ++requestIdRef.current;
       setState({ status: 'loading' });
 
       const sendPromise = (async () => {
          try {
+            // make the actual request, on response, make sure no new requests have been sent out before deciding where to return the response
             const data = await mutationFunctionRef.current(input);
             if (requestId === requestIdRef.current) { setState({ status: 'ready', data }); }
             return data;

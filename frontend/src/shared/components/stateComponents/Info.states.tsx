@@ -6,7 +6,7 @@ interface StateInfoProps {
 
 export function StateInfoInsert ({ children }: StateInfoProps) {
    return (
-      <p className={ styles.info }>
+      <p className={ styles.info } aria-live='assertive'>
          { children }
       </p>
    )
