@@ -8,17 +8,19 @@ export interface IngredientType {
       description: string;
       amount: number;
    }
-   nutrition?: {
-      calories: number;
-      fat: number;
-      cholesterol: number;
-      sodium: number;
-      potassium: number;
-      carbohydrates: number;
-      fibre: number;
-      sugar: number;
-      protein: number;
-   }
+   nutrition?: TypeNutrition
+}
+
+export interface TypeNutrition { 
+   calories: number;
+   fat: number;
+   cholesterol: number;
+   sodium: number;
+   potassium: number;
+   carbohydrates: number;
+   fibre: number;
+   sugar: number;
+   protein: number;
 }
 
 export interface IngredientConversionType {

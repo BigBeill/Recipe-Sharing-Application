@@ -3,12 +3,16 @@
 import { PackagedImageType } from "../domain/image.types";
 import { unpackImage } from "../services/image.services";
 
-export default function ImageDisplay ({ packagedImage }: { packagedImage: PackagedImageType | undefined }) {
+type Props = React.ComponentPropsWithoutRef<'div'> & {
+   packagedImage: PackagedImageType | undefined;
+}
+
+export default function ImageDisplay ({ packagedImage, ...rest }: Props) {
 
    const image = unpackImage(packagedImage);
 
    return (
-      <img {...image} />
+      <img { ...image } { ...rest } />
    );
 
 }

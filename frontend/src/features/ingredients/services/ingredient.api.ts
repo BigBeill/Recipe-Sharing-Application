@@ -18,7 +18,7 @@ export function createIngredientApi(call: TypeApiCaller) {
          url: `/ingredients/conversionOptionList/${ingredientId}`,
          method: 'get',
       }),
-   get: (ingredientId: number, params: TypeIngredientServiceGetParams) =>
+   get: (ingredientId: number, params?: TypeIngredientServiceGetParams) =>
       call<IngredientType>({
          url: `/ingredients/get/${ingredientId}`,
          method: 'get',

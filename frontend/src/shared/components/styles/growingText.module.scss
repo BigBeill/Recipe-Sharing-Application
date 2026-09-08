@@ -1,11 +1,13 @@
-.wrapper {
-   height: 100%;
-   width: 100%;
-   min-width: 0;
-   overflow: hidden;
-   
-   display: flex;
-   align-items: center;
+
+@layer defaults {
+   .wrapper {
+      height: 100%;
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+   }
 }
 
 .text {

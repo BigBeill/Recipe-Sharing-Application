@@ -30,7 +30,7 @@ export default function Notebook ({ components }: notebookParams) {
    const firstComponentIndex = currentIndex - components.firstItemIndex;
    const firstComponent = grabComponentFromList(firstComponentIndex);
    const secondComponent = grabComponentFromList(firstComponentIndex + 1);
-   const paginationBar = <PaginationBar pageCount={ Math.ceil(components.count / 2) } />;
+   const paginationBar = (components.count <= 2) ? null : <PaginationBar pageCount={ Math.ceil(components.count / 2) } />;
    
    return <NotebookView firstComponent={ firstComponent } secondComponent={ secondComponent } paginationBar={ paginationBar } />;
 }
@@ -68,7 +68,7 @@ function NotebookView({firstComponent, secondComponent, paginationBar}: Notebook
 
    return(
       <div className={styles.notebookContainer}>
-         <div className={`${styles.notebook} ${displayRight ? styles.displayRight : ''}`}>
+         <section className={`${styles.notebook} ${displayRight ? styles.displayRight : ''}`}>
             <div className={`${styles.page} ${(displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(false)}>
                {firstComponent || null}
             </div>
@@ -76,8 +76,8 @@ function NotebookView({firstComponent, secondComponent, paginationBar}: Notebook
             <div className={`${ styles.page } ${(!displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(true)}>
                {secondComponent || null}
             </div>
-         </div>
-         {paginationBar}
+         </section>
+         { paginationBar }
       </div>
    )
 }
@@ -91,8 +91,8 @@ function NotebookView({firstComponent, secondComponent, paginationBar}: Notebook
 export function NotebookPage({ children, className, ...rest }: ComponentPropsWithoutRef<'div'>) {
    
    return (
-      <section className={ [styles.NotebookPage, className].filter(Boolean).join(' ') } { ...rest } >
+      <div className={ [styles.notebookPage, className].filter(Boolean).join(' ') } { ...rest } >
          { children }
-      </section>
+      </div>
    );
 }

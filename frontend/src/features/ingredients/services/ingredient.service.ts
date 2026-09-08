@@ -13,7 +13,7 @@ export function createIngredientService(api: TypeIngredientApi) {
          return api.conversionOptionList(ingredientId);
       },
 
-      get: (ingredientId: number, params: TypeIngredientServiceGetParams): Promise<IngredientType> => {
+      get: (ingredientId: number, params?: TypeIngredientServiceGetParams): Promise<IngredientType> => {
          return api.get(ingredientId, params);
       },
 

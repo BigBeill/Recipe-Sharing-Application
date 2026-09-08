@@ -1,0 +1,41 @@
+@use '../../../shared/styles/variables' as *;
+
+.wrapper {
+   width: fit-content;
+   display: inline-block;
+
+   h3 {
+      margin: 0rem;
+      font-size: 1.8rem;
+      font-weight: bold;
+   }
+
+   ul {
+      margin: 0.6rem 0rem 0rem 0rem;
+      padding: 0rem;
+      width: 15rem;
+
+      li {
+         margin-bottom: 0.3rem;
+         display: flex;
+         align-items: baseline;
+
+         > :first-child {
+            flex: 1;
+            display: flex;
+            white-space: nowrap;
+
+            &::after {
+               content: '';
+               flex: 1;
+               border-bottom: 1px dotted currentColor;
+               margin-bottom: 4px;
+            }
+         }
+
+         > :last-child {
+            white-space: nowrap;
+         }
+      }
+   }
+}

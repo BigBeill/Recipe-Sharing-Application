@@ -1,5 +1,5 @@
 import { PackagedImageType } from '@/features/images/domain/image.types';
-import { IngredientType } from '../../ingredients/domain/ingredient.types';
+import { IngredientType, TypeNutrition } from '../../ingredients/domain/ingredient.types';
 
 export interface RecipeDraft {
    ownerId: string;
@@ -20,15 +20,5 @@ export interface RecipeType{
    ingredientList: IngredientType[];
    instructionList: string[];
    visibility: 'public' | 'private' | 'personal';
-   nutrition?: {
-      calories: number;
-      fat: number;
-      cholesterol: number;
-      sodium: number;
-      potassium: number;
-      carbohydrates: number;
-      fibre: number;
-      sugar: number;
-      protein: number;
-   }
+   nutrition?: TypeNutrition
 }

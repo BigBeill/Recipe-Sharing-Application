@@ -3,6 +3,15 @@ import { RecipeType } from "../domain/recipes.types";
 import GrowingText from "@/shared/components/GrowingText";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 
+
+
+/*
+This is very similar to recipePage.tsx except it puts everything on a single white page.
+Used for showing the contents of recipes where the full notebook doesn't make sense
+*/
+
+
+
 export default function RecipePreview({ recipe }: { recipe: RecipeType }) {
 
    return (

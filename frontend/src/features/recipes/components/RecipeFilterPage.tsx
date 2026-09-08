@@ -2,7 +2,7 @@
 
 import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
-import { ingredientService } from "@/features/ingredients/services/ingredient.service";
+import { ingredientService } from "@/features/ingredients/services/ingredient.service.client";
 import { ButtonOval } from "@/shared/components/Button.components";
 import { InputText } from "@/shared/components/Input.components";
 import { NotebookPage } from "@/shared/components/Notebook";
