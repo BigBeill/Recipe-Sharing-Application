@@ -1,0 +1,11 @@
+.spinAnimation {
+   width: fit-content;
+   height: fit-content;
+   animation: spin 1.2s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+   transform-origin: center;
+}
+
+@keyframes spin {
+   from { transform: rotate(0deg); }
+   to   { transform: rotate(360deg); }
+}

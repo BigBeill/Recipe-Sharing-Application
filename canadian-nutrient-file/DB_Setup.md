@@ -15,7 +15,7 @@ createdb "Canadian Nutrient File"
 createuser myuser --createdb --login --pwprompt
 ```
 
-1. (optional) Connect to new database to test successful creation
+4. (optional) Connect to new database to test successful creation
 
 ```
 psql "Canadian Nutrient File"

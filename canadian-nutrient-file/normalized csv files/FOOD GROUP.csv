@@ -1,4 +1,4 @@
-Food_Group_ID,Food_Group_Code,Food_Group_Name,Food_Group_Name_F
+_id,code,description,description_F
 1,1,Dairy and Egg Products,Produits laitiers et d'oeufs
 2,2,Spices and Herbs,Épices et fines herbes
 3,3,Babyfoods,Aliments pour bébés

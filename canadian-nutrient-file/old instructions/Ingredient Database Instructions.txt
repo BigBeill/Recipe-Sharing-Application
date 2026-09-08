@@ -7,98 +7,103 @@ paste this query into the Canadian Nutrient File database:
 
 // ============ START OF QUERY ============
 
-CREATE TABLE food_name (
-	food_id numeric,
-	food_code numeric,
-   food_group_id numeric,
+CREATE TABLE food (
+	_id numeric,
+	code numeric,
+   	food_group_id numeric,
 	food_source_id numeric,
-	food_description text,
-	food_description_f text,
-	food_date_of_entry date,
-	food_date_of_publication date,
+	description text,
+	description_f text,
+	date_of_entry date,
+	date_of_publication date,
 	country_code numeric,
 	scientific_name text
 );
 
 CREATE TABLE nutrient_amount (
 	food_id numeric,
-   nutrient_id numeric,
-   nutrient_value numeric,
+   	nutrient_id numeric,
+   	value numeric,
 	standard_error numeric,
 	number_of_observations numeric,
 	nutrient_source_id numeric,
-	nutrient_date_entry date
+	date_entry date
 );
 
 CREATE TABLE conversion_factor (
 	food_id numeric,
 	measure_id numeric,
-	conversion_factor_value numeric,
-	conversion_factor_date_of_entry date
+	value numeric,
+	date_of_entry date
 );
 
 CREATE TABLE refuse_amount (
 	food_id numeric,
 	refuse_id numeric,
 	refuse_amount numeric,
-	refuse_date_of_entry date
+	date_of_entry date
 );
 
 CREATE TABLE yield_amount (
 	food_id numeric,
 	yield_id numeric,
 	yield_amount numeric,
-	yield_date_of_entry date
+	date_of_entry date
 );
 
 CREATE TABLE food_group (
 	food_group_id numeric,
 	food_group_code numeric,
-	food_group_name text,
-	food_group_name_f text
+	description text,
+	description_f text
 );
 
 CREATE TABLE food_source (
-	food_source_id numeric,
-	food_source_code numeric,
-	food_source_description text,
-	food_source_description_f text
+	_id numeric,
+	code numeric,
+	description text,
+	description_f text
 );
 
-CREATE TABLE nutrient_name (
-	nutrient_id numeric,
-	nutrient_code numeric,
-	nutrient_symbol text,
+CREATE TABLE nutrient (
+	_id numeric,
+	code numeric,
+	symbol text,
 	unit text,
-	nutrient_name text,
-	nutrient_name_f text,
+	description text,
+	description_f text,
 	tag_name text,
-	nutrient_decimals numeric
+	decimals numeric
 );
 
 CREATE TABLE nutrient_source (
-	nutrient_source_id numeric,
-	nutrient_source_code numeric,
-	nutrient_Source_description text,
-	nutrient_Source_description_f text
+	_id numeric,
+	code numeric,
+	description text,
+	description_f text
 );
 
-CREATE TABLE measure_name (
-	measure_id numeric,
-	measure_description text,
-	measure_description_f text
+CREATE TABLE measure (
+	_id numeric,
+	description text,
+	description_f text
 );
 
-CREATE TABLE refuse_name (
-	refuse_id numeric,
-	refuse_description text,
-	refuse_description_f text
+CREATE TABLE refuse (
+	_id numeric,
+	description text,
+	description_f text
 );
 
-CREATE TABLE yield_name (
-	yield_id numeric,
-	yield_description text,
-	yield_description_f text
+CREATE TABLE yield (
+	_id numeric,
+	description text,
+	description_f text
+);
+
+CREATE TABLE common_food_names (
+	food_id numeric,
+	common_name text
 );
 
 // ============ END OF QUERY ============

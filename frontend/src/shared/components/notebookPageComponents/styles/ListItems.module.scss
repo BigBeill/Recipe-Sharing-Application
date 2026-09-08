@@ -1,0 +1,43 @@
+@use '../../../styles/variables' as *;
+
+.page {
+   height: 100%;
+   width: 100%;
+   overflow: hidden
+}
+
+.list {
+   margin: 0;
+   height: 100%;
+   width: 100%;
+   padding: 0;
+   display: flex;
+   flex-direction: column;
+}
+
+.item {
+   flex: 1 1 0;
+   height: 100%;
+   width: 100%;
+   overflow: hidden;
+   background-color: $color-background;
+   border-bottom: 2px solid $color-text;
+
+   a {
+      display: flex;
+
+      .title {
+         margin: 0 1.5rem;
+         flex: 1 1 0;
+      }
+
+      .decretiveLine {
+         width: 0.45rem;
+         background-color: $color-primary;
+      }
+   }
+
+   &:last-child {
+      border-bottom: none;
+   }
+}

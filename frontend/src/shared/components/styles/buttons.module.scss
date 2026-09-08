@@ -1,0 +1,107 @@
+@use '../../styles/variables' as *;
+
+%universalButtonStyling {
+   display: inline-block;
+   width: calc(100% - 0.6rem);
+   height: 3rem;
+   margin: 0.3rem;
+   background: $color-background;
+   color: $color-secondary;
+   border: 0.12rem solid $color-secondary;
+   font-weight: 600;
+   text-decoration: none;
+   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+   transition: all 0.2s ease-in-out;
+
+   &:hover {
+      cursor: pointer;
+   }
+}
+
+.buttonInline {
+   margin-top: auto;
+
+   svg { 
+      height: 1.5rem;
+   }
+
+   :hover {
+      cursor: pointer;
+   }
+}
+
+.buttonNarrowNav {
+   margin: 0.78rem 0 0 auto;
+   height: 3rem;
+   width: fit-content;
+   display: inline-flex;
+   background-color: transparent;
+   border: none;
+
+   &:hover {
+      cursor: pointer;
+   }
+   
+   /* md:hidden — applies at the md breakpoint and up */
+   @media (min-width: 48rem) {
+      display: none;
+   }
+
+   span {
+      margin: 0.75rem 0.6rem 0 0;
+      height: fit-content;
+      width: fit-content;
+      line-height: 1;
+      font-size: 1.5rem;
+   }
+
+   svg {
+      width: 2.7rem;
+      height: 2.7rem;
+   }
+}
+
+.buttonOval {
+   @extend %universalButtonStyling;
+   border-radius: 1.5rem;
+
+   &:hover, &.loadingState {
+      color: $color-background;
+      background: $color-secondary;
+   }
+}
+
+.buttonShielded {
+   margin: 0.3rem;
+   display: flex;
+   gap: 0.12rem;
+
+   button{
+      flex: 1 1 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      margin: 0rem;
+   }
+
+   button:first-child {
+      border-radius: 1.5rem 0.3rem 0.3rem 1.5rem;
+   }
+
+   button:last-child {
+      border-radius: 0.3rem 1.5rem 1.5rem 0.3rem;
+   }
+
+   &.shielded {
+      button:first-child {
+         border-radius: 1.5rem;
+      }
+
+      button:last-child {
+         flex: 0 0 0;
+         padding-inline: 0rem;
+         border-width: 0rem;
+         margin-inline-start: -0.12rem;
+      }
+   }
+}

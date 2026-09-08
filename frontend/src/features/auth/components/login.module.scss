@@ -1,0 +1,104 @@
+@use '../../../shared/styles/variables' as *;
+
+// css specifically for the login and register page
+.loginForm {
+	margin: auto;
+	margin-top: 6rem;
+	width: 100%;
+	max-width: 18rem;
+	padding: 3rem;
+	padding-bottom: 4rem;
+	color: white;
+	backdrop-filter: blur(12px) brightness(40%);
+	border: .1rem solid #57534e;
+	border-radius: 0.375rem;
+	box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+	h1{
+		margin-bottom: 0.25rem;
+		font-size: 2.25rem;
+		line-height: 2.5rem;
+		font-weight: 700;
+		text-align: center;
+	}
+
+	> p {
+		margin: 0rem;
+		margin-top: 1rem;
+		padding: 0rem;
+	}
+
+	a {
+		margin: 0rem;
+		padding: 0rem;
+		color: #60a5fa;
+	}
+}
+
+.loginBackground {
+	background-image: url('/loginBackground.jpg');
+}
+
+.checkboxInputWrapper {
+	margin: 0.6rem 0rem;
+
+	&:hover *{
+		cursor: pointer;
+		user-select: none;
+	}
+
+	input {
+		accent-color: $color-secondary;
+	}
+}
+
+.textInputWrapper {
+	position: relative;
+	margin: 1.2rem 0rem;
+
+	input {
+		display: block;
+		width: 100%;
+		background: none;
+		padding-top: 0.3rem;
+		padding-bottom: 0.15rem;
+		padding-left: 0rem;
+		padding-right: 0rem;
+		font-size: 0.875rem;
+		line-height: 1.25rem;
+		border: none;
+		border-bottom: 2px solid $color-background;
+		border-radius: 0rem;
+		box-shadow: none;
+		appearance: none;
+		transition: all 0.3s ease-in-out;
+		color: white;    
+	}
+
+	label {
+		pointer-events: none;
+		margin: 0rem;
+		padding: 0rem;
+		position: absolute;
+		font-size: 0.875rem;
+		line-height: 1.25rem;
+		transition: all 0.18s ease-in-out;
+		transform: translateY(-1.5rem);
+		color: $color-background;
+	}
+
+	&:has(input:focus), &:has(input:not(:placeholder-shown)) {
+		input {
+			border: none;
+			border-bottom: 2px solid $color-trinary;
+			outline: none;
+		}
+
+		label {
+			transform: translateY(-2.4rem);
+			color: $color-trinary;
+			font-size: 0.75rem;
+			line-height: 1rem;
+		}
+	}
+}

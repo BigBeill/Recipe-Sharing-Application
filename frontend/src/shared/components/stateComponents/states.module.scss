@@ -1,0 +1,39 @@
+.error {
+   margin: 1.2rem 0.6rem;
+   padding: 0.3rem !important;
+   padding-left: 0.9rem !important;
+   border: 0.1rem solid #991b1b;
+   border-radius: 0.3rem;
+   background-color: rgb(153, 27, 27, .5);
+
+   p {
+      margin: 0rem;
+   }
+
+   ul {
+      margin: 0rem;
+      padding: 0rem 0.6rem;
+
+      li {
+         margin: 0.3rem 0rem;
+      }
+   }
+}
+
+.info {
+   margin: 0rem 2.4rem;
+   padding: 0.3rem !important;
+   padding-left: 0.9rem !important;
+   border: 0.1rem solid #166534;
+   border-radius: 0.3rem;
+   background-color: rgb(22, 101, 52, .5);
+}
+
+.warning {
+   margin: 0rem 2.4rem;
+   padding: 0.3rem !important;
+   padding-left: 0.9rem !important;
+   border: 0.1rem solid #854d0e;
+   border-radius: 0.3rem;
+   background-color: rgb(133, 77, 14, .5);
+}

@@ -1,0 +1,39 @@
+.paginationBar {
+   flex: 0 0 fit-content;
+   margin: auto;
+   width: fit-content;
+   height : fit-content;
+   background-color: var(--background-color);
+   display: flex;
+   justify-content: center;
+   overflow: hidden;
+   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+   border: 0.06rem solid var(--text-color-dark);
+   border-radius: 3rem;
+
+   .primaryBlock {
+      pointer-events: none;
+      text-decoration: underline;
+   }
+
+   > * {
+      box-sizing: border-box;
+      border: 0.06rem solid var(--text-color-dark);
+      border-top: 0rem;
+      border-bottom: 0rem;
+      margin: 0rem;
+      padding: 0rem 1.2rem;
+      height: 3rem;
+      border-radius: 0rem;
+      font-size: 1.5rem;
+      line-height: 3rem;
+
+      &:first-child{
+         border-left: none;
+      }
+
+      &:last-child{
+         border-right: none;
+      }
+   }
+}

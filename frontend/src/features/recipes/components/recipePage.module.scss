@@ -1,0 +1,47 @@
+
+.wrapper {
+   h2 {
+      margin: 1.2rem 0rem;
+      width: fit-content;
+      font-size: 3rem;
+   }
+
+   h3{
+      margin: 1.2rem 0rem 0rem;
+      font-size: 1.8rem;
+      font-weight: bold;
+   }
+
+   > ol, > ul {
+      list-style: none;
+      margin: 0.6rem 0rem 0rem 0rem;
+      padding: 0rem;
+      li {
+         margin-bottom: 0.6rem;
+         border-bottom: 1px black solid;
+      }
+   }
+}
+
+.shareSpace {
+   height: fit-content; width: 100%;
+   display: flex;
+   justify-content: center;
+   gap: 6rem;
+   align-items: center;
+}
+
+.list {
+   list-style: none;
+   margin: 0.6rem 0rem 0rem 0rem;
+   padding: 0rem;
+   li {
+      margin-bottom: 0.6rem;
+      border-bottom: 1px black solid;
+   }
+}
+
+.photo {
+   height: 12rem; width: 12rem;
+   display: inline-block;
+}

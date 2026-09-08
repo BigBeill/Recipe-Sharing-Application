@@ -2,8 +2,8 @@
 
 REM change file path and save as .bat
 
-cd C:\Users\your_file_path\git_repository\client
-start cmd /k "npm run client"
+cd C:\Users\your_file_path\git_repository\frontend
+start cmd /k "pnpm run dev"
 
-cd ../server
-start cmd /k "npm run server"
+cd ../backend
+start cmd /k "bun run dev"

@@ -1,4 +1,4 @@
-Food_ID,Nutrient_ID,Nutrient_Value,Standard_Error,Number_of_Observations,Nutrient_Source_ID,Nutrient_Date_Of_Entry
+food_id,nutrient_id,value,standard_error,number_of_observations,nutrient_source_id,date_of_entry
 2,203,9.54,0,0,102,2010-04-16
 2,204,15.7,0,0,102,2010-04-16
 2,205,5.91,0,0,102,2010-04-16

@@ -1,0 +1,55 @@
+@use '../../styles/variables' as *;
+
+.linkBackground {
+   height: 100%;
+   width: 100%;
+   color: inherit;
+   text-decoration: inherit;
+}
+
+.linkPair {
+   display: flex;
+   gap: 0.6rem;
+
+   a {
+      flex: 1;
+      min-width: 0;
+      display: inline-block;
+      height: 3rem;
+      line-height: 3rem;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      box-sizing: border-box;
+      text-align: center;
+
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+         cursor: pointer;
+      }
+
+      &:first-child {
+         color: $color-background;
+         background: $color-primary;
+         border: 0.12rem solid $color-primary;
+
+         &:hover {
+            transform: scale(1.05);
+            border-radius: 0.3rem;
+         }
+      }
+
+      &:last-child {
+         color: $color-secondary;
+         background: $color-background;
+         border: 0.12rem solid $color-secondary;
+         box-sizing: border-box;
+
+         &:hover {
+            color: $color-background;
+            background: $color-secondary;
+         }
+      }
+   }
+}

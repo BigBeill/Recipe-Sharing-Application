@@ -1,0 +1,35 @@
+
+
+@mixin fade-in($duration: 0.3s, $easing: ease-in) {
+   opacity: 0;
+   animation: fadeIn $duration $easing forwards;
+}
+
+@mixin slide-up($duration: 0.9s, $easing: ease-out) {
+   transform: translateY(100vh);
+   animation: slideUp $duration $easing forwards;
+}
+
+@mixin grow-on-hover {
+   transition: 
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+
+   &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+   }
+}
+
+@mixin title-on-hover {
+   @include grow-on-hover;
+   transform: rotate(5deg);
+
+   &:hover {
+      transform: rotate(0deg) scale(1.05);
+   }
+}
+
+@mixin spin($duration: 1.5s) {
+   animation: spin $duration cubic-bezier(0.7, 0, 0.3, 1) infinite;
+}

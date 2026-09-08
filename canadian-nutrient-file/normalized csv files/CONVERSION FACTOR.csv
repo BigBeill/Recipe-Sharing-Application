@@ -1,4 +1,4 @@
-Food_ID,Measure_ID,Conversion_Factor_Value,Conversion_Factor_Date_Of_Entry
+food_id,measure_id,value,date_of_entry
 2,341,0.40152,1997-05-01
 2,383,0.5019,2003-08-12
 2,415,1.0038,2003-08-12

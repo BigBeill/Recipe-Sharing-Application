@@ -1,0 +1,22 @@
+
+@layer defaults {
+   .wrapper {
+      height: 100%;
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+   }
+}
+
+.text {
+   margin: 0rem !important;
+   padding: 0rem;
+   max-height: 100%;
+   width: max-content ;
+   max-width: 100%;
+   display: inline-block;
+   text-wrap: wrap;
+   text-decoration: none;
+}
