@@ -1,5 +1,5 @@
 import IngredientGroupPage from "@/features/ingredients/components/IngredientGroupPage";
-import { ingredientService } from "@/features/ingredients/services/ingredient.service";
+import { ingredientService } from "@/features/ingredients/services/ingredient.service.server";
 import preRenderService from "@/shared/lib/preRenderService";
 
 export default async function Page() {

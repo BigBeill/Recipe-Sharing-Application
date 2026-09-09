@@ -1,6 +1,8 @@
+"use client"
+
 import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import { IngredientConversionType, IngredientType } from "@/features/ingredients/domain/ingredient.types";
-import { ingredientService } from "@/features/ingredients/services/ingredient.service";
+import { ingredientService } from "@/features/ingredients/services/ingredient.service.client";
 import { ButtonOval } from "@/shared/components/Button.components";
 import { NotebookPage } from "@/shared/components/Notebook";
 import { useInteractableList } from "@/shared/hooks/useInteractableList";

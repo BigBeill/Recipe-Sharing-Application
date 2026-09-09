@@ -1,6 +1,6 @@
 import IngredientPage from "@/features/ingredients/components/IngredientPage";
 import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
-import { ingredientService } from "@/features/ingredients/services/ingredient.service";
+import { ingredientService } from "@/features/ingredients/services/ingredient.service.server";
 import preRenderService from "@/shared/lib/preRenderService";
 
 export default async function IngredientList({ params }: { params: Promise<{ IngredientGroupId: number, ingredientId: number }> }) {

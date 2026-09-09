@@ -1,6 +1,6 @@
 import { verifySession } from "@/features/auth/server/session";
 import EditRecipeView from "@/features/recipes/components/EditRecipeView"
-import { recipeService } from "@/features/recipes/services/recipes.service";
+import { recipeService } from "@/features/recipes/services/recipes.service.server";
 import preRenderService from "@/shared/lib/preRenderService";
 import { redirect } from "next/navigation";
 
