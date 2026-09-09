@@ -36,8 +36,8 @@ export default function EditRecipeInstructionsView ({ refs, initial }: Component
             onClick={() => { instructionList.removeIndex(index) }} 
          />
       ),
-      renderItemHeader(item: string, index: number) {
-         <h4>Step {index + 1} </h4>
+      renderItemHeader: (item: string, index: number) => {
+         return <h4>Step {index + 1} </h4>
       },
    });
 
