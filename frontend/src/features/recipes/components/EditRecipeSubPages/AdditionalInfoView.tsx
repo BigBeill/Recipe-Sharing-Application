@@ -23,7 +23,7 @@ export default function EditRecipeAdditionalInfoView ({ refs, initial }: Compone
 
          <div style={{ width: '12rem', height: '12rem', margin: '0rem 0rem 3rem 3rem' }}>
             <ImageUploader 
-               imageRef={ refs.image }
+               ref={ refs.image }
                initial={ initial?.image }
                category='recipe'
             />
