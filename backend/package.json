@@ -6,7 +6,7 @@
    "scripts": {
       "dev": "bun --watch src/index.ts",
       "build": "bun build ./src/index.ts --outdir ./dist --target bun --minify",
-      "start": "NODE_ENV=production bun ./dist/index.js"
+      "start": "NODE_ENVIRONMENT=production bun ./dist/index.js"
    },
    "devDependencies": {
       "@types/bun": "latest",
