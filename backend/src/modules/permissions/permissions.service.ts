@@ -6,7 +6,7 @@ import type { RelationshipType } from "../users/users.types";
 export class PermissionsService {
    private readonly repository: UsersRepository;
 
-   constructor(usersRepository: UsersRepository) {
+   constructor({ usersRepository }: { usersRepository: UsersRepository }) {
       this.repository = usersRepository;
    }
 

@@ -1,6 +1,4 @@
 import { Elysia, t } from 'elysia';
-import { AuthService } from './auth.service';
-import { AuthRepository } from './auth.repository';
 import { RegisterValidator } from './validators/register.validator';
 import { LoginValidator } from './validators/login.validator';
 import { authenticateMiddleware, authorizeMiddleware } from './auth.middleware';
@@ -8,8 +6,9 @@ import { requestPasswordResetValidator } from './validators/requestPasswordReset
 import { NotFoundError } from '../../common/types/error.types';
 import { resetPasswordValidator } from './validators/resetPassword.validator';
 import { changePasswordValidator } from './validators/changePassword.validator';
+import { authService } from '../../container';
 
-const service = new AuthService(new AuthRepository());
+const service = authService;
 
 export const authController = new Elysia({ prefix: '/auth' })
    .post( '/login',

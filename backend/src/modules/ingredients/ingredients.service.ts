@@ -19,7 +19,7 @@ interface SearchIngredientParams extends PaginationParams {
 export class IngredientsService {
    private readonly repository: IngredientsRepository;
 
-   constructor(ingredientsRepository: IngredientsRepository) {
+   constructor({ ingredientsRepository }: { ingredientsRepository: IngredientsRepository }) {
       this.repository = ingredientsRepository;
    }
 

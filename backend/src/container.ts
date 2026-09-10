@@ -1,4 +1,4 @@
-import { createContainer, asClass, InjectionMode } from "awilix";
+import { createContainer, asClass } from "awilix";
 import { AuthRepository } from "./modules/auth/auth.repository";
 import { RecipesRepository } from "./modules/recipes/recipes.repository";
 import { UsersRepository } from "./modules/users/users.repository";
@@ -10,7 +10,7 @@ import { IngredientsRepository } from "./modules/ingredients/ingredients.reposit
 import { IngredientsService } from "./modules/ingredients/ingredients.service";
 import { PermissionsService } from "./modules/permissions/permissions.service";
 
-const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
+const container = createContainer();
 
 container.register({
   authRepository: asClass(AuthRepository).singleton(),
