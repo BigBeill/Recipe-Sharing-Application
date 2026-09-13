@@ -20,7 +20,7 @@ interface LinePositionType {
 
 const UNDERLINE_SPEED = 900;
 const UNDERLINE_MIN_DURATION = 0.15;
-const UNDERLINE_MAX_DURATION = 0.6;
+const UNDERLINE_MAX_DURATION = 0.35;
 
 const withDuration = (
    previous: LinePositionType,

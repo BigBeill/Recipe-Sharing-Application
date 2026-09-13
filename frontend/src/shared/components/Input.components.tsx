@@ -63,13 +63,17 @@ export function InputText({ label, dataRef, readOnlyOptions, initial, ...rest }:
 
    return (
       <div className={ styles.inputTextWrapper }>
-         { (readOnlyOptions?.condition === true) ? (<>
-            <h4>{ label }</h4>
-            <p>{ value || readOnlyOptions.placeholder }</p>
-         </>) : (<>
-            <label>{ label }</label>
-            <input type='text' value={ value } onChange={ (event) => setValue(event.target.value) } { ...rest } />
-         </>) }
+         { (readOnlyOptions?.condition === true) ? (
+            <>
+               <h4>{ label }</h4>
+               <p>{ value || readOnlyOptions.placeholder }</p>
+            </>
+         ) : (
+            <>
+               <label>{ label }</label>
+               <input { ...rest } type='text' value={ value } onChange={ (event) => setValue(event.target.value) } />
+            </>) 
+         }
       </div>
    )
 }
@@ -99,7 +103,7 @@ export function InputTextArea({ label, placeholder, dataRef, initial, readOnlyOp
    }), [value]);
 
    return (
-      <div className={ styles.inputTextAreaWrapper }>
+      <div className={ styles.inputTextWrapper }>
          { (readOnlyOptions?.condition === true) ? (<>
             <h4>{ label }</h4>
             <p>{ value || readOnlyOptions.placeholder }</p>
