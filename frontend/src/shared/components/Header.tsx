@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './styles/header.module.scss';
 import { ButtonNarrowNav } from './Button.components';
-import useAuth from '@/features/auth/hooks/useAuth';
+import { useAuth } from '@/features/auth/providers/AuthProvider';
 
 interface NavigationNodeType {
    name: string,
@@ -41,19 +41,19 @@ const withDuration = (
 };
 
 export default function Header() {
-   const { authId } = useAuth();
+   const { session, sessionStatus } = useAuth();
 
    const navigation = useMemo<NavigationNodeType[][]>(() => [
       [
          { name: 'Home', href: '/' },
          { name: 'Recipes', href: '/recipes' },
          { name: 'Ingredients', href: '/ingredients' },
-         ...(authId !== null ? [{ name: 'Social', href: '/users' }] : []),
+         ...(sessionStatus === 'authenticated' ? [{ name: 'Social', href: '/users' }] : []),
          { name: 'About Project', href: '/about' },
       ],
       [
-         ...(authId !== null ? 
-            [{ name: 'Profile', href: `/users/${ authId }` }]
+         ...(sessionStatus === 'authenticated' ? 
+            [{ name: 'Profile', href: `/users/${ session.userId }` }]
          : 
             [
                { name: 'Login', href: '/auth/login' },
@@ -61,7 +61,7 @@ export default function Header() {
             ]
          ),
       ]
-   ], [authId]);
+   ], [sessionStatus]);
 
    const [navOpen, setNavOpen] = useState(false);
    const pathname = usePathname();

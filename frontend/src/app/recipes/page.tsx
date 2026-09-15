@@ -1,3 +1,4 @@
+import { verifySession } from "@/features/auth/server/session";
 import SearchRecipePage from "@/features/recipes/components/SearchRecipePage";
 
 export default async function SearchRecipe() {

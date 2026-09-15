@@ -4,12 +4,19 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ServiceStateType } from "../shared.types";
 
 export type ServiceMutationReturnType<TInput, TOutput> = ServiceStateType<TOutput> & {
-   send: (input: TInput) => Promise<TOutput>;
+   send: [TInput] extends [void] ? () => Promise<TOutput> : (input: TInput) => Promise<TOutput>;
    resetToIdle: () => void;
    overrideOutput: (output: TOutput) => void;
 }
 
-export function useServiceMutation<TInput, TOutput>(mutationFunction: (input: TInput) => Promise<TOutput>): ServiceMutationReturnType<TInput, TOutput> {
+// no-input overload
+export function useServiceMutation<TOutput>(mutationFunction: () => Promise<TOutput>): ServiceMutationReturnType<void, TOutput>;
+
+// required-input overload
+export function useServiceMutation<TInput, TOutput>(mutationFunction: (input: TInput) => Promise<TOutput>): ServiceMutationReturnType<TInput, TOutput>;
+
+// implementation
+export function useServiceMutation<TInput, TOutput>( mutationFunction: (input?: TInput) => Promise<TOutput> ): ServiceMutationReturnType<TInput, TOutput> {
    const [state, setState] = useState<ServiceStateType<TOutput>>({ status: 'idle' });
 
    const mutationFunctionRef = useRef(mutationFunction);
@@ -20,7 +27,7 @@ export function useServiceMutation<TInput, TOutput>(mutationFunction: (input: TI
    const requestIdRef = useRef(0);
 
    // returns data both directly and indirectly in case await is needed
-   const send = useCallback((input: TInput): Promise<TOutput> => {
+   const send = useCallback((input?: TInput): Promise<TOutput> => {
 
       // save a new requestId and compare with the Ref later
       const requestId = ++requestIdRef.current;
@@ -60,5 +67,5 @@ export function useServiceMutation<TInput, TOutput>(mutationFunction: (input: TI
       send, 
       resetToIdle,
       overrideOutput
-   };
+   } as ServiceMutationReturnType<TInput, TOutput>;
 }

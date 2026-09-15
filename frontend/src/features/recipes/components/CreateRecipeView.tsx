@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from 'react';
-import { RecipeType } from '../domain/recipes.types';
+import { RecipeDraft } from '../domain/recipes.types';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { DataHandle } from '@/shared/shared.types';
 import Notebook from '@/shared/components/Notebook';
@@ -16,7 +16,7 @@ import { recipeService } from '../services/recipes.service.client';
 import { useRouter } from 'next/navigation';
 
 interface ComponentParams {
-   recipe: Omit<RecipeType, '_id'>,
+   recipe: RecipeDraft
 }
 
 export default function CreateRecipeView({ recipe }: ComponentParams ) {
@@ -50,7 +50,7 @@ export default function CreateRecipeView({ recipe }: ComponentParams ) {
       <Notebook components={ {
          list: [
             <EditRecipeGeneralInfoView newRecipe={ !('_id' in recipe) } refs={ { title: refs.title, description: refs.description } } initial={ { title: recipe.title, description: recipe.description } } />,
-            <EditRecipeAdditionalInfoView refs={ { image: refs.image, visibility: refs.visibility } } initial={ { image: recipe.image || undefined, visibility: recipe.visibility } } />,
+            <EditRecipeAdditionalInfoView refs={ { image: refs.image, visibility: refs.visibility } } initial={ { image: undefined, visibility: recipe.visibility } } />,
             <EditRecipeIngredientsView refs={ { ingredientList: refs.ingredientList } } initial={ { ingredientList: recipe.ingredientList } } />,
             <EditRecipeInstructionsView refs={ { instructionList: refs.instructionList } } initial={ { instructionList: recipe.instructionList } } />,
             <EditRecipeFinalizeChangesView saveMutator={ saveMutator } deleteMutator={ deleteMutator } />,

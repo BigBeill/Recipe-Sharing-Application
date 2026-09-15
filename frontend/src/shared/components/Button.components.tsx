@@ -5,6 +5,7 @@ import Spinner from './icons/spinner';
 import { useState } from 'react';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useLoading } from '../hooks/loadingContext';
 
 
 export type ButtonIconType = React.ComponentPropsWithoutRef<'button'> & {
@@ -14,12 +15,13 @@ export type ButtonIconType = React.ComponentPropsWithoutRef<'button'> & {
 
 interface ButtonIconListProps {
    iconList: ButtonIconType[];
-   loadingState?: boolean;
+   showLoading?: boolean;
 }
 
-export function ButtonIconList ({ iconList, loadingState = false }: ButtonIconListProps) {
+export function ButtonIconList ({ iconList, showLoading = false }: ButtonIconListProps) {
+   const isLoading = showLoading && useLoading();
    return (
-      <div className={loadingState ? 'hidden' : undefined}>
+      <div className={isLoading ? 'hidden' : undefined}>
          { iconList.map(({ icon, label, ...rest }) => (
             <button key={ label } aria-label={ label } { ...rest } >
                <FontAwesomeIcon icon={ icon } />
@@ -68,14 +70,14 @@ export function ButtonNarrowNav({ navOpen, onClick }: ButtonNarrowNavParams ) {
 
 
 type ButtonOvalProps = React.ComponentPropsWithoutRef<'button'> & {
-   loadingState?: boolean;
+   showLoading?: boolean;
 };
 
-export function ButtonOval({ children, loadingState, ...rest }: ButtonOvalProps) {
-   const { className, ...domProps } = rest;
+export function ButtonOval({ children, className, showLoading = false, ...rest }: ButtonOvalProps) {
+   const isLoading = showLoading && useLoading();
    return (
-      <button className={[styles.buttonOval, loadingState && styles.loadingState, className].filter(Boolean).join(' ') } { ...domProps }>
-         { loadingState ? <Spinner /> : children }
+      <button className={[styles.buttonOval, isLoading && styles.loadingState, className].filter(Boolean).join(' ') } { ...rest }>
+         { isLoading ? <Spinner /> : children }
       </button>
    );
 }
@@ -85,10 +87,10 @@ export function ButtonOval({ children, loadingState, ...rest }: ButtonOvalProps)
 interface ButtonShieldedProps {
    message: string,
    onClick: () => void,
-   loadingState?: boolean
+   showLoading?: boolean
 }
 
-export function ButtonShielded({ message, onClick, loadingState }: ButtonShieldedProps) {
+export function ButtonShielded({ message, onClick, showLoading = false }: ButtonShieldedProps) {
    const [shielded, setShielded] = useState<boolean>(true);
 
    function attemptOnClick() {
@@ -98,7 +100,7 @@ export function ButtonShielded({ message, onClick, loadingState }: ButtonShielde
 
    return (
       <div className={ [styles.buttonShielded, shielded && styles.shielded].filter(Boolean).join(' ') } >
-         <ButtonOval loadingState={ loadingState } onClick={ attemptOnClick }>{ shielded ? message : `confirm ${ message }` }</ButtonOval>
+         <ButtonOval showLoading={ showLoading } onClick={ attemptOnClick }>{ shielded ? message : `confirm ${ message }` }</ButtonOval>
          <ButtonOval onClick={ () => setShielded(true) }>Cancel</ButtonOval>
       </div>
    );
