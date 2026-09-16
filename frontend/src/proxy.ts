@@ -15,7 +15,7 @@ function isStale(token: string | undefined): boolean {
    catch { return true; }
 }
 
-export async function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
 
    // check for an access token and pass the request along if it is valid
    const accessToken = request.cookies.get('accessToken')?.value;

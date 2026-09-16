@@ -16,7 +16,7 @@ type TypeBuildAuthResultOptions = { oldRefreshToken: string; expiresAt?: undefin
 export class AuthService {
    private readonly repository: AuthRepository;
 
-   constructor(authRepository: AuthRepository) {
+   constructor({ authRepository }: { authRepository: AuthRepository }) {
       this.repository = authRepository;
    }
 

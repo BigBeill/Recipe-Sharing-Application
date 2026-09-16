@@ -83,7 +83,7 @@ export default function RecipeFilterPage() {
          <InputText label='Name' value={ title } dataRef={ titleRef } placeholder='recipe name' />
          <IngredientSearch onSubmit={ ingredientList.addItem } />
 
-         <ButtonOval onClick={ handleFormSubmit }>search</ButtonOval>
+         <ButtonOval showLoading={ true } onClick={ handleFormSubmit }>search</ButtonOval>
       </NotebookPage>
    );
 }

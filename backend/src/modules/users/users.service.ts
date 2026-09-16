@@ -22,11 +22,6 @@ interface GetUserParams extends AuthIdParams{
    includeRelationship?: boolean;
 }
 
-interface SearchFoldersParams extends PaginationParams {
-   authId: string;
-   parentId?: string;
-}
-
 interface SearchUsersParams extends PaginationParams {
    authId?: string;
    _id?: string;
@@ -48,7 +43,12 @@ export class UsersService {
    private readonly recipesService: RecipesService;
    private readonly imagesService: ImagesService;
 
-   constructor(usersRepository: UsersRepository, authService: AuthService, recipesService: RecipesService, imagesService: ImagesService) {
+   constructor({ usersRepository, authService, recipesService, imagesService }: { 
+      usersRepository: UsersRepository, 
+      authService: AuthService, 
+      recipesService: RecipesService, 
+      imagesService: ImagesService 
+   }) {
       this.repository = usersRepository;
       this.authService = authService;
       this.recipesService = recipesService;

@@ -5,7 +5,6 @@ import GrowingText from '@/shared/components/GrowingText';
 import { RelationshipType, UserType } from '../domain/user.types';
 import ImageUploader from '@/features/images/components/ImageUploader';
 import { useRouter } from 'next/navigation';
-import useAuth from '@/features/auth/hooks/useAuth';
 import { unpackImage } from '@/features/images/services/image.services';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import styles from './profilePage.module.scss';
@@ -13,6 +12,8 @@ import { ButtonOval, ButtonShielded } from '@/shared/components/Button.component
 import { InputTextArea } from '@/shared/components/Input.components';
 import { DataHandle } from '@/shared/shared.types';
 import { userService } from '../services/user.service.client';
+import { useAuth } from '@/features/auth/providers/AuthProvider';
+import { LoadingProvider } from '@/shared/hooks/loadingContext';
 
 interface Props {
    initial: UserType
@@ -24,12 +25,13 @@ export default function ProfilePage({ initial }: Props) {
    const [modifiedUser, setModifiedUser] = useState<UserType | null>(null);
 
    const router = useRouter();
-   const { logout } = useAuth();
+   const { logoutSession } = useAuth();
 
    const bioRef = useRef<DataHandle<string>>(null);
    const imageRef = useRef<DataHandle<File | null>>(null);
 
-   const userMutator = useServiceMutation((newUser: UserType): Promise<UserType> => { return userService.update(newUser); })
+   // mutator for updating the user (when coming out of edit mode)
+   const userMutator = useServiceMutation((updatedUser: UserType): Promise<UserType> => { return userService.update(updatedUser); })
 
    async function saveChanges() {
       if (!modifiedUser) { return; }
@@ -61,7 +63,7 @@ export default function ProfilePage({ initial }: Props) {
 
    // handle logout function
    function handleLogout() {
-      logout()
+      logoutSession()
          .then(() => router.push('/login'));
    }
 
@@ -101,36 +103,38 @@ export default function ProfilePage({ initial }: Props) {
          <div> {/* styleDiv, should not contain anything */} </div>
 
          {/* display the appropriate set of two buttons */}
-         <div className="splitSpace">
-            { modifiedUser ? (
-               <>
-                  <ButtonShielded key='save' message='Save Changes' loadingState={ userMutator.status === 'loading' } onClick={ saveChanges } />
-                  <ButtonShielded key='delete' message='Delete Changes' onClick={ () => { setModifiedUser(null); } }/>
-               </>
-            ) : user.relationship?.type == "none" ? (
-               <>
-                  <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('requestReceived'); } }>Send friend request</ButtonOval>
-               </>
-            ) : user.relationship?.type == "friend" ? (
-               <>
-                  <ButtonShielded message='Remove Friend' loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('none') } } />
-               </>
-            ) : user.relationship?.type == "requestReceived" ? (
-               <>
-                  <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('none') } }>Cancel friend request</ButtonOval>
-               </>
-            ) : user.relationship?.type == "requestSent" ? (
-               <>
-                  <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('friend'); } }>Accept friend request</ButtonOval>
-                  <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('none'); } }>Reject friend request</ButtonOval>
-               </>
-            ) : user.relationship?.type == "self" ? (
-               <>
-                  <ButtonOval onClick={ () => { setModifiedUser(user); } }> edit account </ButtonOval>
-                  <ButtonShielded key='logout' message="logout" onClick={ () => { handleLogout(); } }/>
-               </>
-            ) : null }
-         </div>
+         <LoadingProvider value={ relationshipMutator.status === 'loading' || userMutator.status === 'loading' }>
+            <div className="splitSpace">
+               { modifiedUser ? (
+                  <>
+                     <ButtonShielded key='save' message='Save Changes' showLoading={ true } onClick={ saveChanges } />
+                     <ButtonShielded key='delete' message='Delete Changes' onClick={ () => { setModifiedUser(null); } }/>
+                  </>
+               ) : user.relationship?.type == "none" ? (
+                  <>
+                     <ButtonOval showLoading={ true } onClick={ () => { updateRelationship('requestReceived'); } }>Send friend request</ButtonOval>
+                  </>
+               ) : user.relationship?.type == "friend" ? (
+                  <>
+                     <ButtonShielded message='Remove Friend' showLoading={ true } onClick={ () => { updateRelationship('none') } } />
+                  </>
+               ) : user.relationship?.type == "requestReceived" ? (
+                  <>
+                     <ButtonOval showLoading={ true } onClick={ () => { updateRelationship('none') } }>Cancel friend request</ButtonOval>
+                  </>
+               ) : user.relationship?.type == "requestSent" ? (
+                  <>
+                     <ButtonOval showLoading={ true } onClick={ () => { updateRelationship('friend'); } }>Accept friend request</ButtonOval>
+                     <ButtonOval showLoading={ true } onClick={ () => { updateRelationship('none'); } }>Reject friend request</ButtonOval>
+                  </>
+               ) : user.relationship?.type == "self" ? (
+                  <>
+                     <ButtonOval onClick={ () => { setModifiedUser(user); } }> edit account </ButtonOval>
+                     <ButtonShielded key='logout' message="logout" onClick={ () => { handleLogout(); } }/>
+                  </>
+               ) : null }
+            </div>
+         </LoadingProvider>
 
       </div >
    )

@@ -21,9 +21,10 @@ export default function LandingPage() {
             </div>
             <AnimationCrooked>
                <MiniComponent>
-                  <LazyLoad serviceCall={ () => recipeService.get(featuredRecipeId) } >
-                     { (response) => <RecipePreview recipe={response} /> }
-                  </ LazyLoad>
+                  <LazyLoad renderChildren={ async () => {
+                     const recipe = await recipeService.get(featuredRecipeId);
+                     return <RecipePreview recipe={ recipe } />
+                  } } />
                </MiniComponent>
             </AnimationCrooked>
          </section>

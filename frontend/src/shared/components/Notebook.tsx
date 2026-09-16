@@ -4,14 +4,19 @@ import React, { useState, useEffect, ComponentPropsWithoutRef } from 'react';
 import PaginationBar from '@/shared/components/PaginationBar';
 import styles from './styles/notebook.module.scss';
 import { useSearchParams } from 'next/navigation';
-import { StateLoadingPage } from './stateComponents/Loading.states';
+import { StateLoadingInsert, StateLoadingPage } from './stateComponents/Loading.states';
 import { BrokenPaginatedListType } from '../shared.types';
 
-interface notebookParams {
+
+
+
+
+
+interface notebookProps {
    components: BrokenPaginatedListType<React.ReactNode>
 }
 
-export default function Notebook ({ components }: notebookParams) {
+export default function Notebook ({ components }: notebookProps) {
 
    const searchParams = useSearchParams();
    const page = Number(searchParams.get('page')) || 1;
@@ -30,18 +35,22 @@ export default function Notebook ({ components }: notebookParams) {
    const firstComponentIndex = currentIndex - components.firstItemIndex;
    const firstComponent = grabComponentFromList(firstComponentIndex);
    const secondComponent = grabComponentFromList(firstComponentIndex + 1);
-   const paginationBar = (components.count <= 2) ? null : <PaginationBar pageCount={ Math.ceil(components.count / 2) } />;
+   const paginationBar = (components.count <= 2) ? undefined : <PaginationBar pageCount={ Math.ceil(components.count / 2) } />;
    
    return <NotebookView firstComponent={ firstComponent } secondComponent={ secondComponent } paginationBar={ paginationBar } />;
 }
 
 
-interface NotebookProps {
+
+
+
+
+interface ViewProps {
    firstComponent?: React.ReactNode;
    secondComponent?: React.ReactNode;
-   paginationBar: React.ReactNode;
+   paginationBar?: React.ReactNode;
 }
-function NotebookView({firstComponent, secondComponent, paginationBar}: NotebookProps) {
+function NotebookView({firstComponent, secondComponent, paginationBar}: ViewProps) {
 
    // use States that keep track of whether the screen is too narrow to display both pages at once, and if so which page to display
    const [narrowScreen, setNarrowScreen] = useState<boolean>(false);
@@ -95,4 +104,15 @@ export function NotebookPage({ children, className, ...rest }: ComponentPropsWit
          { children }
       </div>
    );
+}
+
+
+
+
+
+
+export function NotebookSkelton() {
+   return (
+      <NotebookView firstComponent={ <StateLoadingInsert /> }/>
+   )
 }

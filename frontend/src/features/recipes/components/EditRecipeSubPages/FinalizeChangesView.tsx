@@ -14,14 +14,14 @@ export default function EditRecipeFinalizeChangesView({ saveMutator, deleteMutat
    return (
       <NotebookPage>
          <h2>Finalize Recipe Changes</h2>
-         <ButtonOval onClick={() => { saveMutator.send(undefined) } }>Save recipe</ButtonOval>
+         <ButtonOval onClick={() => { saveMutator.send() } }>Save recipe</ButtonOval>
 
          { (saveMutator.status === 'loading' || deleteMutator.status === 'loading') && <StateLoadingInsert /> }
          { saveMutator.status === 'error' && <InsertError error={ saveMutator.error } /> }
          { deleteMutator?.status === 'error' && <InsertError error={ deleteMutator.error}/> }
          
-         <ButtonShielded message="Save Recipe" onClick={ () => saveMutator.send(undefined) } />
-         <ButtonShielded message="Delete Recipe" onClick={ () => { deleteMutator.send(undefined) } } />
+         <ButtonShielded message="Save Recipe" onClick={ () => saveMutator.send() } />
+         <ButtonShielded message="Delete Recipe" onClick={ () => { deleteMutator.send() } } />
       </NotebookPage>
    );
 }

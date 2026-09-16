@@ -1,7 +1,6 @@
 import { NotFoundError, UnauthorizedError } from "../../common/types/error.types";
 import type { RecipeRecord } from "../../common/mongo-db/schemas/recipe.schema";
 import type AuthIdParams from "../../common/parameters/authId.parameters";
-import removeMongooseNoise from "../../common/utils/removeMongooseNoise";
 import type { ImagesService } from "../images/images.service";
 import type { IngredientsService } from "../ingredients/ingredients.service";
 import type { RecipesRepository } from "./recipes.repository";
@@ -25,7 +24,12 @@ export class RecipesService {
    private readonly ingredientsService: IngredientsService;
    private readonly permissionsService: PermissionsService;
 
-   constructor(recipesRepository: RecipesRepository, imagesService: ImagesService, ingredientsService: IngredientsService, permissionsService: PermissionsService) {
+   constructor({ recipesRepository, imagesService, ingredientsService, permissionsService }: { 
+      recipesRepository: RecipesRepository, 
+      imagesService: ImagesService, 
+      ingredientsService: IngredientsService, 
+      permissionsService: PermissionsService }
+   ) {
       this.repository = recipesRepository;
       this.imagesService = imagesService;
       this.ingredientsService = ingredientsService;
