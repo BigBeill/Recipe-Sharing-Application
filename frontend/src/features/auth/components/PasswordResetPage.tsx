@@ -10,6 +10,7 @@ import { InsertError } from '@/shared/components/stateComponents/InsertStateComp
 import { StateInfoInsert } from '@/shared/components/stateComponents/Info.states';
 import { useAuth } from '../providers/AuthProvider';
 
+/** Renders the URL-selected password-reset step while redirecting to the home route on mount. */
 export default function PasswordResetPage() {
    const [token, setToken] = useState<string | null>(null);
 

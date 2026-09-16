@@ -15,6 +15,7 @@ import { LoadingProvider } from '@/shared/hooks/loadingContext';
 
 const groupSize = 5
 
+/** Searches from URL filters, redirects guests from friends or personal searches, and shares loading state. */
 export default function SearchRecipePage() {
 
    const { sessionStatus } = useAuth();

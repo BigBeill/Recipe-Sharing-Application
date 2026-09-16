@@ -8,6 +8,7 @@ export type TypeSession = { userId: string; roles: string[] };
 
 const JWKS = createRemoteJWKSet(new URL(`${process.env.ELYSIA_URL}/.well-known/jwks.json`));
 
+/** Returns verified access-token claims, or `null` when the cookie is absent or verification fails. */
 export const verifySession = cache(async (): Promise<TypeSession | null> => {
 
    const token = (await cookies()).get('accessToken')?.value;

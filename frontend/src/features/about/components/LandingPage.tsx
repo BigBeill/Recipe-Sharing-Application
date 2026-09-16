@@ -6,6 +6,7 @@ import LazyLoad from "@/shared/components/LazyLoad";
 import RecipePreview from "@/features/recipes/components/RecipePreview";
 import { recipeService } from "@/features/recipes/services/recipes.service.server";
 
+/** Renders the landing content and resolves its featured recipe through the lazy-load boundary. */
 export default function LandingPage() {
 
    const featuredRecipeId = '6879a6901775cc14af3170ef';

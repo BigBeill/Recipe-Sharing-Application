@@ -19,6 +19,7 @@ interface ComponentParams {
    recipe: RecipeDraft
 }
 
+/** Renders a draft editor, starts its image input empty, and creates the harvested recipe on save. */
 export default function CreateRecipeView({ recipe }: ComponentParams ) {
 
    const router = useRouter();

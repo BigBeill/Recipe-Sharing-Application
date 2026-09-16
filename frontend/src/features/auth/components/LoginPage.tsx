@@ -15,6 +15,7 @@ interface TypeLoginData {
    rememberMe: boolean,
 }
 
+/** Renders login controls, updates the session after success, and redirects authenticated users home. */
 export default function LoginPage() {
 
    const router = useRouter();

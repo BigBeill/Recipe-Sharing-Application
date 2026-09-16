@@ -3,6 +3,7 @@ import CreateRecipeView from "@/features/recipes/components/CreateRecipeView";
 import { RecipeDraft } from "@/features/recipes/domain/recipes.types";
 import { redirect } from "next/navigation";
 
+/** Builds an authenticated user's blank recipe draft or redirects guests to login. */
 export default async function NewRecipe() {
 
    const session = await verifySession();

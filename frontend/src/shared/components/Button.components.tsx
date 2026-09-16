@@ -18,6 +18,7 @@ interface ButtonIconListProps {
    showLoading?: boolean;
 }
 
+/** Renders icon-only buttons and hides the list when its opted-in loading context is active. */
 export function ButtonIconList ({ iconList, showLoading = false }: ButtonIconListProps) {
    const isLoading = showLoading && useLoading();
    return (
@@ -73,6 +74,7 @@ type ButtonOvalProps = React.ComponentPropsWithoutRef<'button'> & {
    showLoading?: boolean;
 };
 
+/** Renders an oval button that can replace its content with the shared loading spinner. */
 export function ButtonOval({ children, className, showLoading = false, ...rest }: ButtonOvalProps) {
    const isLoading = showLoading && useLoading();
    return (
@@ -90,6 +92,7 @@ interface ButtonShieldedProps {
    showLoading?: boolean
 }
 
+/** Requires confirmation before invoking an action and can reflect the shared loading state. */
 export function ButtonShielded({ message, onClick, showLoading = false }: ButtonShieldedProps) {
    const [shielded, setShielded] = useState<boolean>(true);
 

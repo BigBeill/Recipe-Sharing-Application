@@ -10,6 +10,11 @@ export type ServiceMutationReturnType<TInput, TOutput> = ServiceStateType<TOutpu
 }
 
 // no-input overload
+/**
+ * Tracks an asynchronous mutation while preventing stale requests from replacing newer state.
+ * Each `send` call still returns its own result or normalized error; resetting or overriding the
+ * state also invalidates updates from requests already in flight.
+ */
 export function useServiceMutation<TOutput>(mutationFunction: () => Promise<TOutput>): ServiceMutationReturnType<void, TOutput>;
 
 // required-input overload

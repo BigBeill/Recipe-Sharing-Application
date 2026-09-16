@@ -40,6 +40,7 @@ const withDuration = (
    };
 };
 
+/** Renders responsive navigation with session-specific links and an animated active-link marker. */
 export default function Header() {
    const { session, sessionStatus } = useAuth();
 

@@ -3,6 +3,7 @@
 import { useAuth } from "@/features/auth/providers/AuthProvider";
 import { LinkPair } from "@/shared/components/Link.components";
 
+/** Selects account-entry or recipe-management links from the current session status. */
 export default function LandingPageLinks() {
    const { sessionStatus } = useAuth();
 

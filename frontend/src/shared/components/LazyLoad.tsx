@@ -8,6 +8,7 @@ interface LazyLoadProps {
    fallback?: React.ReactNode;
 }
 
+/** Resolves asynchronous content behind Suspense and maps rejected renders to error views. */
 export default function LazyLoad<T>({ renderChildren, fallback = <StateLoadingPage /> }: LazyLoadProps) {
    return (
       <Suspense fallback={ fallback }>
@@ -16,6 +17,7 @@ export default function LazyLoad<T>({ renderChildren, fallback = <StateLoadingPa
    )
 }
 
+/** Resolves content and distinguishes missing resources from other render failures. */
 async function LazyLoadPage({ renderChildren }: Omit<LazyLoadProps, "fallback">) {
    try {
       return await renderChildren();

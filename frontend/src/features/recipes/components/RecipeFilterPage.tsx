@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useRef } from "react";
 
+/** Renders URL-backed recipe filters whose search button can reflect the shared loading state. */
 export default function RecipeFilterPage() {
 
    const router = useRouter();

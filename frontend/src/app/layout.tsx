@@ -7,6 +7,7 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+/** Starts session verification and exposes its pending result through the application shell. */
 export default async function Layout({ children }: LayoutProps) {
    const sessionPromise = verifySession();
 

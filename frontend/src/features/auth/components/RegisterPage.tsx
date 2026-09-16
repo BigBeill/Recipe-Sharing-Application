@@ -16,6 +16,7 @@ interface TypeRegisterData {
    passwordTwo: string,
 }
 
+/** Renders registration controls, updates the session after success, and redirects authenticated users home. */
 export default function RegisterPage() {
 
    const router = useRouter();

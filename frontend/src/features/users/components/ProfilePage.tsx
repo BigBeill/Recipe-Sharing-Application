@@ -19,6 +19,7 @@ interface Props {
    initial: UserType
 }
 
+/** Renders profile and relationship controls while sharing mutation loading state with opted-in buttons. */
 export default function ProfilePage({ initial }: Props) {
 
    const [user, setUser] = useState<UserType>(initial);
@@ -61,7 +62,7 @@ export default function ProfilePage({ initial }: Props) {
       setUser((previous) => { return { ...previous, relationship: mutatedRelationship } });
    }
 
-   // handle logout function
+   /** Clears the session and navigates to the login route after logout succeeds. */
    function handleLogout() {
       logoutSession()
          .then(() => router.push('/login'));
