@@ -1,5 +1,5 @@
-import Notebook from "@/shared/components/Notebook";
+import { NotebookSkelton } from "@/shared/components/Notebook";
 
 export default function Loading() {
-   return <Notebook components={ { list: [], count: 1, firstItemIndex: 0 } } />
+   return <NotebookSkelton />
 }
