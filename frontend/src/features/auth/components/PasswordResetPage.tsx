@@ -7,18 +7,18 @@ import { ButtonOval } from '@/shared/components/Button.components';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
-import useAuth from '../hooks/useAuth';
 import { StateInfoInsert } from '@/shared/components/stateComponents/Info.states';
+import { useAuth } from '../providers/AuthProvider';
 
 export default function PasswordResetPage() {
    const [token, setToken] = useState<string | null>(null);
 
    const router = useRouter();
-   const { authId } = useAuth();
+   const { sessionStatus } = useAuth();
 
    useEffect(() => {
-      if (authId !== null) { router.replace("/"); }
-   }, [authId]);
+      if (sessionStatus) { router.replace('/'); }
+   },[sessionStatus]);
 
    useEffect(() => {
       // check for a token

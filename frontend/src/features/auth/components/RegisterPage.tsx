@@ -7,10 +7,10 @@ import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service.client';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
-import useAuth from '../hooks/useAuth';
+import { useAuth } from '../providers/AuthProvider';
 
 interface TypeRegisterData {
-   username: string,
+   name: string,
    email: string,
    passwordOne: string,
    passwordTwo: string,
@@ -19,22 +19,24 @@ interface TypeRegisterData {
 export default function RegisterPage() {
 
    const router = useRouter();
-   const { override: overrideAuth } = useAuth();
+   const { sessionStatus, overrideSession } = useAuth();
 
-   const [registerData, setRegisterData] = useState<TypeRegisterData>({ username: "", email: "", passwordOne: "", passwordTwo: "" });
-   const registerMutator = useServiceMutation((input: TypeRegisterData) => authService.register({ ...input, name: input.username }));
+   useEffect(() => {
+      if (sessionStatus === 'authenticated') { router.replace('/'); }
+   },[sessionStatus]);
+
+
+   const [registerData, setRegisterData] = useState<TypeRegisterData>({ name: "", email: "", passwordOne: "", passwordTwo: "" });
+   const registerMutator = useServiceMutation(async () => {
+      const response = await authService.register(registerData);
+      overrideSession({ userId: response._id, roles: [] });
+      router.replace('/');
+   });
 
    useEffect(() => {
       document.body.classList.add(styles.loginBackground);
       return () => { document.body.classList.remove(styles.loginBackground); }
    }, []);
-
-   useEffect(() => {
-      if (registerMutator.status === "ready") { 
-         overrideAuth(registerMutator.data._id)
-         router.replace('/');
-      }
-   }, [registerMutator.status]);
 
    useEffect(() => {
       registerMutator.resetToIdle();
@@ -50,9 +52,9 @@ export default function RegisterPage() {
                name="username"
                id="username"
                placeholder=' '
-               value={ registerData.username }
-               onChange={ (event) => setRegisterData((data) => ({...data, username: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(registerData) } } }
+               value={ registerData.name }
+               onChange={ (event) => setRegisterData((data) => ({...data, name: event.target.value })) }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send() } } }
             />
             <label htmlFor="username">Username</label>
          </div>
@@ -65,7 +67,7 @@ export default function RegisterPage() {
                placeholder=' '
                value={ registerData.email }
                onChange={ (event) => setRegisterData((data) => ({ ...data, email: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(registerData) } } }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send() } } }
             />
             <label htmlFor="email">Email</label>
          </div>
@@ -78,7 +80,7 @@ export default function RegisterPage() {
                placeholder=' '
                value={ registerData.passwordOne }
                onChange={ (event) => setRegisterData((data) => ({ ...data, passwordOne: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(registerData) } } }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send() } } }
             />
             <label htmlFor="passwordOne">Password</label>
          </div>
@@ -91,7 +93,7 @@ export default function RegisterPage() {
                placeholder=' '
                value={ registerData.passwordTwo }
                onChange={ (event) => setRegisterData((data) => ({ ...data, passwordTwo: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(registerData) } } }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send() } } }
             />
             <label htmlFor="passwordTwo">Confirm Password</label>
          </div>

@@ -8,12 +8,12 @@ interface LayoutProps {
 }
 
 export default async function Layout({ children }: LayoutProps) {
-   const session = await verifySession();
+   const sessionPromise = verifySession();
 
    return(
       <html lang="en">
          <body>
-            <AuthProvider initial={ session?.userId ?? null }>
+            <AuthProvider sessionPromise={ sessionPromise }>
                <Header />
                <main>
                   { children }

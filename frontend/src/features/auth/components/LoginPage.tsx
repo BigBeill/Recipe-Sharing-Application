@@ -7,10 +7,10 @@ import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service.client';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
-import useAuth from '../hooks/useAuth';
+import { useAuth } from '../providers/AuthProvider';
 
-interface FormDataType {
-   username: string,
+interface TypeLoginData {
+   name: string,
    password: string,
    rememberMe: boolean,
 }
@@ -18,21 +18,24 @@ interface FormDataType {
 export default function LoginPage() {
 
    const router = useRouter();
-   const { override: overrideAuth } = useAuth();
-   const [loginData, setLoginData] = useState<FormDataType>({ username: "", password: "", rememberMe: false });
-   const loginMutator = useServiceMutation((input: FormDataType) => authService.login({ ...input, name: input.username }));
+   const { sessionStatus, overrideSession } = useAuth();
+
+   useEffect(() => {
+      if (sessionStatus === 'authenticated') { router.replace('/'); }
+   },[sessionStatus]);
+
+   const [loginData, setLoginData] = useState<TypeLoginData>({ name: "", password: "", rememberMe: false });
+   
+   const loginMutator = useServiceMutation(async () => { 
+      const response = await authService.login(loginData);
+      overrideSession({ userId: response._id, roles: [] });
+      router.replace('/');
+   });
 
    useEffect(() => {
       document.body.classList.add(styles.loginBackground);
       return () => { document.body.classList.remove(styles.loginBackground); }
    }, []);
-
-   useEffect(() => {
-      if (loginMutator.status === "ready") { 
-         overrideAuth(loginMutator.data._id);
-         router.replace('/'); 
-      }
-   }, [loginMutator.status]);
 
    useEffect(() => {
       loginMutator.resetToIdle();
@@ -47,9 +50,9 @@ export default function LoginPage() {
                name="username"
                id="username"
                placeholder=' '
-               value={ loginData.username }
-               onChange={ (event) => setLoginData((data) => ({ ...data, username: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { loginMutator.send(loginData) } } }
+               value={ loginData.name }
+               onChange={ (event) => setLoginData((data) => ({ ...data, name: event.target.value })) }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { loginMutator.send() } } }
             />
             <label htmlFor="username">Username</label>
          </div>
@@ -62,7 +65,7 @@ export default function LoginPage() {
                placeholder=' '
                value={ loginData.password }
                onChange={ (event) => setLoginData((data) => ({ ...data, password: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { loginMutator.send(loginData) } } }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { loginMutator.send() } } }
             />
             <label htmlFor="password">Password</label>
          </div>
