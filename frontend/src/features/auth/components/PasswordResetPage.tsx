@@ -8,18 +8,10 @@ import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 import { StateInfoInsert } from '@/shared/components/stateComponents/Info.states';
-import { useAuth } from '../providers/AuthProvider';
 import { LoadingProvider } from '@/shared/hooks/loadingContext';
 
 export default function PasswordResetPage() {
    const [token, setToken] = useState<string | null>(null);
-
-   const router = useRouter();
-   const { sessionStatus } = useAuth();
-
-   useEffect(() => {
-      if (sessionStatus) { router.replace('/'); }
-   },[sessionStatus]);
 
    useEffect(() => {
       // check for a token
@@ -59,7 +51,7 @@ function GetEmail() {
    }, [formFields]);
 
    return (
-      <>
+      <LoadingProvider value={ passwordResetMutator.status === "loading" }>
          <div className={ styles.textInputWrapper }>
             <input 
                type="email"
@@ -90,7 +82,7 @@ function GetEmail() {
                A password reset link has been sent to your email!
             </StateInfoInsert>
          : null}
-      </>
+      </LoadingProvider>
    )
 }
 
