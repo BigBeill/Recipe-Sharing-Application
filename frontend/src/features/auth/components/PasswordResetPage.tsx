@@ -110,45 +110,42 @@ function GetNewPassword({ token }: {token: string}) {
 
    return (
       <LoadingProvider value={ resetPasswordMutator.status === 'loading' }>
-         <div className={ styles.loginForm } id='resetPasswordForm'>
-            <h1>Change Your Password</h1>
-            <div className={ styles.textInputWrapper }>
-               <input 
-                  type="password"
-                  name="newPassword"
-                  id="newPasswordOne"
-                  placeholder=' '
-                  onChange={(event) => { setFormFields((previous) => { return { ...previous, passwordOne: event.target.value } }) } }
-                  onKeyDown={(event) => { if (event.key === 'Enter') { resetPasswordMutator.send(); } }}
-               />
-               <label htmlFor="newPasswordOne">Enter New Password</label>
-            </div>
-            <div className={ styles.textInputWrapper }>
-               <input 
-                  type="password"
-                  name="newPasswordConfirm"
-                  id="newPasswordTwo"
-                  placeholder=' '
-                  onChange={(event) => { setFormFields((previous) => { return { ...previous, passwordTwo: event.target.value } }) } }
-                  onKeyDown={(event) => { if (event.key === 'Enter') { resetPasswordMutator.send(); } }}
-               />
-               <label htmlFor="newPasswordTwo">Re-Enter New Password</label>
-            </div>
-            <ButtonOval 
-               name="submit"
-               id="submitButton"
-               style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
-               onClick={ () => { resetPasswordMutator.send(); } }
-               showLoading={ true }
-            > Change Password </ButtonOval>
-
-            { resetPasswordMutator.status == 'error' &&
-               <InsertError error={ resetPasswordMutator.error } />
-            }
-
-            <p>Need a new link?</p>
-            <a href='/resetPassword'>Reset Password</a>
+         <div className={ styles.textInputWrapper }>
+            <input 
+               type="password"
+               name="newPassword"
+               id="newPasswordOne"
+               placeholder=' '
+               onChange={(event) => { setFormFields((previous) => { return { ...previous, passwordOne: event.target.value } }) } }
+               onKeyDown={(event) => { if (event.key === 'Enter') { resetPasswordMutator.send(); } }}
+            />
+            <label htmlFor="newPasswordOne">Enter New Password</label>
          </div>
+         <div className={ styles.textInputWrapper }>
+            <input 
+               type="password"
+               name="newPasswordConfirm"
+               id="newPasswordTwo"
+               placeholder=' '
+               onChange={(event) => { setFormFields((previous) => { return { ...previous, passwordTwo: event.target.value } }) } }
+               onKeyDown={(event) => { if (event.key === 'Enter') { resetPasswordMutator.send(); } }}
+            />
+            <label htmlFor="newPasswordTwo">Re-Enter New Password</label>
+         </div>
+         <ButtonOval 
+            name="submit"
+            id="submitButton"
+            style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
+            onClick={ () => { resetPasswordMutator.send(); } }
+            showLoading={ true }
+         > Change Password </ButtonOval>
+
+         { resetPasswordMutator.status == 'error' &&
+            <InsertError error={ resetPasswordMutator.error } />
+         }
+
+         <p>Need a new link?</p>
+         <a href='/resetPassword'>Reset Password</a>
       </LoadingProvider>
    );
 }

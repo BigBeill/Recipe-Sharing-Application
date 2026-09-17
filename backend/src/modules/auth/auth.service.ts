@@ -10,6 +10,7 @@ import type { DeleteResult } from 'mongoose';
 import removeMongooseNoise from '../../common/utils/removeMongooseNoise';
 import { generateRefreshToken, signAccessToken } from './tokenSigner';
 import { graceCache } from "./lib/refreshTokenGraceCache";
+import type { PasswordResetTokenRecord } from "../../common/mongo-db/schemas/passwordResetToken.schema";
 
 type TypeBuildAuthResultOptions = { oldRefreshToken: string; expiresAt?: undefined; } | { oldRefreshToken?: undefined; expiresAt: Date };
 
@@ -96,6 +97,7 @@ export class AuthService {
       const user = await this.repository.searchUserExact({ email: normalizedEmail });
       if (!user[0]) { throw new NotFoundError(`user containing { email: ${email} }`); }
       const userId = user[0]._id.toString();
+      const username = user[0].name;
 
       await this.cleanSavedTokens(userId);
 
@@ -103,7 +105,7 @@ export class AuthService {
       const tokenHash = new Bun.CryptoHasher("sha256").update(resetToken).digest("hex");
       await this.repository.createPasswordResetToken(userId, tokenHash);
 
-      await sendPasswordResetEmail(email, resetToken);
+      await sendPasswordResetEmail(email, { username, resetToken});
    }
 
    async verifyPassword(_id: string, password: string): Promise<boolean> {
@@ -117,18 +119,29 @@ export class AuthService {
    async resetPassword(password: string, resetToken: string): Promise<void> {
    
       const tokenHash = new Bun.CryptoHasher("sha256").update(resetToken).digest("hex");
-      const tokenHashRecord = await this.repository.getPasswordResetToken(tokenHash);
+
+      // fetch the reset token by hash
+      let tokenHashRecord: PasswordResetTokenRecord | null;
+      try { tokenHashRecord = await this.repository.getPasswordResetToken(tokenHash); }
+      catch (error) { 
+         console.log("auth.service.resetPassword failed to fetch token form the database:", error); 
+         throw new NotFoundError(""); 
+      }
 
       if (!tokenHashRecord) { throw new NotFoundError(""); }
-      const userId = tokenHashRecord.tokenHash
+      
+      // hash the new password and grab the userId its for
+      const hashedPassword = await hashPassword(password);
 
-      const [ hashedPassword ] = await Promise.all([
-         hashPassword(password),
+      // hahs the new password and remove any old instances of password reset requests
+      const userId = tokenHashRecord.userId.toString();
+      const [] = await Promise.all([
+         this.repository.updatePassword(userId, hashedPassword),
          this.repository.deletePasswordResetTokens(userId),
          this.repository.deleteRefreshTokensByUserId(userId),
       ]);
 
-      await this.repository.updatePassword(userId, hashedPassword);
+      return;
    }
 
    private async buildAuthResult(userId: string, options: TypeBuildAuthResultOptions): Promise<AuthResultType> {
