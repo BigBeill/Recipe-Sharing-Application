@@ -1,5 +1,7 @@
+import "server-only";
+
 import { ErrorNotFound } from "../lib/api/errorClasses";
-import { Suspense, use } from "react";
+import { Suspense } from "react";
 import { StateLoadingPage } from "./stateComponents/Loading.states";
 import StateErrorPage from "./stateComponents/Error.states";
 
@@ -13,12 +15,12 @@ export default function LazyLoad({ renderChildren, fallback = <StateLoadingPage 
       <Suspense fallback={ fallback }>
          <LazyLoadPage renderChildren={ renderChildren } />
       </Suspense>
-   )
+   );
 }
 
 async function LazyLoadPage({ renderChildren }: Omit<LazyLoadProps, "fallback">) {
    try {
-      return use(renderChildren());
+      return await renderChildren();
    }
    catch (error) {
       if (error instanceof ErrorNotFound) { 
