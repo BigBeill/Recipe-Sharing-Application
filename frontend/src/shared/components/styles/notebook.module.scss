@@ -96,9 +96,15 @@
 
 
 
+@layer defaults {
+  .notebookPage {
+    display: block;
+    overflow: scroll;
+  }
+}
+
 .notebookPage {
-   height: calc(100% - 2.4rem); width: calc(100% - 2.4rem);
-   display: block;
-   overflow: scroll;
-   padding: 1.2rem;
+  height: calc(100% - 2.4rem);
+  width: calc(100% - 2.4rem);
+  padding: 1.2rem;
 }

@@ -1,18 +1,16 @@
-import styles from './recipePreview.module.scss';
-import { RecipeType } from "../domain/recipes.types";
+import styles from './recipe.module.scss';
+import { RecipeType } from '../../domain/recipes.types';
 import GrowingText from "@/shared/components/GrowingText";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 
 
 
 /*
-This is very similar to recipePage.tsx except it puts everything on a single white page.
-Used for showing the contents of recipes where the full notebook doesn't make sense
+This is very similar to Recipe.page.tsx except it puts everything on a single white page.
+Used for displaying recipe as a plugin component, instead of the entire page dedicated to one recipe
 */
 
-
-
-export default function RecipePreview({ recipe }: { recipe: RecipeType }) {
+export default function RecipeComponent({ recipe }: { recipe: RecipeType }) {
 
    return (
       <div className={ styles.preview }>

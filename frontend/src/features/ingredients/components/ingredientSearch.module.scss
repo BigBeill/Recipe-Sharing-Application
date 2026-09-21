@@ -1,0 +1,22 @@
+.wrapper {
+   display: flex;
+   gap: 0.3rem;
+
+   .primaryInput {
+      flex: 1;
+   }
+}
+
+.submitButtonWrapper {
+   align-self: center;
+   
+   button {
+      font-size: 1.5rem;
+      background-color: transparent;
+      border: none;
+
+      &:hover {
+         cursor: pointer;
+      }
+   }
+}

@@ -1,5 +1,5 @@
 import { verifySession } from "@/features/auth/server/session";
-import CreateRecipeView from "@/features/recipes/components/CreateRecipeView";
+import CreateRecipePage from "@/features/recipes/view/pages/CreateRecipe.page";
 import { RecipeDraft } from "@/features/recipes/domain/recipes.types";
 import { redirect } from "next/navigation";
 
@@ -17,5 +17,5 @@ export default async function NewRecipe() {
       visibility: 'public',
    }
 
-   return <CreateRecipeView recipe={ defaultRecipe }/>
+   return <CreateRecipePage recipe={ defaultRecipe }/>
 }

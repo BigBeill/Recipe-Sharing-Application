@@ -1,25 +1,25 @@
 "use client"
 
 import { useRef } from 'react';
-import { RecipeType } from '../domain/recipes.types';
+import { RecipeType } from '../../domain/recipes.types';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { DataHandle } from '@/shared/shared.types';
 import Notebook from '@/shared/components/Notebook';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import harvestRefsObject from '@/shared/lib/harvestRefsObject';
-import EditRecipeFinalizeChangesView from './EditRecipeSubPages/FinalizeChangesView';
-import EditRecipeGeneralInfoView from './EditRecipeSubPages/GeneralInfoView';
-import EditRecipeAdditionalInfoView from './EditRecipeSubPages/AdditionalInfoView';
-import EditRecipeIngredientsView from './EditRecipeSubPages/IngredientsView';
-import EditRecipeInstructionsView from './EditRecipeSubPages/InstructionsView';
-import { recipeService } from '../services/recipes.service.client';
+import EditRecipeFinalizeChangesView from '../components/EditRecipePageComponents/FinalizeChangesView';
+import EditRecipeGeneralInfoView from '../components/EditRecipePageComponents/GeneralInfoView';
+import EditRecipeAdditionalInfoView from '../components/EditRecipePageComponents/AdditionalInfoView';
+import EditRecipeIngredientsView from '../components/EditRecipePageComponents/IngredientsView';
+import EditRecipeInstructionsView from '../components/EditRecipePageComponents/InstructionsView';
+import { recipeService } from '../../services/recipes.service.client';
 import { useRouter } from 'next/navigation';
 
 interface ComponentParams {
 	recipe: RecipeType
 }
 
-export default function EditRecipeView({ recipe }: ComponentParams ) {
+export default function EditRecipePage({ recipe }: ComponentParams ) {
 
 	const router = useRouter();
 

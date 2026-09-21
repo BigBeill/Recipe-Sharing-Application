@@ -1,0 +1,18 @@
+.notebookPage {
+   display: flex;
+   flex-direction: column;
+   overflow: hidden;
+}
+
+.input {
+   margin-top: 0rem;
+}
+
+.header {
+   margin-top: 3rem;
+   margin-bottom: 1.5rem
+}
+
+.submitButton {
+   margin-bottom: 3rem;
+}

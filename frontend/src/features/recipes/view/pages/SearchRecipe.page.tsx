@@ -1,15 +1,14 @@
 "use client"
 
-import React, { use, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import useServiceState from '@/shared/hooks/useServiceState';
 import Notebook from '@/shared/components/Notebook';
 import NotebookPageListItems from '@/shared/components/notebookPageComponents/ListItems';
-import RecipeFilterPage from './RecipeFilterPage';
+import RecipeFilterPage from '../components/RecipeFilter.component';
 import { BrokenPaginatedListType } from '@/shared/shared.types';
 import combinePaginatedLists from '@/shared/lib/combinePaginatedLists';
-import { recipeService } from '../services/recipes.service.client';
-import { TypeSession } from '@/features/auth/server/session';
+import { recipeService } from '../../services/recipes.service.client';
 import { useAuth } from '@/features/auth/providers/AuthProvider';
 import { LoadingProvider } from '@/shared/hooks/loadingContext';
 

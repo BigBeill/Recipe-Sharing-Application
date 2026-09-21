@@ -1,5 +1,6 @@
 "use client"
 
+import styles from "./recipeFilter.module.scss";
 import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import { ingredientService } from "@/features/ingredients/services/ingredient.service.client";
@@ -14,7 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useRef } from "react";
 
-export default function RecipeFilterPage() {
+export default function RecipeFilterComponent() {
 
    const router = useRouter();
    const pathname = usePathname();
@@ -77,13 +78,14 @@ export default function RecipeFilterPage() {
    }
 
    return (
-      <NotebookPage>
-         <h1>Public Recipes</h1>
+      <NotebookPage className={ styles.notebookPage }>
+         <h1 className={ styles.header } >Public Recipes</h1>
 
-         <InputText label='Name' value={ title } dataRef={ titleRef } placeholder='recipe name' />
-         <IngredientSearch onSubmit={ ingredientList.addItem } />
+         <InputText className={ styles.input } label='Name' value={ title } dataRef={ titleRef } placeholder='Search for a recipe by name' />
+         { ingredientList.htmlView }
+         <IngredientSearch placeholder='Describe an ingredient you would like to be include in your recipe' onSubmit={ ingredientList.addItem } />
 
-         <ButtonOval showLoading={ true } onClick={ handleFormSubmit }>search</ButtonOval>
+         <ButtonOval className={ styles.submitButton } showLoading={ true } onClick={ handleFormSubmit }>search</ButtonOval>
       </NotebookPage>
    );
 }

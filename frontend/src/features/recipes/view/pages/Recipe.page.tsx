@@ -1,7 +1,7 @@
 "use client"
 
-import styles from './recipePage.module.scss';
-import { RecipeType } from "../domain/recipes.types";
+import styles from './recipe.module.scss';
+import { RecipeType } from "../../domain/recipes.types";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { ComponentPropsWithoutRef, Ref, useRef } from "react";
 import Notebook, { NotebookPage } from "@/shared/components/Notebook";

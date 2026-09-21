@@ -1,19 +1,20 @@
 "use client"
 
+import style from './ingredientSearch.module.scss';
 import { useState } from "react";
 import { IngredientType } from "../domain/ingredient.types";
 import useServiceState from "@/shared/hooks/useServiceState";
 import { InputText } from "@/shared/components/Input.components";
 import { ButtonIconList } from "@/shared/components/Button.components";
-import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import { PaginatedListType } from "@/shared/shared.types";
 import { ingredientService } from "../services/ingredient.service.client";
 
-interface ComponentProps {
-   onSubmit: (ingredient: IngredientType) => void
+type ComponentProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onSubmit'> & {
+   onSubmit: (ingredient: IngredientType) => void;
 }
 
-export default function IngredientSearch({ onSubmit }: ComponentProps) {
+export default function IngredientSearch({ onSubmit, className, ...rest }: ComponentProps) {
 
    const defaultIngredient: IngredientType = { _id: 0, description: '' }
    
@@ -41,16 +42,16 @@ export default function IngredientSearch({ onSubmit }: ComponentProps) {
    }
 
    return (
-      <div>
-         <div>
-            <InputText label="Search Ingredient" onChange={ (event) => setSearchTerm(event.target.value) }/>
+      <div className={ [style.wrapper, className].filter(Boolean).join(" ") }>
+         <div className={style.primaryInput }>
+            <InputText label="Search Ingredient" onChange={ (event) => setSearchTerm(event.target.value) } { ...rest } />
             <ul className={`${ searchResults.count === 0 ? 'hidden' : '' }`}>
                { searchResults.list.map((ingredient, index) => (
                   <li key={index} onClick={ () => selectIngredient(ingredient) }> { ingredient.commonName ? ingredient.commonName : ingredient.description } </li>
                ))}
             </ul>
          </div>
-         <div className='svgButtonContainer'>
+         <div className={ style.submitButtonWrapper }>
             <ButtonIconList iconList={ [{ icon: faCircleCheck, label: 'Add Ingredient to List',  onClick: () => handleSubmit() }] } />
          </div>
       </div>
