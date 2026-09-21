@@ -1,13 +1,14 @@
-import { NotFoundError, UnauthorizedError } from "../../common/types/error.types";
-import type { RecipeRecord } from "../../common/mongo-db/schemas/recipe.schema";
-import type AuthIdParams from "../../common/parameters/authId.parameters";
-import type { ImagesService } from "../images/images.service";
-import type { IngredientsService } from "../ingredients/ingredients.service";
-import type { RecipesRepository } from "./recipes.repository";
-import type { NutritionType, RecipeType } from "./recipes.types";
-import type PaginationParams from "../../common/parameters/pagination.parameters";
-import type { PermissionsService } from "../permissions/permissions.service";
-import type { PaginatedListType } from "../../common/types/return.types";
+import { NotFoundError, UnauthorizedError } from "../../../common/types/error.types";
+import type { RecipeRecord } from "../../../database/schemas/recipe.schema";
+import type AuthIdParams from "../../../common/parameters/authId.parameters";
+import type { ImagesService } from "../../images/images.service";
+import type PaginationParams from "../../../common/parameters/pagination.parameters";
+import type { PermissionsService } from "../../permissions/permissions.service";
+import type { PaginatedListType } from "../../../common/types/return.types";
+import type { RecipesRepository } from "../infrastructure/recipes.repository";
+import type { IngredientsService } from "../../ingredients/application/ingredients.service";
+import type { TypeNutrition, TypeRecipe } from "../domain/recipes.types";
+import type { TypeRecipeIngredient } from "../../ingredients/domain/ingredients.types";
 
 interface GetRecipeListParams extends PaginationParams { 
    authId?: string,
@@ -38,18 +39,16 @@ export class RecipesService {
 
 
 
-   async createRecipe(recipe: Omit<RecipeType, '_id' | 'ownerId' | 'nutrition'> & {nutrition?: NutritionType}, params: AuthIdParams): Promise<RecipeType> {
+   async createRecipe(recipe: Omit<TypeRecipe, '_id' | 'ownerId' | 'nutrition'> & {nutrition?: TypeNutrition}, params: AuthIdParams): Promise<TypeRecipe> {
       const { authId } = params;
       if (!authId) { throw new UnauthorizedError(); }
 
       const [ image, nutrition ] = await Promise.all([
-         recipe.image
-            ? this.imagesService.saveImage("recipes", recipe.image.filename, authId)
-            : undefined,
-         this.ingredientsService.getNutrition(recipe.ingredientList)
+         recipe.image ? this.imagesService.saveImage("recipes", recipe.image.filename, authId) : undefined,
+         this.getNutrition(recipe.ingredientList),
       ]);
 
-      const completedRecipe = {
+      const completedRecipe: Omit<TypeRecipe, "_id"> = {
          ...recipe,
          ownerId: authId,
          image,
@@ -83,18 +82,32 @@ export class RecipesService {
       const recipes = await this.repository.searchRecipes({ ownerIdList: [ownerId], visibilityList: ['public', 'personal', 'private'] });
 
       // check for images associated with the recipes and then delete both the images and recipes
-      const promiseList = recipes.list.map(async (recipe) => {
+      await Promise.all(recipes.list.map(async (recipe) => {
          if (recipe.image) { await this.imagesService.deleteImage('recipes', recipe.image.filename); }
          await this.repository.deleteRecipe(recipe._id.toString());
-      });
+      }));
 
-      await Promise.all(promiseList);
       return true;
    }
 
 
 
-   async getRecipe(_id: string, { authId }: AuthIdParams): Promise<RecipeType> {
+   async getNutrition(ingredientList: TypeRecipeIngredient[]): Promise<TypeNutrition> {
+      const nutritionList = await Promise.all(ingredientList.map((ingredient) => this.ingredientsService.getNutrition(ingredient)));
+
+      // combine each ingredients nutritional value
+      return nutritionList.reduce(
+         (accumulator, nutrition) => {
+            for (const key of Object.keys(accumulator) as (keyof typeof accumulator)[]) { accumulator[key] += nutrition[key]; }
+            return accumulator;
+         }, 
+         { calories: 0, fat: 0, cholesterol: 0, sodium: 0, potassium: 0, carbohydrates: 0, fibre: 0, sugar: 0, protein: 0 }
+      );
+   }
+
+
+
+   async getRecipe(_id: string, { authId }: AuthIdParams): Promise<TypeRecipe> {
       const mongooseRecord = await this.repository.getRecipe(_id);
       if (!mongooseRecord) { throw new NotFoundError('Recipe not found')}
 
@@ -114,23 +127,23 @@ export class RecipesService {
 
 
 
-   async hydrateRecipe(record: RecipeRecord): Promise<RecipeType> {
+   async hydrateRecipe(record: RecipeRecord): Promise<TypeRecipe> {
       return {
          _id: record._id.toString(),
          ownerId: record.ownerId.toString(),
          title: record.title,
-         description: record.description ?? '',
-         image: record.image ?? undefined,
+         description: record.description,
+         image: record.image,
          ingredientList: await Promise.all(record.ingredientList.map(async (ingredient) => { return await this.ingredientsService.hydrateIngredient(ingredient); }) ),
          instructionList: record.instructionList,
-         nutrition: record.nutrition ?? undefined,
+         nutrition: record.nutrition,
          visibility: record.visibility,
       };
    }
 
 
 
-   async searchRecipes(params: GetRecipeListParams): Promise<PaginatedListType<RecipeType>> {
+   async searchRecipes(params: GetRecipeListParams): Promise<PaginatedListType<TypeRecipe>> {
       const { authId, title, ownerIdList = [], ingredientIdList, visibilityList = ['public'], skip = 0, limit = 12 } = params;
 
       let allowedOwnerIdList: string[] = ownerIdList;
@@ -160,7 +173,7 @@ export class RecipesService {
 
 
 
-   async updateRecipe(recipe: Omit<RecipeType, 'nutrition'> & {nutrition?: NutritionType}, params: AuthIdParams): Promise<boolean> {
+   async updateRecipe(recipe: Omit<TypeRecipe, 'nutrition'> & {nutrition?: TypeNutrition}, params: AuthIdParams): Promise<boolean> {
       const { authId } = params;
 
       const oldMongooseRecord = await this.repository.getRecipe(recipe._id);
@@ -183,7 +196,7 @@ export class RecipesService {
       }
 
       if (recalculateNutrition) {
-         recipe.nutrition = await this.ingredientsService.getNutrition(recipe.ingredientList);
+         recipe.nutrition = await this.getNutrition(recipe.ingredientList);
       }
 
       if (recipe.image && recipe.image.filename !== oldMongooseRecord.image?.filename) { await this.imagesService.saveImage('recipes', recipe.image.filename, authId); }

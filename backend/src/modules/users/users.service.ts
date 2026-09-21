@@ -1,6 +1,6 @@
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../common/types/error.types";
-import type { FriendRequestRecord } from "../../common/mongo-db/schemas/friendRequest.schema";
-import type { FriendshipRecord } from "../../common/mongo-db/schemas/friendship.schema";
+import type { FriendRequestRecord } from "../../database/schemas/friendRequest.schema";
+import type { FriendshipRecord } from "../../database/schemas/friendship.schema";
 import type AuthIdParams from "../../common/parameters/authId.parameters";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
 import type { PaginatedListType } from "../../common/types/return.types";
@@ -8,7 +8,7 @@ import removeMongooseNoise from "../../common/utils/removeMongooseNoise";
 import type { AuthService } from "../auth/auth.service";
 import type { ImagesService } from "../images/images.service";
 import type { ImageType } from "../images/images.types";
-import type { RecipesService } from "../recipes/recipes.service";
+import type { RecipesService } from "../recipes/application/recipes.service";
 import { UsersRepository } from "./users.repository";
 import type { UserType, RelationshipType } from "./users.types";
 import { buildConflictString } from "./users.utils";

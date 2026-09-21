@@ -1,19 +1,19 @@
-import type { ImageType } from "../images/images.types";
-import type { IngredientType } from "../ingredients/ingredients.types";
+import type { ImageType } from "../../images/images.types";
+import type { TypeRecipeIngredient } from "../../ingredients/domain/ingredients.types";
 
-export interface RecipeType {
+export interface TypeRecipe {
    _id: string;
    ownerId: string;
    title: string;
    description: string;
    image?: ImageType;
-   ingredientList: IngredientType[];
+   ingredientList: TypeRecipeIngredient[];
    instructionList: string[];
-   nutrition: NutritionType
+   nutrition: TypeNutrition;
    visibility: 'public' | 'private' | 'personal';
 }
 
-export interface NutritionType {
+export interface TypeNutrition {
    calories: number;
    fat: number;
    cholesterol: number;

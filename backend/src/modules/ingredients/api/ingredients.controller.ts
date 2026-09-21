@@ -1,15 +1,16 @@
 import Elysia from "elysia";
-import { ingredientsService } from "../../container";
-import { SearchValidator } from "./validators/search.validator";
-import { PostgresIdValidator } from "../../common/validators/postgresId.validator";
-import { SearchConversionValidator } from "./validators/searchConversion.validator";
-import type { PaginatedListType } from "../../common/types/return.types";
-import type { IngredientGroupType } from "./ingredients.types";
-import { GetValidator } from "./validators/get.validator";
+import { ingredientsService } from "../../../container";
+import { SearchValidator } from "../domain/validators/search.validator";
+import { PostgresIdValidator } from "../../../common/validators/postgresId.validator";
+import { SearchConversionValidator } from "../domain/validators/searchConversion.validator";
+import { GetValidator } from "../domain/validators/get.validator";
 
 const service = ingredientsService;
 
 export const ingredientsController = new Elysia({ prefix: '/ingredients' })
+
+
+
    .get( '/get/:_id',
       async ({ params, query }) => {
          const { _id } = params;
@@ -23,6 +24,9 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
          query: GetValidator,
       }
    )
+
+
+
    .get( '/search',
       async ({ query }) => {
          const { description, food_group_id, skip = 0, limit = 32 } = query;
@@ -35,10 +39,13 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
          query: SearchValidator
       }
    )
+
+
+
    .get( '/searchConversion',
       async ({ query }) => {
          const { food_id, skip = 0, limit = 32  } = query;
-         const conversionList = service.searchConversion(food_id, { skip, limit });
+         const conversionList = await service.searchConversion(food_id, { skip, limit });
          return { 
             data: conversionList 
          };
@@ -47,9 +54,12 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
          query: SearchConversionValidator,
       }
    )
+
+
+
    .get( '/searchGroup', 
       async () => {
-         const groupList: PaginatedListType<IngredientGroupType> = await service.searchGroup({});
+         const groupList = await service.searchGroup({});
          return {
             data: groupList 
          };

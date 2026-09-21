@@ -10,7 +10,7 @@ import type { DeleteResult } from 'mongoose';
 import removeMongooseNoise from '../../common/utils/removeMongooseNoise';
 import { generateRefreshToken, signAccessToken } from './tokenSigner';
 import { graceCache } from "./lib/refreshTokenGraceCache";
-import type { PasswordResetTokenRecord } from "../../common/mongo-db/schemas/passwordResetToken.schema";
+import type { PasswordResetTokenRecord } from "../../database/schemas/passwordResetToken.schema";
 
 type TypeBuildAuthResultOptions = { oldRefreshToken: string; expiresAt?: undefined; } | { oldRefreshToken?: undefined; expiresAt: Date };
 

@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { env } from './env';
+import { env } from '../../config/env';
 
 const postgresConnection = new Pool({
    host: env.POSTGRES_DB_HOST,

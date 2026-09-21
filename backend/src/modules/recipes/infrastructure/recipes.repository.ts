@@ -1,8 +1,9 @@
-import { RecipeModel, type RecipeRecord } from "../../common/mongo-db/schemas/recipe.schema";
-import type { PaginatedListType } from "../../common/types/return.types";
-import { escapeRegex } from "../../common/utils/filter";
-import type { RecipeType } from "./recipes.types";
-import { toStoredRecipe } from "./recipes.utils";
+import type { PaginatedListType } from "../../../common/types/return.types";
+import { escapeRegex } from "../../../common/utils/filter";
+import { RecipeModel, type RecipeRecord } from "../../../database/schemas/recipe.schema";
+import { dehydrateRecipe } from "../application/recipes.dehydrate";
+import type { TypeRecipe } from "../domain/recipes.types";
+
 
 interface GetRecipeListParams {
    title?: string;
@@ -15,19 +16,27 @@ interface GetRecipeListParams {
 
 export class RecipesRepository {
 
-   async createRecipe(recipe: Omit<RecipeType, '_id'>): Promise<RecipeRecord> {
-      const savedRecipe = await RecipeModel.create(toStoredRecipe(recipe));
+
+
+   async createRecipe(recipe: Omit<TypeRecipe, '_id'>): Promise<RecipeRecord> {
+      const savedRecipe = await RecipeModel.create(dehydrateRecipe(recipe));
       return savedRecipe.toObject();
    }
+
+
 
    async deleteRecipe(_id: string): Promise<void> {
       await RecipeModel.deleteOne({ _id });
    }
 
+
+   
    async getRecipe(_id: string): Promise<RecipeRecord | null> {
       return RecipeModel.findOne({ _id }).lean<RecipeRecord | null>();
    }
 
+
+   
    async searchRecipes(params: GetRecipeListParams): Promise<PaginatedListType<RecipeRecord>> {
       const { title, ownerIdList, ingredientIdList, visibilityList, skip, limit } = params;
       // quick safety check to make sure this function is being used correctly (not effective authorization)
@@ -72,10 +81,12 @@ export class RecipesRepository {
       return { list: recordList, count: countList[0]?.count || 0, firstItemIndex: skip ?? 0 };
    }
 
-   async updateRecipe(recipe: RecipeType): Promise<RecipeRecord | null> {
+
+
+   async updateRecipe(recipe: TypeRecipe): Promise<RecipeRecord | null> {
       const updatedRecipe = await RecipeModel.findByIdAndUpdate(
          recipe._id,
-         toStoredRecipe(recipe),
+         dehydrateRecipe(recipe),
          { runValidators: true }
       );
       return updatedRecipe?.toObject() ?? null;

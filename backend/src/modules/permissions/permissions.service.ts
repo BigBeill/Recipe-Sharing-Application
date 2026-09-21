@@ -1,5 +1,5 @@
-import type { FriendRequestRecord } from "../../common/mongo-db/schemas/friendRequest.schema";
-import type { FriendshipRecord } from "../../common/mongo-db/schemas/friendship.schema";
+import type { FriendRequestRecord } from "../../database/schemas/friendRequest.schema";
+import type { FriendshipRecord } from "../../database/schemas/friendship.schema";
 import type { UsersRepository } from "../users/users.repository";
 import type { RelationshipType } from "../users/users.types";
 

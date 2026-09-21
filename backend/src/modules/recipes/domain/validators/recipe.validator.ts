@@ -1,8 +1,8 @@
 import { t } from "elysia";
-import { IdValidator } from "../../../common/validators/id.validator";
+import { IdValidator } from "../../../../common/validators/id.validator";
 import { IngredientValidator } from "../../ingredients/validators/ingredient.validator";
-import { NutritionValidator } from "../../../common/validators/nutrition.validator";
-import { ImageLinkValidator } from "../../images/validators/imageLink.validator";
+import { NutritionValidator } from "../../../../common/validators/nutrition.validator";
+import { ImageLinkValidator } from "../../../images/validators/imageLink.validator";
 
 export const RecipeValidator = t.Object({
    recipe: t.Object({

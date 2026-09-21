@@ -1,4 +1,4 @@
-import type { UserRecord } from "../../common/mongo-db/schemas/user.schema";
+import type { UserRecord } from "../../database/schemas/user.schema";
 import { joinWithOxfordComma } from "../../common/utils/joinWithOxfordComma";
 import type { UserType } from "./users.types";
 

@@ -1,6 +1,6 @@
 import { Schema, Types, model, type HydratedDocument } from 'mongoose';
 import { ImageSchema } from './image.schema';
-import type { ImageType } from '../../../modules/images/images.types';
+import type { ImageType } from '../../modules/images/images.types';
 
 interface TypeTimestamps {
    createdAt: Date;

@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'bun:test'
 import mongoose from 'mongoose';
 import { app } from '../../app';
-import { UserModel } from '../../common/mongo-db/schemas/user.schema';
+import { UserModel } from '../../database/schemas/user.schema';
 
 describe('Auth module', () => {
    beforeAll(async () => {

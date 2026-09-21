@@ -1,10 +1,10 @@
 import Elysia from "elysia";
-import { authenticateMiddleware, authorizeMiddleware } from "../auth/auth.middleware";
-import { IdValidator } from "../../common/validators/id.validator";
-import { recipesService } from "../../container";
-import { SearchValidator } from "./validators/search.validator";
-import { AddRecipeValidator } from "./validators/addRecipe.Validator";
-import { RecipeValidator } from "./validators/recipe.validator";
+import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
+import { IdValidator } from "../../../common/validators/id.validator";
+import { recipesService } from "../../../container";
+import { SearchValidator } from "../domain/validators/search.validator";
+import { AddRecipeValidator } from "../domain/validators/addRecipe.Validator";
+import { RecipeValidator } from "../domain/validators/recipe.validator";
 
 const service = recipesService;
 

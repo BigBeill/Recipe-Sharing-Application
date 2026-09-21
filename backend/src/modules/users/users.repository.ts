@@ -1,6 +1,6 @@
-import { FriendRequestModel, type FriendRequestRecord } from "../../common/mongo-db/schemas/friendRequest.schema";
-import { FriendshipModel, type FriendshipRecord } from "../../common/mongo-db/schemas/friendship.schema";
-import { UserModel, type UserRecord } from "../../common/mongo-db/schemas/user.schema";
+import { FriendRequestModel, type FriendRequestRecord } from "../../database/schemas/friendRequest.schema";
+import { FriendshipModel, type FriendshipRecord } from "../../database/schemas/friendship.schema";
+import { UserModel, type UserRecord } from "../../database/schemas/user.schema";
 import type { ImageType } from "../images/images.types";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
 import type { PaginatedListType } from "../../common/types/return.types";

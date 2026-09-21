@@ -4,9 +4,9 @@ import { RecipesRepository } from "./modules/recipes/recipes.repository";
 import { UsersRepository } from "./modules/users/users.repository";
 import { AuthService } from "./modules/auth/auth.service";
 import { ImagesService } from "./modules/images/images.service";
-import { RecipesService } from "./modules/recipes/recipes.service";
+import { RecipesService } from "./modules/recipes/application/recipes.service";
 import { UsersService } from "./modules/users/users.service";
-import { IngredientsRepository } from "./modules/ingredients/ingredients.repository";
+import { IngredientsRepository } from "./modules/ingredients/data/ingredients.repository";
 import { IngredientsService } from "./modules/ingredients/ingredients.service";
 import { PermissionsService } from "./modules/permissions/permissions.service";
 
