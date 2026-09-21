@@ -12,7 +12,6 @@ export function unpackImage (packagedImage: PackagedImageType | undefined): Unpa
       alt: "",
       loading: "lazy" as const,
       onError: (error: React.SyntheticEvent<HTMLImageElement, Event>) => {
-         console.log("image failed do download attempting to get the fallback image:", FALLBACK_IMAGE)
          if (error.currentTarget.src.endsWith(FALLBACK_IMAGE)) { return; }
          error.currentTarget.onerror = null;
          error.currentTarget.src = FALLBACK_IMAGE;
