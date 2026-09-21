@@ -8,6 +8,7 @@ import Notebook, { NotebookPage } from "@/shared/components/Notebook";
 import { Fullscreen } from "@/shared/components/Fullscreen";
 import NutritionList from '@/features/ingredients/components/NutritionList';
 import { DataHandle } from '@/shared/shared.types';
+import BasicPage from '@/shared/components/basic/page';
 
 interface Props {
    recipe: RecipeType;
@@ -19,7 +20,14 @@ export default function RecipePage ({ recipe }: Props) {
 
    return (
       <>
-         <Notebook components={ { list: [<TitleView recipe={ recipe }/>, <InstructionView recipe={ recipe } onClick={ () => fullscreenRef.current!.setData(true) } />], count: 2, firstItemIndex: 0 } }/>
+         <Notebook components={ { 
+            list: [
+               <TitleView recipe={ recipe }/>, 
+               <InstructionView recipe={ recipe } onClick={ () => fullscreenRef.current!.setData(true) } />
+            ], 
+            count: 2, 
+            firstItemIndex: 0 
+         } }/>
 
          <FullscreenView recipe={ recipe } ref={ fullscreenRef } />
       </>
@@ -79,24 +87,25 @@ function InstructionView({ recipe, ...rest }: Props & ComponentPropsWithoutRef<'
 }
 
 function FullscreenView({ recipe, ref }: Props & { ref: Ref<DataHandle<boolean>> }) {
-
    return (
       <Fullscreen ref={ ref } >
-         <h1>{ recipe.title }</h1>
-         <ul >
-            { recipe.ingredientList.map((ingredient, index) => (
-               <li key={ index }>{ ingredient.portion?.amount } { ingredient.portion?.description} of { ingredient.description }</li>
-            )) }
-         </ul>
-         <h3>Instructions</h3>
-         <ol>
-            { recipe.instructionList.map((instruction, index) => (
-               <li key={ index }>
-                  <h4>Step { index + 1}</h4>
-                  <p>{ instruction }</p>
-               </li>
-            ))}
-         </ol>
+         <BasicPage>
+            <h1>{ recipe.title }</h1>
+            <ul >
+               { recipe.ingredientList.map((ingredient, index) => (
+                  <li key={ index }>{ ingredient.portion?.amount } { ingredient.portion?.description} of { ingredient.description }</li>
+               )) }
+            </ul>
+            <h3>Instructions</h3>
+            <ol>
+               { recipe.instructionList.map((instruction, index) => (
+                  <li key={ index }>
+                     <h4>Step { index + 1}</h4>
+                     <p>{ instruction }</p>
+                  </li>
+               ))}
+            </ol>
+         </BasicPage>
       </Fullscreen>
    );
 }
