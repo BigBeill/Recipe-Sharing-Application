@@ -1,6 +1,6 @@
 import { t } from "elysia";
-import { NutritionValidator } from "../../../common/validators/nutrition.validator";
-import { PostgresIdValidator } from "../../../common/validators/postgresId.validator";
+import { NutritionValidator } from "../../../../common/validators/nutrition.validator";
+import { PostgresIdValidator } from "../../../../common/validators/postgresId.validator";
 
 export const IngredientValidator = t.Object({
    ingredient: t.Object({
