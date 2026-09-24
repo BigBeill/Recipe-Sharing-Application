@@ -15,9 +15,6 @@ type ComponentProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onSubmit'> 
 }
 
 export default function IngredientSearch({ onSubmit, className, ...rest }: ComponentProps) {
-   const defaultIngredient: IngredientType = { _id: 0, description: '' }
-   
-   const [currentIngredient, setCurrentIngredient] = useState<IngredientType>(defaultIngredient);
    const [searchTerm, setSearchTerm] = useState('');
 
    const emptyIngredientOptions = { list: [], count: 0, firstItemIndex: 0 };
@@ -36,24 +33,22 @@ export default function IngredientSearch({ onSubmit, className, ...rest }: Compo
    // * set { currentIngredient } to the user selected ingredient
    function selectIngredient(ingredient: IngredientType) {
       setSearchTerm('');
-      setCurrentIngredient(ingredient);
       setIngredientOptions(emptyIngredientOptions)
+      handleSubmit(ingredient);
    }
 
-   // * pass { currentIngredient } to { onSubmit() }, and reset the component
-   // * if { currentIngredient } is null, grab the top ingredient form { ingredientOptions }
-   async function handleSubmit() {
-      if (currentIngredient._id !== 0) {
-         onSubmit(currentIngredient);
-         setCurrentIngredient(defaultIngredient);
+   // * pass { ingredient } to { onSubmit() }, and reset this component
+   // * if { ingredients } is not provided, grab the top ingredient form { ingredientOptions }
+   async function handleSubmit(ingredient?: IngredientType) {
+      if (ingredient) { onSubmit(ingredient); }
+      else {
+         const promise = ingredientOptionsState.waitForLoad();
+         setSearchTerm(''); // ? once promise has been grabbed let the user start entering a new ingredient while the app pulls this one
+         const ingredients = await promise;
+         if (ingredients.status !== 'ready') { throw new Error('could not grab ingredient'); }
+         if (ingredients.data.count == 0) { return; }
+         onSubmit(ingredients.data.list[0]); // ? submit the first item in the list returned
       }
-
-      const promise = ingredientOptionsState.waitForLoad();
-      setSearchTerm(''); // ? once promise has been grabbed let the user start entering a new ingredient while the app pulls this one
-      const ingredients = await promise;
-      if (ingredients.status !== 'ready') { throw new Error('could not grab ingredient'); }
-      if (ingredients.data.count == 0) { return; }
-      onSubmit(ingredients.data.list[0]); // ? submit the first item in the list returned
    }
 
    // * check if the key entered was an enter key --> { pass to handleSubmit() }
@@ -77,7 +72,7 @@ export default function IngredientSearch({ onSubmit, className, ...rest }: Compo
             { // ? hovering list --> exists when { ingredientOptions } isn't empty
                ingredientOptions.count > 0 ? (
                   <ul className={ styles.searchList }>
-                     { ingredientOptions.list.map((ingredient, index) => (
+                     { ingredientOptions.list.toReversed().map((ingredient, index) => (
                         <li 
                            key={index} 
                            onClick={ () => selectIngredient(ingredient) }

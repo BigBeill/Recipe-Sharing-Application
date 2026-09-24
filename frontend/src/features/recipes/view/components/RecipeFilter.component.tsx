@@ -30,9 +30,7 @@ export default function RecipeFilterComponent() {
    const ingredientListRef = useRef<DataHandle<IngredientType[]>>(null);
    const categoryRef = useRef<DataHandle<"public" | "friends" | "personal">>(null);
 
-   /*
-      Define ingredientList --> using useInteractableList
-   */
+   // * create and track a list of all user added ingredients
    const ingredientList = useInteractableList({
       initial: [],
       ref: ingredientListRef,
@@ -53,19 +51,16 @@ export default function RecipeFilterComponent() {
       ), 
    });
 
-   /*
-      Create useServiceState
-   */
+   // * get a list of all ingredients as listed by there id's in the url
    useServiceState(async () => {
-      // get ingredientList without any removed ingredients
       const urlIds = new Set(ingredientIdList);
       const prunedIngredientList = ingredientListRef.current!.getData().filter((ingredient) => urlIds.has(ingredient._id));
 
-      // get ingredientIdList without any already known ingredients
+      // ? get ingredientIdList without any already known ingredients
       const currentIds = new Set(ingredientListRef.current!.getData().map((ingredient) => ingredient._id));
       const newIdList = ingredientIdList.filter((id) => !currentIds.has(id));
 
-      // fetch all new ingredients from the server
+      // ? fetch all unknown ingredients from the server
       const newIngredientList = await Promise.all(
          newIdList.map((id) => {
             return ingredientService.get(id); 
@@ -75,11 +70,7 @@ export default function RecipeFilterComponent() {
       ingredientListRef.current!.setData([...prunedIngredientList, ...newIngredientList]);
    }, [ingredientIdList]);
 
-   /*
-      Define handleFromSubmit
-      Fetch user input'd title and ingredientList form references
-      Set fetched data inside URLSearchParams --> representing ingredients by their associated _id fields
-   */
+   // * grab user entered data from url and add them to { URLsearchParams }
    function handleFormSubmit() {
       const updatedParams = new URLSearchParams()
       const title = titleRef.current!.getData()

@@ -35,7 +35,7 @@
    padding: 0rem;
 
    li {
-      border-top: 1px black solid;
+      border-bottom: 1px black solid;
       margin: 0rem;
       padding: 0.15rem 1.2rem;
 
@@ -44,9 +44,9 @@
          background-color: lightgray !important;
       }
 
-      &:first-child {
+      &:last-child {
          background-color: $color-trinary;
-         border-top: none;
+         border-bottom: none;
          font-weight: bold;
       }
    }
