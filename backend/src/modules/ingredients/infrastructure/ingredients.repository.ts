@@ -107,11 +107,14 @@ export class IngredientsRepository {
 
 
    async  searchIngredients ({ description, food_group_id, skip = 0, limit }: GetIngredientList): Promise<PaginatedListType<TypeIngredient>> {
+      const descriptionConditionList = (description?.trim().split(/\s+/) ?? []).filter(Boolean).map((entry) => {
+         return { column: 'description', operation: 'ILIKE', value: `%${ entry }%` };
+      });
       const { list, count } = await postgresQueryBuilder<TypeIngredient>('SELECT * FROM food', { 
          where: [
-            description && { column: 'description', operation: 'ILIKE', value: `%${description}%` },
-            food_group_id && { column: 'food_group_id', operation: '=', value: `${food_group_id}` }
-         ].filter(Boolean) as { column: string; operation: string; value: string; }[],
+            ...descriptionConditionList,
+            ...(food_group_id ? [{ column: 'food_group_id', operation: '=', value: `${food_group_id}` }] : []),
+         ],
          skip: skip,
          limit: limit,
          includeCount: true
