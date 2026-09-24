@@ -5,12 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import useServiceState from '@/shared/hooks/useServiceState';
 import Notebook from '@/shared/components/Notebook';
 import NotebookPageListItems from '@/shared/components/notebookPageComponents/ListItems';
-import RecipeFilterPage from '../components/RecipeFilter.component';
 import { BrokenPaginatedListType } from '@/shared/shared.types';
 import combinePaginatedLists from '@/shared/lib/combinePaginatedLists';
 import { recipeService } from '../../services/recipes.service.client';
 import { useAuth } from '@/features/auth/providers/AuthProvider';
 import { LoadingProvider } from '@/shared/hooks/loadingContext';
+import RecipeFilterComponent from '../components/RecipeFilter.component';
 
 const groupSize = 5
 
@@ -31,8 +31,22 @@ export default function SearchRecipePage() {
       if (sessionStatus === 'guest' && (category === 'friends' || category === 'personal')) { router.replace('/auth/login'); }
    },[sessionStatus]);
 
-   const [notebookComponents, setNotebookComponents] = useState<BrokenPaginatedListType<React.ReactElement>>({ list: [<RecipeFilterPage />], count: 1, firstItemIndex: 0 });
+   /*
+      Define useState --> notebookComponents
+      Preload the first page of notebook --> using RecipeFilterComponent from '@features/recipes/view/components/RecipeFilter.component'
+   */
+   const [notebookComponents, setNotebookComponents] = useState<BrokenPaginatedListType<React.ReactElement>>({ 
+      list: [<RecipeFilterComponent />], 
+      count: 1, 
+      firstItemIndex: 0 
+   });
 
+   /*
+      Define ServiceState --> recipeListState
+      Fetch recipes from the server based on restrictions provided by searchParams
+      Store returned recipes inside NotebookComponents --> using CombinePaginatedLists from @/shared/lib/combinePaginatedLists 
+      Rerun function on SearchParams change
+   */
    const recipeListState = useServiceState(async () => {
 
       const firstComponent = Math.max((page - 1) * 2, 1); // index of the first component being added to notebookComponents

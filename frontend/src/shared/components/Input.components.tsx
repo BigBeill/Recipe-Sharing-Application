@@ -71,7 +71,7 @@ export function InputText({ className, label, dataRef, readOnlyOptions, initial,
          ) : (
             <>
                <label>{ label }</label>
-               <input { ...rest } type='text' value={ value } onChange={ (event) => setValue(event.target.value) } />
+               <input type='text' value={ value } onChange={ (event) => setValue(event.target.value) } { ...rest } />
             </>) 
          }
       </div>

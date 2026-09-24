@@ -20,6 +20,7 @@ export default function RecipeFilterComponent() {
    const router = useRouter();
    const pathname = usePathname();
    const searchParams = useSearchParams();
+
    const title = searchParams.get('title') || '';
    const ingredients = searchParams.get('ingredients');
    const ingredientIdList = useMemo(() => { return ingredients ? ingredients.split(',').map(Number) : [] }, [ingredients] );
@@ -29,6 +30,9 @@ export default function RecipeFilterComponent() {
    const ingredientListRef = useRef<DataHandle<IngredientType[]>>(null);
    const categoryRef = useRef<DataHandle<"public" | "friends" | "personal">>(null);
 
+   /*
+      Define ingredientList --> using useInteractableList
+   */
    const ingredientList = useInteractableList({
       initial: [],
       ref: ingredientListRef,
@@ -49,6 +53,9 @@ export default function RecipeFilterComponent() {
       ), 
    });
 
+   /*
+      Create useServiceState
+   */
    useServiceState(async () => {
       // get ingredientList without any removed ingredients
       const urlIds = new Set(ingredientIdList);
@@ -68,6 +75,11 @@ export default function RecipeFilterComponent() {
       ingredientListRef.current!.setData([...prunedIngredientList, ...newIngredientList]);
    }, [ingredientIdList]);
 
+   /*
+      Define handleFromSubmit
+      Fetch user input'd title and ingredientList form references
+      Set fetched data inside URLSearchParams --> representing ingredients by their associated _id fields
+   */
    function handleFormSubmit() {
       const updatedParams = new URLSearchParams()
       const title = titleRef.current!.getData()
