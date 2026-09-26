@@ -26,9 +26,10 @@ export function createRecipeService(api: TypeRecipeApi) {
 
       search: (params: TypeRecipeServiceSearchParams): Promise<PaginatedListType<RecipeType>> => {
          const { title, ingredientIdList, visibilityList, limit, skip } = params;
+         console.log(ingredientIdList)
          return api.search({ 
             ...(title ? { title } : undefined),
-            ...(ingredientIdList?.length !== 0 ? ingredientIdList : undefined), 
+            ...(ingredientIdList?.length !== 0 ? { ingredientIdList } : undefined), 
             visibilityList,
             limit,
             skip,

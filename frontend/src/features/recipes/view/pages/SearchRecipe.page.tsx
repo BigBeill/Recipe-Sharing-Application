@@ -41,12 +41,7 @@ export default function SearchRecipePage() {
       firstItemIndex: 0 
    });
 
-   /*
-      Define ServiceState --> recipeListState
-      Fetch recipes from the server based on restrictions provided by searchParams
-      Store returned recipes inside NotebookComponents --> using CombinePaginatedLists from @/shared/lib/combinePaginatedLists 
-      Rerun function on SearchParams change
-   */
+   //* Fetch recipes form the server --> useSearchParams as a filter
    const recipeListState = useServiceState(async () => {
 
       const firstComponent = Math.max((page - 1) * 2, 1); // index of the first component being added to notebookComponents
@@ -64,6 +59,8 @@ export default function SearchRecipePage() {
          skip: firstItem,
          limit: (page === 1 ? groupSize : groupSize * 2)
       });
+
+      console.log(response);
 
       let newComponents = []
 
