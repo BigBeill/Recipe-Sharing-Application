@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import useServiceState from "@/shared/hooks/useServiceState";
-import { BrokenPaginatedListType } from "@/shared/shared.types";
+import { BrokenPaginatedListType } from "@/shared/domain/shared.types";
 import UserFilterPage from "./UserFilterPage";
-import NotebookPageListItems from "@/shared/components/notebookPageComponents/ListItems";
+import NotebookPageListItems from "@/shared/view/components/notebookPageSpecific/ListItems.notebookComponent";
 import combinePaginatedLists from "@/shared/lib/combinePaginatedLists";
-import Notebook from "@/shared/components/Notebook";
 import { userService } from "../services/user.service.client";
+import useServiceState from "@/shared/lib/hooks/useServiceState";
+import NotebookPage from "@/shared/view/pages/Notebook.page";
 
 const groupSize = 5;
 
@@ -47,5 +47,5 @@ export default function SearchUserPage() {
    
    }, [searchParams]);
 
-   return <Notebook components={ notebookComponents } />
+   return <NotebookPage components={ notebookComponents } />
 }

@@ -4,16 +4,16 @@ import styles from "./recipeFilter.module.scss";
 import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import { ingredientService } from "@/features/ingredients/services/ingredient.service.client";
-import { ButtonOval } from "@/shared/components/Button.components";
-import { InputText } from "@/shared/components/Input.components";
-import { NotebookPage } from "@/shared/components/Notebook";
-import { useInteractableList } from "@/shared/hooks/useInteractableList";
-import useServiceState from "@/shared/hooks/useServiceState";
-import { DataHandle } from "@/shared/shared.types";
+import { InputText } from "@/shared/view/components/Input.components";
+import { DataHandle } from "@/shared/domain/shared.types";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useRef } from "react";
+import { useInteractableList } from "@/shared/lib/hooks/useInteractableList";
+import useServiceState from "@/shared/lib/hooks/useServiceState";
+import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
+import { ButtonOval } from "@/shared/view/components/Button.components";
 
 export default function RecipeFilterComponent() {
 
@@ -81,7 +81,7 @@ export default function RecipeFilterComponent() {
    }
 
    return (
-      <NotebookPage className={ styles.notebookPage }>
+      <NotebookComponentDefault className={ styles.notebookPage }>
          <h1 className={ styles.header } >Public Recipes</h1>
 
          <InputText className={ styles.input } label='Name' value={ title } dataRef={ titleRef } placeholder='Search for a recipe by name' />
@@ -89,6 +89,6 @@ export default function RecipeFilterComponent() {
          <IngredientSearch placeholder='Describe an ingredient you would like to be include in your recipe' onSubmit={ ingredientList.addItem } />
 
          <ButtonOval className={ styles.submitButton } showLoading={ true } onClick={ handleFormSubmit }>search</ButtonOval>
-      </NotebookPage>
+      </NotebookComponentDefault>
    );
 }

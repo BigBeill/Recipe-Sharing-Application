@@ -1,4 +1,4 @@
-import { PaginatedListType } from "@/shared/shared.types";
+import { PaginatedListType } from "@/shared/domain/shared.types";
 import { RelationshipType, UserType } from "../domain/user.types";
 import { createUserFormData } from "./user.utils";
 import type {

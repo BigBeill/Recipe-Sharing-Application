@@ -1,11 +1,11 @@
-import { ButtonOval } from "@/shared/components/Button.components";
-import { InputText } from "@/shared/components/Input.components";
-import { NotebookPage } from "@/shared/components/Notebook";
-import { useInteractableList } from "@/shared/hooks/useInteractableList";
-import { DataHandle } from "@/shared/shared.types";
+import { InputText } from "@/shared/view/components/Input.components";
+import { DataHandle } from "@/shared/domain/shared.types";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Ref, useRef } from "react";
+import { useInteractableList } from "@/shared/lib/hooks/useInteractableList";
+import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
+import { ButtonOval } from "@/shared/view/components/Button.components";
 
 interface ComponentProps {
    refs: {
@@ -49,7 +49,7 @@ export default function EditRecipeInstructionsView ({ refs, initial }: Component
    }
 
    return (
-      <NotebookPage>
+      <NotebookComponentDefault>
          <h2>Recipe Instructions</h2>
          { instructionList.htmlView }
 
@@ -59,6 +59,6 @@ export default function EditRecipeInstructionsView ({ refs, initial }: Component
             dataRef={ newInstructionRef }
          />
          <ButtonOval onClick={() => { addInstruction(); }}>Add Instruction</ButtonOval>
-      </NotebookPage>
+      </NotebookComponentDefault>
    )
 }

@@ -1,13 +1,13 @@
 "use client"
 
-import NotebookPageListItems from "@/shared/components/notebookPageComponents/ListItems";
-import Notebook from "@/shared/components/Notebook";
-import { BrokenPaginatedListType } from "@/shared/shared.types";
-import useServiceState from "@/shared/hooks/useServiceState";
+import NotebookPageListItems from "@/shared/view/components/notebookPageSpecific/ListItems.notebookComponent";
+import { BrokenPaginatedListType } from "@/shared/domain/shared.types";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import combinePaginatedLists from "@/shared/lib/combinePaginatedLists";
 import { ingredientService } from "../services/ingredient.service.client";
+import useServiceState from "@/shared/lib/hooks/useServiceState";
+import NotebookPage from "@/shared/view/pages/Notebook.page";
 
 const groupSize = 5;
 
@@ -44,5 +44,5 @@ export default function IngredientListPage({ ingredientGroupId }: PageProps) {
 
    }, [searchParams]);
 
-   return <Notebook components={ notebookComponents } />
+   return <NotebookPage components={ notebookComponents } />
 }

@@ -1,19 +1,19 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import GrowingText from '@/shared/components/GrowingText';
+import GrowingText from '@/shared/view/components/GrowingText.component';
 import { RelationshipType, UserType } from '../domain/user.types';
 import ImageUploader from '@/features/images/components/ImageUploader';
 import { useRouter } from 'next/navigation';
 import { unpackImage } from '@/features/images/services/image.services';
-import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import styles from './profilePage.module.scss';
-import { ButtonOval, ButtonShielded } from '@/shared/components/Button.components';
-import { InputTextArea } from '@/shared/components/Input.components';
-import { DataHandle } from '@/shared/shared.types';
+import { InputTextArea } from '@/shared/view/components/Input.components';
+import { DataHandle } from '@/shared/domain/shared.types';
 import { userService } from '../services/user.service.client';
 import { useAuth } from '@/features/auth/providers/AuthProvider';
-import { LoadingProvider } from '@/shared/hooks/loadingContext';
+import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
+import { LoadingProvider } from '@/shared/lib/hooks/loadingContext';
+import { ButtonOval, ButtonShielded } from '@/shared/view/components/Button.components';
 
 interface Props {
    initial: UserType

@@ -1,4 +1,4 @@
-import { PaginatedListType } from "@/shared/shared.types";
+import { PaginatedListType } from "@/shared/domain/shared.types";
 import { RecipeDraft, RecipeType } from "../domain/recipes.types";
 import { checkValidRecipeDraft, createRecipeFormData } from "./recipes.utils";
 import {

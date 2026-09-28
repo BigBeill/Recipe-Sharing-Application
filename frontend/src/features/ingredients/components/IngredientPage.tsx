@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { IngredientType } from "../domain/ingredient.types";
-import BasicPage from "@/shared/components/basic/page";
+import BasicPage from "@/shared/view/pages/Basic.page";
 
 export default function IngredientPage({ ingredient }: { ingredient: IngredientType }) {
 

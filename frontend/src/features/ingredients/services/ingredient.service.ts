@@ -1,5 +1,5 @@
 import { IngredientGroupType, IngredientType } from "../domain/ingredient.types";
-import { PaginatedListType } from "@/shared/shared.types";
+import { PaginatedListType } from "@/shared/domain/shared.types";
 import type {
    TypeIngredientApi,
    TypeIngredientServiceGetParams,

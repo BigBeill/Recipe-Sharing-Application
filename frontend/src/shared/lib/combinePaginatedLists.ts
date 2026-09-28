@@ -1,4 +1,4 @@
-import { BrokenPaginatedListType } from "../shared.types";
+import { BrokenPaginatedListType } from "../domain/shared.types";
 
 // * combine two paginated lists together
 // * Recommended use is for saving returns from the server on a paginated list, so if the user backtracks they don't need to wait for results to load before seeing old recipes

@@ -1,7 +1,7 @@
 import { IngredientGroupType } from "../domain/ingredient.types";
-import NotebookPageListItems from "@/shared/components/notebookPageComponents/ListItems";
-import Notebook from "@/shared/components/Notebook";
-import { PaginatedListType } from "@/shared/shared.types";
+import NotebookPageListItems from "@/shared/view/components/notebookPageSpecific/ListItems.notebookComponent";
+import { PaginatedListType } from "@/shared/domain/shared.types";
+import NotebookPage from "@/shared/view/pages/Notebook.page";
 
 const groupSize = 5;
 
@@ -19,5 +19,5 @@ export default function IngredientGroupPage({ ingredientGroups }: props) {
       notebookComponents.list.push(<NotebookPageListItems key={ groupStartIndex } itemList={ itemList } defaultListSize={ groupSize } />);
    }
 
-   return <Notebook components={ notebookComponents } />
+   return <NotebookPage components={ notebookComponents } />
 }

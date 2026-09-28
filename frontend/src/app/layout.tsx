@@ -1,7 +1,7 @@
 import AuthProvider from '@/features/auth/providers/AuthProvider';
 import '../shared/styles/globals.scss';
-import Header from '@/shared/components/Header';
 import { verifySession } from '@/features/auth/server/session';
+import Header from '@/shared/view/layout/Header.layout';
 
 interface LayoutProps {
   children: React.ReactNode;

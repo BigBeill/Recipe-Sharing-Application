@@ -3,9 +3,7 @@
 import { useRef } from 'react';
 import { RecipeDraft } from '../../domain/recipes.types';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
-import { DataHandle } from '@/shared/shared.types';
-import Notebook from '@/shared/components/Notebook';
-import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
+import { DataHandle } from '@/shared/domain/shared.types';
 import harvestRefsObject from '@/shared/lib/harvestRefsObject';
 import EditRecipeFinalizeChangesView from '../components/EditRecipePageComponents/FinalizeChangesView';
 import EditRecipeGeneralInfoView from '../components/EditRecipePageComponents/GeneralInfoView';
@@ -14,6 +12,8 @@ import EditRecipeIngredientsView from '../components/EditRecipePageComponents/In
 import EditRecipeInstructionsView from '../components/EditRecipePageComponents/InstructionsView';
 import { recipeService } from '../../services/recipes.service.client';
 import { useRouter } from 'next/navigation';
+import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
+import NotebookPage from '@/shared/view/pages/Notebook.page';
 
 interface ComponentParams {
    recipe: RecipeDraft
@@ -33,7 +33,7 @@ export default function CreateRecipePage({ recipe }: ComponentParams ) {
       instructionList: useRef<DataHandle<string[]>>(null),
    }
 
-   const saveMutator = useServiceMutation (async () => {
+   const saveMutator = useServiceMutation(async () => {
       await recipeService.create({
          ownerId: recipe.ownerId,
          ...harvestRefsObject(refs),
@@ -41,13 +41,13 @@ export default function CreateRecipePage({ recipe }: ComponentParams ) {
       router.push('/recipes');
    });
 
-   const deleteMutator = useServiceMutation (async () => {
+   const deleteMutator = useServiceMutation(async () => {
       router.replace('/recipes');
    });
 
    // call notebook and give it pageList
    return (
-      <Notebook components={ {
+      <NotebookPage components={ {
          list: [
             <EditRecipeGeneralInfoView newRecipe={ !('_id' in recipe) } refs={ { title: refs.title, description: refs.description } } initial={ { title: recipe.title, description: recipe.description } } />,
             <EditRecipeAdditionalInfoView refs={ { image: refs.image, visibility: refs.visibility } } initial={ { image: undefined, visibility: recipe.visibility } } />,

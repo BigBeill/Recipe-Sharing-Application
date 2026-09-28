@@ -1,10 +1,10 @@
-import MiniComponent from "@/shared/components/MiniComponent";
-import AnimationCrooked from "@/shared/animations/crooked.animation";
-import { LinkPair } from "@/shared/components/Link.components";
+import MiniComponent from "@/shared/view/components/Mini.component";
+import AnimationCrooked from "@/shared/view/animations/crooked.animation";
+import { LinkPair } from "@/shared/view/components/Link.components";
 import LandingPageLinks from "./LandingPageLinks";
-import LazyLoad from "@/shared/components/LazyLoad";
 import RecipeComponent from "@/features/recipes/view/components/Recipe.component";
 import { recipeService } from "@/features/recipes/services/recipes.service.server";
+import ServerLazyLoad from "@/shared/lib/lazyLoad/Server.lazyLoad";
 
 export default function LandingPage() {
 
@@ -21,7 +21,7 @@ export default function LandingPage() {
             </div>
             <AnimationCrooked>
                <MiniComponent>
-                  <LazyLoad renderChildren={ async () => {
+                  <ServerLazyLoad renderChildren={ async () => {
                      const recipe = await recipeService.get(featuredRecipeId);
                      return <RecipeComponent recipe={ recipe } />
                   } } />

@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import styles from './login.module.scss';
-import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service.client';
-import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
-import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 import { useAuth } from '../providers/AuthProvider';
-import { LoadingProvider } from '@/shared/hooks/loadingContext';
+import { ButtonOval } from '@/shared/view/components/Button.components';
+import { StateErrorInsert } from '@/shared/view/states/Error.states';
+import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
+import { LoadingProvider } from '@/shared/lib/hooks/loadingContext';
 
 interface TypeLoginData {
    name: string,
@@ -93,7 +93,7 @@ export default function LoginPage() {
             > Login </ButtonOval>
 
             { loginMutator.status == 'error' &&
-               <InsertError error={ loginMutator.error } />
+               <StateErrorInsert error={ loginMutator.error } />
             }
             
             <p>Don&apos;t have an account?</p>

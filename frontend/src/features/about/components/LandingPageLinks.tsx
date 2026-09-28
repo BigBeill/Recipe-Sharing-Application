@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/features/auth/providers/AuthProvider";
-import { LinkPair } from "@/shared/components/Link.components";
+import { LinkPair } from "@/shared/view/components/Link.components";
 
 export default function LandingPageLinks() {
    const { sessionStatus } = useAuth();

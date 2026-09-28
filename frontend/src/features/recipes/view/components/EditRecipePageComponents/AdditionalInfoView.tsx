@@ -1,9 +1,9 @@
 import ImageUploader from "@/features/images/components/ImageUploader";
 import { PackagedImageType } from "@/features/images/domain/image.types";
-import { InputRadioButtons } from "@/shared/components/Input.components";
-import { NotebookPage } from "@/shared/components/Notebook";
-import { DataHandle} from "@/shared/shared.types";
+import { InputRadioButtons } from "@/shared/view/components/Input.components";
+import { DataHandle} from "@/shared/domain/shared.types";
 import { Ref } from "react";
+import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 
 interface ComponentProps {
    refs: {
@@ -18,7 +18,7 @@ interface ComponentProps {
 
 export default function EditRecipeAdditionalInfoView ({ refs, initial }: ComponentProps) {
    return (
-      <NotebookPage>
+      <NotebookComponentDefault>
          <h2>Additional Information</h2>
 
          <div style={{ width: '12rem', height: '12rem', margin: '0rem 0rem 3rem 3rem' }}>
@@ -39,6 +39,6 @@ export default function EditRecipeAdditionalInfoView ({ refs, initial }: Compone
                { value: 'personal', label: "Personal - Only you can view this recipe" }
             ] }
          />
-      </NotebookPage>
+      </NotebookComponentDefault>
    )
 }

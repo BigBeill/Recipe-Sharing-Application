@@ -3,12 +3,12 @@
 import styles from './ingredientSearch.module.scss';
 import { useState } from "react";
 import { IngredientType } from "../domain/ingredient.types";
-import useServiceState from "@/shared/hooks/useServiceState";
-import { InputText } from "@/shared/components/Input.components";
-import { ButtonIconList } from "@/shared/components/Button.components";
+import { InputText } from "@/shared/view/components/Input.components";
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
-import { PaginatedListType } from "@/shared/shared.types";
+import { PaginatedListType } from "@/shared/domain/shared.types";
 import { ingredientService } from "../services/ingredient.service.client";
+import useServiceState from '@/shared/lib/hooks/useServiceState';
+import { ButtonIconList } from '@/shared/view/components/Button.components';
 
 type ComponentProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onSubmit'> & {
    onSubmit: (ingredient: IngredientType) => void;

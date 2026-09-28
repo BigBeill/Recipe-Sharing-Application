@@ -1,5 +1,4 @@
 import IngredientPage from "@/features/ingredients/components/IngredientPage";
-import { PopupModal } from "@/shared/components/PopupModal";
 import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import { ingredientService } from "@/features/ingredients/services/ingredient.service.server";
 import preRenderService from "@/shared/lib/preRenderService";
@@ -10,8 +9,6 @@ export default async function IngredientList({ params }: { params: Promise<{ Ing
    const ingredient: IngredientType = await preRenderService(() => { return ingredientService.get(ingredientId, { includeNutrition: true }) })
 
    return (
-      <PopupModal >
-         <IngredientPage ingredient={ ingredient } />;
-      </PopupModal>
+      <IngredientPage ingredient={ ingredient } />
    )
 }

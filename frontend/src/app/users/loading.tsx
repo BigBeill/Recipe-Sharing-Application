@@ -1,4 +1,4 @@
-import { StateLoadingPage } from "@/shared/components/stateComponents/Loading.states";
+import { StateLoadingPage } from "@/shared/view/states/Loading.states";
 
 export default function Loading() {
    return <StateLoadingPage />;

@@ -1,6 +1,6 @@
 import type { TypeApiCaller } from "@/shared/lib/api/types";
 import { RecipeType } from "../domain/recipes.types";
-import { PaginatedListType } from "@/shared/shared.types";
+import { PaginatedListType } from "@/shared/domain/shared.types";
 
 export type TypeRecipeServiceGetParams = { includeNutrients?: boolean; }
 export type TypeRecipeServiceSearchParams = {

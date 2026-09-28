@@ -6,7 +6,7 @@ import { useRef, useState, useEffect, Ref, useImperativeHandle } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { unpackImage } from "../services/image.services";
-import { DataHandle } from '@/shared/shared.types';
+import { DataHandle } from '@/shared/domain/shared.types';
 import { PackagedImageType } from '../domain/image.types';
 
 

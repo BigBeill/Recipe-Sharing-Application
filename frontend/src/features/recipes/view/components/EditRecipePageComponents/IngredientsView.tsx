@@ -3,11 +3,11 @@
 import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import { IngredientConversionType, IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import { ingredientService } from "@/features/ingredients/services/ingredient.service.client";
-import { ButtonOval } from "@/shared/components/Button.components";
-import { NotebookPage } from "@/shared/components/Notebook";
-import { useInteractableList } from "@/shared/hooks/useInteractableList";
-import useServiceState from "@/shared/hooks/useServiceState";
-import { DataHandle } from "@/shared/shared.types";
+import { DataHandle } from "@/shared/domain/shared.types";
+import { useInteractableList } from "@/shared/lib/hooks/useInteractableList";
+import useServiceState from "@/shared/lib/hooks/useServiceState";
+import { ButtonOval } from "@/shared/view/components/Button.components";
+import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Ref, useState } from "react";
@@ -61,7 +61,7 @@ export default function EditRecipeIngredientsView ({ refs, initial}: ComponentPr
    }
 
    return (
-      <NotebookPage>
+      <NotebookComponentDefault>
          <h2>Recipe Ingredients</h2>
          
          { ingredientList.htmlView }
@@ -93,6 +93,6 @@ export default function EditRecipeIngredientsView ({ refs, initial}: ComponentPr
 
          <button className="darkText additionalMargin" onClick={() => addIngredient()}>Add Ingredient</button>
 
-      </NotebookPage>
+      </NotebookComponentDefault>
    )
 }

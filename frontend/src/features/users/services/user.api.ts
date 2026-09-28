@@ -1,6 +1,6 @@
 import type { TypeApiCaller } from "@/shared/lib/api/types";
 import { RelationshipType, UserType } from "../domain/user.types"
-import { PaginatedListType } from "@/shared/shared.types";
+import { PaginatedListType } from "@/shared/domain/shared.types";
 
 export type TypeUserServiceGetParam = { includeRelationship: boolean };
 export type TypeUserServiceProcessFriendRequestParams = { accept: boolean; }

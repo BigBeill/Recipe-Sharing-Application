@@ -2,15 +2,15 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import useServiceState from '@/shared/hooks/useServiceState';
-import Notebook from '@/shared/components/Notebook';
-import NotebookPageListItems from '@/shared/components/notebookPageComponents/ListItems';
-import { BrokenPaginatedListType } from '@/shared/shared.types';
+import NotebookPageListItems from '@/shared/view/components/notebookPageSpecific/ListItems.notebookComponent';
+import { BrokenPaginatedListType } from '@/shared/domain/shared.types';
 import combinePaginatedLists from '@/shared/lib/combinePaginatedLists';
 import { recipeService } from '../../services/recipes.service.client';
 import { useAuth } from '@/features/auth/providers/AuthProvider';
-import { LoadingProvider } from '@/shared/hooks/loadingContext';
 import RecipeFilterComponent from '../components/RecipeFilter.component';
+import useServiceState from '@/shared/lib/hooks/useServiceState';
+import { LoadingProvider } from '@/shared/lib/hooks/loadingContext';
+import NotebookPage from '@/shared/view/pages/Notebook.page';
 
 const groupSize = 5
 
@@ -76,7 +76,7 @@ export default function SearchRecipePage() {
 
    return (
       <LoadingProvider value={ recipeListState.status === "loading" } >
-         <Notebook components={ notebookComponents } />
+         <NotebookPage components={ notebookComponents } />
       </LoadingProvider>
    );
 }

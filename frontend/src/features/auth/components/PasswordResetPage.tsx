@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { authService } from '../services/auth.service.client';
-import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
-import { ButtonOval } from '@/shared/components/Button.components';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
-import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
-import { StateInfoInsert } from '@/shared/components/stateComponents/Info.states';
-import { LoadingProvider } from '@/shared/hooks/loadingContext';
+import { StateInfoInsert } from '@/shared/view/states/Info.states';
+import { ButtonOval } from '@/shared/view/components/Button.components';
+import { StateErrorInsert } from '@/shared/view/states/Error.states';
+import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
+import { LoadingProvider } from '@/shared/lib/hooks/loadingContext';
 
 export default function PasswordResetPage() {
    const [token, setToken] = useState<string | null>(null);
@@ -74,7 +74,7 @@ function GetEmail() {
          >Change Password</ButtonOval>
          
          { passwordResetMutator.status == 'error' &&
-            <InsertError error={ passwordResetMutator.error } />
+            <StateErrorInsert error={ passwordResetMutator.error } />
          }
 
          { passwordResetMutator.status === "ready" ?
@@ -141,7 +141,7 @@ function GetNewPassword({ token }: {token: string}) {
          > Change Password </ButtonOval>
 
          { resetPasswordMutator.status == 'error' &&
-            <InsertError error={ resetPasswordMutator.error } />
+            <StateErrorInsert error={ resetPasswordMutator.error } />
          }
 
          <p>Need a new link?</p>

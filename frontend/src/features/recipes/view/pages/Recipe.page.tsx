@@ -4,11 +4,12 @@ import styles from './recipe.module.scss';
 import { RecipeType } from "../../domain/recipes.types";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { ComponentPropsWithoutRef, Ref, useRef } from "react";
-import Notebook, { NotebookPage } from "@/shared/components/Notebook";
-import { Fullscreen } from "@/shared/components/Fullscreen";
 import NutritionList from '@/features/ingredients/components/NutritionList';
-import { DataHandle } from '@/shared/shared.types';
-import BasicPage from '@/shared/components/basic/page';
+import { DataHandle } from '@/shared/domain/shared.types';
+import BasicPage from '@/shared/view/pages/Basic.page';
+import NotebookPage from '@/shared/view/pages/Notebook.page';
+import { NotebookComponentDefault } from '@/shared/view/components/notebookPageSpecific/default.notebookComponent';
+import { FullscreenPage } from '@/shared/view/pages/Fullscreen.page';
 
 interface Props {
    recipe: RecipeType;
@@ -20,7 +21,7 @@ export default function RecipePage ({ recipe }: Props) {
 
    return (
       <>
-         <Notebook components={ { 
+         <NotebookPage components={ { 
             list: [
                <TitleView recipe={ recipe }/>, 
                <InstructionView recipe={ recipe } onClick={ () => fullscreenRef.current!.setData(true) } />
@@ -36,7 +37,7 @@ export default function RecipePage ({ recipe }: Props) {
 
 function TitleView({ recipe }: Props) {
    return (
-      <NotebookPage>
+      <NotebookComponentDefault>
          <div className={ styles.wrapper } >
             <h2 className={ styles.heading2 }>{ recipe.title }</h2>
 
@@ -50,14 +51,14 @@ function TitleView({ recipe }: Props) {
                <p>{ recipe.description }</p>
             </div>
          </div>
-      </NotebookPage>
+      </NotebookComponentDefault>
    );
 }
 
 function InstructionView({ recipe, ...rest }: Props & ComponentPropsWithoutRef<'div'>) {
 
    return (
-      <NotebookPage { ...rest }>
+      <NotebookComponentDefault { ...rest }>
          <div className={ styles.wrapper } >
             <h2>How To Make</h2>
             <h3>Ingredients</h3>
@@ -82,13 +83,13 @@ function InstructionView({ recipe, ...rest }: Props & ComponentPropsWithoutRef<'
                )) }
             </ol>
          </div>
-      </NotebookPage>
+      </NotebookComponentDefault>
    )
 }
 
 function FullscreenView({ recipe, ref }: Props & { ref: Ref<DataHandle<boolean>> }) {
    return (
-      <Fullscreen ref={ ref } >
+      <FullscreenPage ref={ ref } >
          <BasicPage>
             <h1>{ recipe.title }</h1>
             <ul >
@@ -106,6 +107,6 @@ function FullscreenView({ recipe, ref }: Props & { ref: Ref<DataHandle<boolean>>
                ))}
             </ol>
          </BasicPage>
-      </Fullscreen>
+      </FullscreenPage>
    );
 }

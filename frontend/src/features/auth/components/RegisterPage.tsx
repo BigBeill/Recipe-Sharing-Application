@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
-import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service.client';
-import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
-import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 import { useAuth } from '../providers/AuthProvider';
-import { LoadingProvider } from '@/shared/hooks/loadingContext';
+import { ButtonOval } from '@/shared/view/components/Button.components';
+import { StateErrorInsert } from '@/shared/view/states/Error.states';
+import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
+import { LoadingProvider } from '@/shared/lib/hooks/loadingContext';
 
 interface TypeRegisterData {
    name: string,
@@ -109,7 +109,7 @@ export default function RegisterPage() {
             > Create Account </ButtonOval>
 
             { registerMutator.status == 'error' &&
-               <InsertError error={ registerMutator.error } />
+               <StateErrorInsert error={ registerMutator.error } />
             }
 
             <p>Already have an account?</p>
