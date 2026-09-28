@@ -1,7 +1,7 @@
 import type { DeleteResult } from "mongoose";
-import { RefreshTokenModel, type RefreshTokenRecord } from "../../common/mongo-db/schemas/refreshToken.schema";
-import { UserModel, type UserRecord } from "../../common/mongo-db/schemas/user.schema";
-import { PasswordResetTokenModel, type PasswordResetTokenRecord } from "../../common/mongo-db/schemas/passwordResetToken.schema";
+import { RefreshTokenModel, type RefreshTokenRecord } from "../../database/schemas/refreshToken.schema";
+import { UserModel, type UserRecord } from "../../database/schemas/user.schema";
+import { PasswordResetTokenModel, type PasswordResetTokenRecord } from "../../database/schemas/passwordResetToken.schema";
 
 type UserWithPassword = UserRecord & { passwordHash: string; };
 

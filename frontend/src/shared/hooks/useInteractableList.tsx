@@ -1,6 +1,6 @@
 import "client-only";
 
-import { Component, ReactNode, Ref, useImperativeHandle, useRef, useState } from 'react';
+import { ReactNode, Ref, useImperativeHandle, useRef, useState } from 'react';
 import styles from './styles/interactableList.module.scss'
 import { Reorder } from 'framer-motion';
 import { DataHandle } from "../shared.types";

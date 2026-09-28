@@ -53,7 +53,7 @@ type InputTextParams = React.ComponentPropsWithoutRef<'input'> & {
    }
 }
 
-export function InputText({ label, dataRef, readOnlyOptions, initial, ...rest }: InputTextParams) {
+export function InputText({ className, label, dataRef, readOnlyOptions, initial, ...rest }: InputTextParams) {
    const [value, setValue] = useState(initial || '');
 
    useImperativeHandle(dataRef, () => ({
@@ -62,7 +62,7 @@ export function InputText({ label, dataRef, readOnlyOptions, initial, ...rest }:
    }),[value]);
 
    return (
-      <div className={ styles.inputTextWrapper }>
+      <div className={ [styles.inputTextWrapper, className].filter(Boolean).join(" ") }>
          { (readOnlyOptions?.condition === true) ? (
             <>
                <h4>{ label }</h4>
@@ -71,7 +71,7 @@ export function InputText({ label, dataRef, readOnlyOptions, initial, ...rest }:
          ) : (
             <>
                <label>{ label }</label>
-               <input { ...rest } type='text' value={ value } onChange={ (event) => setValue(event.target.value) } />
+               <input type='text' value={ value } onChange={ (event) => setValue(event.target.value) } { ...rest } />
             </>) 
          }
       </div>

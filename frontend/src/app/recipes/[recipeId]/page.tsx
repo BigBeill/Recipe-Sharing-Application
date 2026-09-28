@@ -1,5 +1,6 @@
-import RecipePage from "@/features/recipes/components/RecipePage";
+
 import { recipeService } from "@/features/recipes/services/recipes.service.server";
+import RecipePage from "@/features/recipes/view/pages/Recipe.page";
 import preRenderService from "@/shared/lib/preRenderService";
 
 export default async function Page({ params }: { params: Promise<{recipeId: string}> }) {

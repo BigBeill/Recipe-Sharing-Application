@@ -1,0 +1,53 @@
+@use '../../../shared/styles/variables' as *;
+
+.wrapper {
+   display: flex;
+   gap: 0.3rem;
+
+   .searchBar {
+      flex: 1;
+      position: relative;
+   }
+}
+
+.submitButtonWrapper {
+   align-self: center;
+   
+   button {
+      font-size: 1.5rem;
+      background-color: transparent;
+      border: none;
+
+      &:hover {
+         cursor: pointer;
+      }
+   }
+}
+
+.searchList {
+   position: absolute;
+   left: 0;
+   bottom: 3.6rem;
+   background-color: $color-background;
+   box-shadow:  0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+   border: 1px black solid;
+   list-style: none;
+   padding: 0rem;
+
+   li {
+      border-bottom: 1px black solid;
+      margin: 0rem;
+      padding: 0.15rem 1.2rem;
+
+      &:hover {
+         cursor: pointer;
+         background-color: lightgray !important;
+      }
+
+      &:last-child {
+         background-color: $color-trinary;
+         border-bottom: none;
+         font-weight: bold;
+      }
+   }
+}

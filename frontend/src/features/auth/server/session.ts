@@ -21,7 +21,7 @@ export const verifySession = cache(async (): Promise<TypeSession | null> => {
       });
       return { userId: payload.sub as string, roles: (payload.roles as string[]) ?? [] };
    } catch (error) {
-      console.log('token failed:', error)
+      console.warn('token failed:', error)
       return null;
    }
 });

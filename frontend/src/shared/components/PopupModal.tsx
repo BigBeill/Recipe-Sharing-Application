@@ -1,8 +1,8 @@
 "use client"
 
-import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import styles from './styles/popupModal.module.scss'
+import { useRouter } from "next/navigation";
 
 export function PopupModal({ children }: { children: React.ReactNode }) {
    const dialogRef = useRef<HTMLDialogElement>(null);

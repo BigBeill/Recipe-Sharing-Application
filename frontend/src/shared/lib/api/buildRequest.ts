@@ -12,11 +12,13 @@ export default function buildRequest(config: TypeApiRequestConfig): TypePrepared
    let url = `${BASE_URL}${config.url}`;
 
    if (!hasBody && body && !isFormData) {
-      const query = new URLSearchParams(
-         Object.entries(body)
-            .filter(([, value]) => value != null)
-            .map(([key, value]) => [key, String(value)])
-      ).toString();
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(body)) {
+         if (value == null) { continue; }
+         if (Array.isArray(value)) { for (const item of value) params.append(key, String(item)); } 
+         else { params.append(key, String(value)); }
+      }
+      const query = params.toString();
       if (query) { url += `?${query}`; }
    }
 
