@@ -1,6 +1,6 @@
 import { Schema, Types, model, type HydratedDocument, type InferSchemaType } from 'mongoose';
 import { ImageSchema } from './image.schema';
-import type { NutritionType } from '../../modules/recipes/domain/recipes.types';
+import type { TypeNutrition } from '../../modules/recipes/domain/recipes.types';
 import type { ImageType } from '../../modules/images/images.types';
 
 interface TypeTimestamps {
@@ -21,7 +21,7 @@ interface TypeDatabaseRecipe {
     image?: ImageType;
     ingredientList: TypeDatabaseIngredient[];
     instructionList: string[];
-    nutrition: NutritionType;
+    nutrition: TypeNutrition;
     visibility: 'public' | 'private' | 'personal';
 }
 

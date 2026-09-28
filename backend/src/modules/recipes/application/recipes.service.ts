@@ -55,7 +55,7 @@ export class RecipesService {
          nutrition,
       }
 
-      const mongooseRecord = await this.repository.createRecipe(completedRecipe);
+      const mongooseRecord = await this.repository.create(completedRecipe);
 
       return {
          ...completedRecipe,
@@ -66,25 +66,25 @@ export class RecipesService {
 
 
    async deleteRecipe(_id: string, { authId }: AuthIdParams ): Promise<boolean> {
-      const recipe = await this.repository.getRecipe(_id);
+      const recipe = await this.repository.get(_id);
       if (!recipe) { throw new NotFoundError('Recipe not found'); }
       if (recipe.ownerId.toString() !== authId) { throw new UnauthorizedError(); }
       if (recipe.image) { await this.imagesService.deleteImage('recipes', recipe.image.filename); }
-      await this.repository.deleteRecipe(_id);
+      await this.repository.delete(_id);
       return true;
    }
 
 
 
-   async deleteManyRecipes(ownerId: string): Promise<boolean> {
+   async deleteManyRecipes(ownerId: string, { authId }: AuthIdParams): Promise<boolean> {
 
       // get all the recipes that need to be deleted
-      const recipes = await this.repository.searchRecipes({ ownerIdList: [ownerId], visibilityList: ['public', 'personal', 'private'] });
+      const recipes = await this.repository.search({ ownerIdList: [ownerId], authId,  visibilityList: ['public', 'personal', 'private'] });
 
       // check for images associated with the recipes and then delete both the images and recipes
       await Promise.all(recipes.list.map(async (recipe) => {
          if (recipe.image) { await this.imagesService.deleteImage('recipes', recipe.image.filename); }
-         await this.repository.deleteRecipe(recipe._id.toString());
+         await this.repository.delete(recipe._id.toString());
       }));
 
       return true;
@@ -108,7 +108,7 @@ export class RecipesService {
 
 
    async getRecipe(_id: string, { authId }: AuthIdParams): Promise<TypeRecipe> {
-      const mongooseRecord = await this.repository.getRecipe(_id);
+      const mongooseRecord = await this.repository.get(_id);
       if (!mongooseRecord) { throw new NotFoundError('Recipe not found')}
 
       // check for any reason a person should not be allowed to view this recipe
@@ -163,7 +163,7 @@ export class RecipesService {
          allowedOwnerIdList = allowedOwnerIdList.filter(item => ownerIdList.includes(item));
       }
 
-      const recipes = await this.repository.searchRecipes({ title, ownerIdList: allowedOwnerIdList, visibilityList, skip, limit });
+      const recipes = await this.repository.search({ title, authId, ownerIdList: allowedOwnerIdList, ingredientIdList, visibilityList, skip, limit });
 
       return {
          ...recipes,
@@ -176,7 +176,7 @@ export class RecipesService {
    async updateRecipe(recipe: Omit<TypeRecipe, 'nutrition'> & {nutrition?: TypeNutrition}, params: AuthIdParams): Promise<boolean> {
       const { authId } = params;
 
-      const oldMongooseRecord = await this.repository.getRecipe(recipe._id);
+      const oldMongooseRecord = await this.repository.get(recipe._id);
       if(!oldMongooseRecord) { throw new NotFoundError('recipe not found'); }
       if (oldMongooseRecord.ownerId.toString() !== authId) { throw new UnauthorizedError(); }
 
