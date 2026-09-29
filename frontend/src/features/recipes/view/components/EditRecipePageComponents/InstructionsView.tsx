@@ -1,11 +1,11 @@
-import { InputText } from "@/shared/view/components/Input.components";
 import { DataHandle } from "@/shared/domain/shared.types";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Ref, useRef } from "react";
+import { KeyboardEvent, Ref, useEffect, useRef } from "react";
 import { useInteractableList } from "@/shared/lib/hooks/useInteractableList";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { ButtonOval } from "@/shared/view/components/Button.components";
+import { InputString } from "@/shared/view/components/Input.components";
 
 interface ComponentProps {
    refs: {
@@ -18,26 +18,30 @@ interface ComponentProps {
 
 export default function EditRecipeInstructionsView ({ refs, initial }: ComponentProps) {
 
+   useEffect (() => {
+      console.log("instance of EditRecipeInstructionView created");
+   }, [])
+
    const newInstructionRef = useRef<DataHandle<string>>(null);
 
    const instructionList = useInteractableList({
       initial: initial.instructionList,
       ref: refs.instructionList,
       renderItemContent: (item: string) => (
-         <p>{item}</p>
+         <p>{ item }</p>
       ),
       renderItemOptions: (item: string, index: number) => (
          <FontAwesomeIcon 
             role='button'
-            tabIndex={0}
-            aria-label={`Remove instruction ${index + 1}`}
-            icon={faTrash} 
-            style={{color: "#575757",}} 
-            onClick={() => { instructionList.removeIndex(index) }} 
+            tabIndex={ 0 }
+            aria-label={ `Remove instruction ${index + 1}` }
+            icon={ faTrash } 
+            style={ { color: "#575757" } } 
+            onClick={ () => { instructionList.removeIndex(index) } } 
          />
       ),
       renderItemHeader: (item: string, index: number) => (
-         <h4>Step {index + 1} </h4>
+         <h4>Step { index + 1 } </h4>
       ),
    });
 
@@ -48,15 +52,21 @@ export default function EditRecipeInstructionsView ({ refs, initial }: Component
       newInstructionRef.current!.setData('');
    }
 
+   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+      if (event.key === 'Enter') { addInstruction() }
+   }
+
    return (
-      <NotebookComponentDefault>
+      <NotebookComponentDefault style={ { display: 'flex', flexDirection: 'column' } }>
          <h2>Recipe Instructions</h2>
          { instructionList.htmlView }
 
-         <InputText
+         <InputString
+            type="text"
             label="New Instruction"
             placeholder="add a new instruction"
-            dataRef={ newInstructionRef }
+            onKeyDown={ (event) => { handleKeyDown(event) } }
+            ref={ newInstructionRef }
          />
          <ButtonOval onClick={() => { addInstruction(); }}>Add Instruction</ButtonOval>
       </NotebookComponentDefault>

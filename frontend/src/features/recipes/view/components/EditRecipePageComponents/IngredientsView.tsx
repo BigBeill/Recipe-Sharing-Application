@@ -1,8 +1,8 @@
 "use client"
 
-import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import { IngredientConversionType, IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import { ingredientService } from "@/features/ingredients/services/ingredient.service.client";
+import IngredientSearch from "@/features/ingredients/view/components/IngredientSearch.component";
 import { DataHandle } from "@/shared/domain/shared.types";
 import { useInteractableList } from "@/shared/lib/hooks/useInteractableList";
 import useServiceState from "@/shared/lib/hooks/useServiceState";
@@ -61,7 +61,7 @@ export default function EditRecipeIngredientsView ({ refs, initial}: ComponentPr
    }
 
    return (
-      <NotebookComponentDefault>
+      <NotebookComponentDefault style={ { display: 'flex', flexDirection: 'column' } }>
          <h2>Recipe Ingredients</h2>
          
          { ingredientList.htmlView }
@@ -90,8 +90,6 @@ export default function EditRecipeIngredientsView ({ refs, initial}: ComponentPr
          <ButtonOval onClick={ () => addIngredient } >
             Add Ingredient
          </ButtonOval>
-
-         <button className="darkText additionalMargin" onClick={() => addIngredient()}>Add Ingredient</button>
 
       </NotebookComponentDefault>
    )

@@ -1,11 +1,11 @@
 "use client"
 
-import { InputText } from "@/shared/view/components/Input.components";
 import { DataHandle } from "@/shared/domain/shared.types";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useRef } from "react";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { ButtonOval } from "@/shared/view/components/Button.components";
+import { InputString } from "@/shared/view/components/Input.components";
 
 export default function UserFilterPage() {
 
@@ -31,8 +31,8 @@ export default function UserFilterPage() {
       <NotebookComponentDefault>
          <h1>Filter Users</h1>
 
-         <InputText label='User ID' initial={ userId } dataRef={ userIdRef } placeholder="search by user ID" />
-         <InputText label='Name' initial={ name } dataRef={ nameRef } placeholder='search by name' />
+         <InputString type='text' label='User ID' initial={ userId } ref={ userIdRef } placeholder="search by user ID" />
+         <InputString type='text' label='Name' initial={ name } ref={ nameRef } placeholder='search by name' />
 
          <ButtonOval onClick={ handleFormSubmit }>search</ButtonOval>
       </NotebookComponentDefault>

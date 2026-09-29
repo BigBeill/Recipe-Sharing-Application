@@ -1,9 +1,9 @@
 import "client-only";
 
-import { ReactNode, Ref, useImperativeHandle, useRef, useState } from 'react';
+import { ReactNode, Ref, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import styles from './styles/interactableList.module.scss'
 import { Reorder } from 'framer-motion';
-import { DataHandle } from "../domain/shared.types";
+import { DataHandle } from "@/shared/domain/shared.types";
 
 interface InteractableListActions<T> {
    addItem: (item: T) => void;
@@ -24,6 +24,10 @@ interface ListItem<T> {
 }
 
 export function useInteractableList<T>({ initial, ref, renderItemContent, renderItemOptions, renderItemHeader }: ComponentProps<T>) {
+
+   useEffect (() => {
+      console.log("instance of useInteractableList created");
+   }, [])
 
    const nextId = useRef(0); // for simplicity, once an ID has been assigned, it will never be reassigned in this list, even if deleted (unless a list reset happens)
    const [list, setList] = useState<ListItem<T>[]>(() => assignIds(initial));
@@ -56,18 +60,19 @@ export function useInteractableList<T>({ initial, ref, renderItemContent, render
    const htmlView = (
       <Reorder.Group className={ styles.interactableList } axis='y' values={list} onReorder={setList}>
          { list.map((item, index) => (
-            <Reorder.Item key={ item.id } value={ item } className={ styles.item }>
+            <Reorder.Item key={ item.id } value={ item } className={ styles.listItem }>
                { renderItemHeader && (
                   <div className={ styles.header }>
                      { renderItemHeader(item.content, index, actions) }
                   </div>
                ) }
-
-               <div className={styles.options }>
-                  { renderItemOptions(item.content, index, actions) }
-               </div>
-               <div className={ styles.content }>
-                  { renderItemContent(item.content, index, actions) }
+               <div className={ styles.body }>
+                  <div className={styles.options }>
+                     { renderItemOptions(item.content, index, actions) }
+                  </div>
+                  <div className={ styles.content }>
+                     { renderItemContent(item.content, index, actions) }
+                  </div>
                </div>
             </Reorder.Item>
          )) }

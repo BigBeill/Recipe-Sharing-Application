@@ -4,12 +4,12 @@ import styles from './recipe.module.scss';
 import { RecipeType } from "../../domain/recipes.types";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { ComponentPropsWithoutRef, Ref, useRef } from "react";
-import NutritionList from '@/features/ingredients/components/NutritionList';
 import { DataHandle } from '@/shared/domain/shared.types';
 import BasicPage from '@/shared/view/pages/Basic.page';
 import NotebookPage from '@/shared/view/pages/Notebook.page';
 import { NotebookComponentDefault } from '@/shared/view/components/notebookPageSpecific/default.notebookComponent';
 import { FullscreenPage } from '@/shared/view/pages/Fullscreen.page';
+import NutritionList from '@/features/ingredients/view/components/NutritionList.component';
 
 interface Props {
    recipe: RecipeType;

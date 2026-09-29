@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react";
-import { IngredientType } from "../domain/ingredient.types";
 import BasicPage from "@/shared/view/pages/Basic.page";
+import { IngredientType } from "../../domain/ingredient.types";
 
 export default function IngredientPage({ ingredient }: { ingredient: IngredientType }) {
 

@@ -1,6 +1,7 @@
-import { StateNotFoundPage } from "@/shared/view/states/NotFound.states";
+import { ErrorNotFound } from "@/shared/lib/api/errorClasses";
+import StateErrorPage from "@/shared/view/states/Error.states";
 
 export default function NotFoundPage() {
 
-   return <StateNotFoundPage />
+   return <StateErrorPage error={ new ErrorNotFound() } />
 }

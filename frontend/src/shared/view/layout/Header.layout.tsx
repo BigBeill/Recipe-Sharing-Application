@@ -49,7 +49,7 @@ export default function Header() {
          { name: 'Recipes', href: '/recipes' },
          { name: 'Ingredients', href: '/ingredients' },
          ...(sessionStatus === 'authenticated' ? [{ name: 'Social', href: '/users' }] : []),
-         { name: 'About Project', href: '/about' },
+         ...(sessionStatus === 'authenticated' ? [{ name: 'CreateRecipe', href: '/recipes/new' }] : [{ name: 'About Project', href: '/about' }]),
       ],
       [
          ...(sessionStatus === 'authenticated' ? 

@@ -100,7 +100,7 @@ export function ButtonShielded({ message, onClick, showLoading = false }: Button
 
    return (
       <div className={ [styles.buttonShielded, shielded && styles.shielded].filter(Boolean).join(' ') } >
-         <ButtonOval showLoading={ showLoading } onClick={ attemptOnClick }>{ shielded ? message : `confirm ${ message }` }</ButtonOval>
+         <ButtonOval showLoading={ showLoading } onClick={ attemptOnClick }>{ shielded ? message : `Confirm ${ message }` }</ButtonOval>
          <ButtonOval onClick={ () => setShielded(true) }>Cancel</ButtonOval>
       </div>
    );

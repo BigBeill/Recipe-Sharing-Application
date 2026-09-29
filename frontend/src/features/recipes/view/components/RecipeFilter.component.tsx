@@ -1,10 +1,8 @@
 "use client"
 
 import styles from "./recipeFilter.module.scss";
-import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import { ingredientService } from "@/features/ingredients/services/ingredient.service.client";
-import { InputText } from "@/shared/view/components/Input.components";
 import { DataHandle } from "@/shared/domain/shared.types";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,6 +12,8 @@ import { useInteractableList } from "@/shared/lib/hooks/useInteractableList";
 import useServiceState from "@/shared/lib/hooks/useServiceState";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { ButtonOval } from "@/shared/view/components/Button.components";
+import IngredientSearch from "@/features/ingredients/view/components/IngredientSearch.component";
+import { InputString } from "@/shared/view/components/Input.components";
 
 export default function RecipeFilterComponent() {
 
@@ -84,7 +84,7 @@ export default function RecipeFilterComponent() {
       <NotebookComponentDefault className={ styles.notebookPage }>
          <h1 className={ styles.header } >Public Recipes</h1>
 
-         <InputText className={ styles.input } label='Name' value={ title } dataRef={ titleRef } placeholder='Search for a recipe by name' />
+         <InputString type='text' className={ styles.input } label='Name' initial={ title } ref={ titleRef } placeholder='Search for a recipe by name' />
          { ingredientList.htmlView }
          <IngredientSearch placeholder='Describe an ingredient you would like to be include in your recipe' onSubmit={ ingredientList.addItem } />
 

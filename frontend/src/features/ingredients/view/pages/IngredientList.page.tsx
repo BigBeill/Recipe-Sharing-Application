@@ -5,9 +5,9 @@ import { BrokenPaginatedListType } from "@/shared/domain/shared.types";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import combinePaginatedLists from "@/shared/lib/combinePaginatedLists";
-import { ingredientService } from "../services/ingredient.service.client";
 import useServiceState from "@/shared/lib/hooks/useServiceState";
 import NotebookPage from "@/shared/view/pages/Notebook.page";
+import { ingredientService } from "../../services/ingredient.service.client";
 
 const groupSize = 5;
 

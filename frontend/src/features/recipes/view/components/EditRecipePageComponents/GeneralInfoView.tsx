@@ -1,7 +1,7 @@
-import { InputText, InputTextArea } from "@/shared/view/components/Input.components";
 import { DataHandle } from "@/shared/domain/shared.types";
 import { Ref } from "react";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
+import { InputString } from "@/shared/view/components/Input.components";
 
 interface ComponentProps {
 	newRecipe: boolean;
@@ -20,8 +20,8 @@ export default function EditRecipeGeneralInfoView ({ newRecipe, refs, initial }:
 		<NotebookComponentDefault>
 			<h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>
 
-			<InputText label='Title' dataRef={ refs.title } initial={ initial.title } placeholder="give your title a recipe" />
-			<InputTextArea label='Description' dataRef={ refs.description } initial={ initial.description } placeholder='describe your recipe' />
+			<InputString type='text' label='Title' ref={ refs.title } initial={ initial.title } placeholder="Give your recipe a name" />
+			<InputString type='textarea' label='Description' ref={ refs.description } initial={ initial.description } placeholder='Describe your recipe' />
 		</NotebookComponentDefault>
 	)
 }

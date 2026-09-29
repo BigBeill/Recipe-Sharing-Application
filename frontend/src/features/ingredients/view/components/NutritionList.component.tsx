@@ -1,5 +1,5 @@
-import styles from './NutritionList.module.scss';
-import{ TypeNutrition } from "../domain/ingredient.types";
+import { TypeNutrition } from '../../domain/ingredient.types';
+import styles from './styles/NutritionList.module.scss';
 
 type Props = React.ComponentPropsWithoutRef<'div'> & {
    nutrition?: TypeNutrition;

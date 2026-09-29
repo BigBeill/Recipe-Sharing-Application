@@ -1,20 +1,23 @@
 "use client"
 
-import styles from './ingredientSearch.module.scss';
+import styles from './styles/ingredientSearch.module.scss';
 import { useState } from "react";
-import { IngredientType } from "../domain/ingredient.types";
-import { InputText } from "@/shared/view/components/Input.components";
+import { InputString } from "@/shared/view/components/Input.components";
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import { PaginatedListType } from "@/shared/domain/shared.types";
-import { ingredientService } from "../services/ingredient.service.client";
 import useServiceState from '@/shared/lib/hooks/useServiceState';
 import { ButtonIconList } from '@/shared/view/components/Button.components';
+import { IngredientType } from '../../domain/ingredient.types';
+import { ingredientService } from '../../services/ingredient.service.client';
 
-type ComponentProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onSubmit'> & {
+type ComponentProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onSubmit' | 'type'> & {
+   extendedRequirements?: boolean
    onSubmit: (ingredient: IngredientType) => void;
 }
 
-export default function IngredientSearch({ onSubmit, className, ...rest }: ComponentProps) {
+export default function IngredientSearch({ extendedRequirements = false, onSubmit, className, ...rest }: ComponentProps) {
+   
+   const [ingredient, setIngredient] = useState<IngredientType | null>(null); // Used if { extendedRequirements } is true
    const [searchTerm, setSearchTerm] = useState('');
 
    const emptyIngredientOptions = { list: [], count: 0, firstItemIndex: 0 };
@@ -61,12 +64,14 @@ export default function IngredientSearch({ onSubmit, className, ...rest }: Compo
 
          <div className={styles.searchBar }>
 
-            <InputText 
+            <InputString
+               type="text"
                label="Search Ingredient" 
-               value={ searchTerm } 
+               value={ searchTerm }
+               placeholder='Describe your ingredient'
                onChange={ (event) => setSearchTerm(event.target.value) } 
                onKeyDown={ handleKeyDown } // ? Clicking enter will grab the current top ingredient in the list and submit it
-               { ...rest } 
+               { ...rest }
             />
 
             { // ? hovering list --> exists when { ingredientOptions } isn't empty

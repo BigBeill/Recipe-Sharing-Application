@@ -7,13 +7,13 @@ import ImageUploader from '@/features/images/components/ImageUploader';
 import { useRouter } from 'next/navigation';
 import { unpackImage } from '@/features/images/services/image.services';
 import styles from './profilePage.module.scss';
-import { InputTextArea } from '@/shared/view/components/Input.components';
 import { DataHandle } from '@/shared/domain/shared.types';
 import { userService } from '../services/user.service.client';
 import { useAuth } from '@/features/auth/providers/AuthProvider';
 import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
 import { LoadingProvider } from '@/shared/lib/hooks/loadingContext';
 import { ButtonOval, ButtonShielded } from '@/shared/view/components/Button.components';
+import { InputString } from '@/shared/view/components/Input.components';
 
 interface Props {
    initial: UserType
@@ -89,10 +89,11 @@ export default function ProfilePage({ initial }: Props) {
             <p>username: { user.name }</p>
          </div>
 
-         <InputTextArea 
+         <InputString 
+            type='textarea'
             label='Personal Bio' 
             placeholder='Talk about yourself' 
-            dataRef={ bioRef }
+            ref={ bioRef }
             initial={ user.bio }
             readOnlyOptions={ {
                condition: !modifiedUser,

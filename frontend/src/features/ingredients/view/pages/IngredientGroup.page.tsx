@@ -1,7 +1,7 @@
-import { IngredientGroupType } from "../domain/ingredient.types";
 import NotebookPageListItems from "@/shared/view/components/notebookPageSpecific/ListItems.notebookComponent";
 import { PaginatedListType } from "@/shared/domain/shared.types";
 import NotebookPage from "@/shared/view/pages/Notebook.page";
+import { IngredientGroupType } from "../../domain/ingredient.types";
 
 const groupSize = 5;
 
