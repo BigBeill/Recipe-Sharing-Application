@@ -37,19 +37,19 @@ export default function LandingPage() {
                   <div aria-hidden="true" className="icon">🍳</div>
                   <h3>Create Recipes</h3>
                   <p>Build and organize your personal recipe collection with detailed ingredients and instructions</p>
-                  <a href="/editRecipe" className="feature-link">Start Creating <span aria-hidden="true">→</span></a>
+                  <a href="/recipes/new" className="feature-link">Start Creating <span aria-hidden="true">→</span></a>
                </div>
                <div className="standardContent">
                   <div aria-hidden="true" className="icon">🌍</div>
                   <h3>Explore Public Recipes</h3>
                   <p>Discover amazing recipes shared by the community and find inspiration for your next meal</p>
-                  <a href="/searchRecipes/public" className="feature-link">Explore Now <span aria-hidden="true">→</span></a>
+                  <a href="/recipes" className="feature-link">Explore Now <span aria-hidden="true">→</span></a>
                </div>
                <div className="standardContent">
                   <div aria-hidden="true" className="icon">👥</div>
                   <h3>Connect with Friends</h3>
                   <p>Share recipes with friends and discover what they're cooking in their kitchen</p>
-                  <a href="/searchUser/friends" className="feature-link">Find Friends <span aria-hidden="true">→</span></a>
+                  <a href="/users" className="feature-link">Find Friends <span aria-hidden="true">→</span></a>
                </div>
             </div>
          </section>
@@ -60,23 +60,23 @@ export default function LandingPage() {
             <div className="collection">
                <div className="buttonContent growOnHover">
                   <div aria-hidden="true" className="icon">📖</div>
-                  <a  href="/searchRecipes/public">Browse Recipes</a>
+                  <a  href="/recipes">Browse Recipes</a>
                </div>
                <div className="buttonContent growOnHover">
                   <div aria-hidden="true" className="icon">📋</div>
-                  <a href="/searchRecipes/personal">My Recipes</a>
+                  <a href="/recipes">My Recipes</a>
                </div>
                <div className="buttonContent growOnHover">
                   <div aria-hidden="true" className="icon">👫</div>
-                  <a href="/searchRecipes/friends">Friend's Recipes</a>
+                  <a href="/recipes">Friend's Recipes</a>
                </div>
                <div className="buttonContent growOnHover">
                   <div aria-hidden="true" className="icon">👤</div>
-                  <a href="/profile">My Profile</a>
+                  <a href='/users'>Find Friends</a>
                </div>
                <div className="buttonContent growOnHover">
                   <div aria-hidden="true" className="icon">ℹ️</div>
-                  <a href="/aboutMe">About</a>
+                  <a href="/about">About</a>
                </div>
             </div>
          </section>
