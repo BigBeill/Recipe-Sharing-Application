@@ -6,6 +6,11 @@ function required(name: string): string {
 	return v;
 }
 
+function optional(name: string): string | undefined {
+  return process.env[name] || undefined;
+}
+
+
 export const env = {
 	PORT: required('PORT'),
 	FRONTEND_URLS: required('FRONTEND_URLS'),
@@ -32,5 +37,7 @@ export const env = {
 	AUTH_PUBLIC_JWK: required('AUTH_PUBLIC_JWK'),
 	AUTH_KEY_ID: required('AUTH_KEY_ID'),
 	AUTH_ISSUER: required('AUTH_ISSUER'),
-	AUTH_AUDIENCE: required('AUTH_AUDIENCE')
+	AUTH_AUDIENCE: required('AUTH_AUDIENCE'),
+
+	COOKIE_DOMAIN: optional('COOKIE_DOMAIN'),
 };
