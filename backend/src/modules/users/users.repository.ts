@@ -4,6 +4,7 @@ import { UserModel, type UserRecord } from "../../database/schemas/user.schema";
 import type { ImageType } from "../images/images.types";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
 import type { PaginatedListType } from "../../common/types/return.types";
+import { escapeRegex } from "../../common/utils/filter";
 
 interface GetFolderListParams extends PaginationParams{
    ownerId: string,
@@ -95,8 +96,8 @@ export class UsersRepository {
       }>([
          {
             $match: {
-               ...(_id && { _id }), 
-               ...(name && { name }),
+               ...(_id && { _id }),
+               ...(name && { name: { $regex: escapeRegex(name), $options: 'i' } }),
             },
          },
          {
@@ -111,7 +112,7 @@ export class UsersRepository {
       ]);
       const { recordList, countList } = resultList[0]!;
 
-      return { list: recordList, count: countList[0]!.count, firstItemIndex: skip ?? 0 }
+      return { list: recordList, count: countList[0]?.count ?? 0, firstItemIndex: skip ?? 0 }
    }
 
    async updateUser(_id: string, { name, email, bio, image }: UpdateUserParams): Promise<UserRecord | null> {
