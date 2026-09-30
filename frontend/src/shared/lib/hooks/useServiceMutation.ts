@@ -1,7 +1,7 @@
 import "client-only";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ServiceStateType } from "../domain/shared.types";
+import { ServiceStateType } from "@/shared/domain/shared.types";
 
 export type ServiceMutationReturnType<TInput, TOutput> = ServiceStateType<TOutput> & {
    send: [TInput] extends [void] ? () => Promise<TOutput> : (input: TInput) => Promise<TOutput>;

@@ -1,8 +1,8 @@
-import { ServiceStateType } from "@/shared/domain/shared.types";
 import "client-only";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ErrorNotFound } from "../api/errorClasses";
+import { ServiceStateType } from "@/shared/domain/shared.types";
 
 type SettledState<T> = Exclude<ServiceStateType<T>, { status: 'loading' }>;
 
