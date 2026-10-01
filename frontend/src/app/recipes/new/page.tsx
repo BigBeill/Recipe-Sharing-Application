@@ -9,7 +9,6 @@ export default async function NewRecipe() {
    if (!session) { redirect('/auth/login'); }
 
    const defaultRecipe: RecipeDraft = {
-      ownerId: session.userId,
       title: '', 
       description: '', 
       ingredientList: [], 
