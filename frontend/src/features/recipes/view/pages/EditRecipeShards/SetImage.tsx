@@ -16,7 +16,7 @@ interface ComponentProps {
    }
 }
 
-export default function EditRecipeAdditionalInfoView ({ refs, initial }: ComponentProps) {
+export default function EditRecipeShardSetImage ({ refs, initial }: ComponentProps) {
    return (
       <NotebookComponentDefault>
          <h2>Additional Information</h2>

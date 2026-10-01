@@ -1,6 +1,6 @@
 "use client"
 
-import styles from "./recipeFilter.module.scss";
+import styles from "./styles/recipeFilter.module.scss";
 import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import { ingredientService } from "@/features/ingredients/services/ingredient.service.client";
 import { DataHandle } from "@/shared/domain/shared.types";

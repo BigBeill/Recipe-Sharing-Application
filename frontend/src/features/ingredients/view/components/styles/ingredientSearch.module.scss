@@ -23,7 +23,7 @@
 .mainInput {
    grid-area: mainInput;
 
-   margin-top: 0rem;
+   margin: 0rem;
 }
 
 .hidden {
@@ -46,7 +46,7 @@
    }
 
    > * {
-      margin-bottom: 0rem;
+      margin: 0rem;
    }
    > .primary {
       flex: 1;

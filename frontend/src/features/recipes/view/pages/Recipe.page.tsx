@@ -1,6 +1,6 @@
 "use client"
 
-import styles from './recipe.module.scss';
+import styles from './styles/recipe.module.scss';
 import { RecipeType } from "../../domain/recipes.types";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { ComponentPropsWithoutRef, Ref, useRef } from "react";

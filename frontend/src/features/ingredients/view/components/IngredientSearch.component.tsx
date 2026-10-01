@@ -1,7 +1,7 @@
 "use client"
 
 import styles from './styles/ingredientSearch.module.scss';
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { InputChooseValue, InputNumber, InputString } from "@/shared/view/components/Input.components";
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import { DataHandle, PaginatedListType } from "@/shared/domain/shared.types";

@@ -16,7 +16,7 @@ interface ComponentProps {
    }
 }
 
-export default function EditRecipeInstructionsView ({ refs, initial }: ComponentProps) {
+export default function EditRecipeShardSetInstructionList ({ refs, initial }: ComponentProps) {
 
    useEffect (() => {
       console.log("instance of EditRecipeInstructionView created");

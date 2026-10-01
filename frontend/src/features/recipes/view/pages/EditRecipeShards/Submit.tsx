@@ -10,7 +10,7 @@ interface ComponentProps {
    deleteMutator: ServiceMutationReturnType<undefined, void>;
 }
 
-export default function EditRecipeFinalizeChangesView({ saveMutator, deleteMutator }: ComponentProps) {
+export default function EditRecipeShardSubmit({ saveMutator, deleteMutator }: ComponentProps) {
 
    return (
       <NotebookComponentDefault style={ { display: 'flex', flexDirection: 'column' } }>

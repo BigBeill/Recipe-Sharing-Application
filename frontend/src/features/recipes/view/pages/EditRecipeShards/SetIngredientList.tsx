@@ -18,7 +18,7 @@ interface ComponentProps {
    }
 }
 
-export default function EditRecipeIngredientsView ({ refs, initial}: ComponentProps) {
+export default function EditRecipeShardSetIngredientList({ refs, initial}: ComponentProps) {
 
    const ingredientList = useInteractableList({
       initial: initial.ingredientList,

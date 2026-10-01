@@ -15,7 +15,7 @@ interface ComponentProps {
 	};
 }
 
-export default function EditRecipeGeneralInfoView ({ newRecipe, refs, initial }: ComponentProps) {
+export default function EditRecipeShardSetTitle ({ newRecipe, refs, initial }: ComponentProps) {
 	return (
 		<NotebookComponentDefault>
 			<h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>

@@ -1,4 +1,4 @@
-import styles from './recipe.module.scss';
+import styles from './styles/recipe.module.scss';
 import { RecipeType } from '../../domain/recipes.types';
 import GrowingText from "@/shared/view/components/GrowingText.component";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
