@@ -35,7 +35,6 @@ export default function EditRecipePage({ recipe }: ComponentParams ) {
 
 	const saveMutator = useServiceMutation(async () => {
 		await recipeService.update(recipe._id, {
-			ownerId: recipe.ownerId,
 			...harvestRefsObject(refs),
 		});
 		router.push('/recipes');
