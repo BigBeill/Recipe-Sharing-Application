@@ -3,7 +3,7 @@ import { PackagedImageType } from "@/features/images/domain/image.types";
 import { DataHandle} from "@/shared/domain/shared.types";
 import { Ref } from "react";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
-import { InputChooseString } from "@/shared/view/components/Input.components";
+import { InputChooseValue } from "@/shared/view/components/Input.components";
 
 interface ComponentProps {
    refs: {
@@ -29,11 +29,11 @@ export default function EditRecipeAdditionalInfoView ({ refs, initial }: Compone
             />
          </div>
 
-         <InputChooseString<string>
+         <InputChooseValue<string>
             type='radio'
             initial={ initial?.visibility }
             label="Recipe Visibility" 
-            ref={ refs.visibility as Ref<DataHandle<string>> }
+            ref={ refs.visibility as Ref<DataHandle<string | undefined>> }
             optionList={ [
                { value: 'public', label: "Public - Anyone can view this recipe" },
                { value: 'private', label: "Private - You and friends can view this recipe" },

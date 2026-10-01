@@ -66,26 +66,7 @@ export default function EditRecipeIngredientsView ({ refs, initial}: ComponentPr
          
          { ingredientList.htmlView }
 
-         <div>
-            <input type='text' placeholder='Ingredient Label (optional)' value={newIngredient.label} onChange={(event) => setNewIngredient({...newIngredient, label: event.target.value})}/>
-            <input 
-               type='number'  
-               placeholder='Amount' 
-               value={newIngredient.portion!.amount} 
-               onChange={ (event) => setNewIngredient((previous) => ({ ...previous, portion: { ...previous.portion, amount: Number(event.target.value) } })) }
-            />
-            <select 
-               value={newIngredient.portion?.description} 
-               onChange={ (event) => setNewIngredient((previous) => ({ ...previous, portion: { ...previous.portion, measure_id: Number(event.target.options[event.target.selectedIndex].id), description: event.target.value } })) } 
-            >
-               <option value="" disabled hidden className='light'>Units</option>
-               { conversionListState.status === 'ready' && conversionListState.data.map((conversionFactor, index) => (
-                  <option key={index} id={ String(conversionFactor.measure_id) }>{conversionFactor.measure_description}</option>
-               )) }
-            </select>
-         </div>
-
-         <IngredientSearch onSubmit={ (ingredient: IngredientType) => ingredientList.addItem(ingredient) }/>
+         <IngredientSearch onSubmit={ (ingredient: IngredientType) => ingredientList.addItem(ingredient) } extendedRequirements={ true }/>
 
          <ButtonOval onClick={ () => addIngredient } >
             Add Ingredient

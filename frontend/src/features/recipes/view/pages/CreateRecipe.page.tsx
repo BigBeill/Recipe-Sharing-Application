@@ -35,7 +35,6 @@ export default function CreateRecipePage({ recipe }: ComponentParams ) {
 
    const saveMutator = useServiceMutation(async () => {
       await recipeService.create({
-         ownerId: recipe.ownerId,
          ...harvestRefsObject(refs),
       });
       router.push('/recipes');

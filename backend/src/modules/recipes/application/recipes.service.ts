@@ -7,8 +7,9 @@ import type { PermissionsService } from "../../permissions/permissions.service";
 import type { PaginatedListType } from "../../../common/types/return.types";
 import type { RecipesRepository } from "../infrastructure/recipes.repository";
 import type { IngredientsService } from "../../ingredients/application/ingredients.service";
-import type { TypeNutrition, TypeRecipe } from "../domain/recipes.types";
+import type { TypeNutrition, TypeRecipe, TypeRecipeDraft } from "../domain/recipes.types";
 import type { TypeRecipeIngredient } from "../../ingredients/domain/ingredients.types";
+import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
 
 interface GetRecipeListParams extends PaginationParams { 
    authId?: string,
@@ -39,28 +40,18 @@ export class RecipesService {
 
 
 
-   async createRecipe(recipe: Omit<TypeRecipe, '_id' | 'ownerId' | 'nutrition'> & {nutrition?: TypeNutrition}, params: AuthIdParams): Promise<TypeRecipe> {
+   async createRecipe(recipeDraft: TypeRecipeDraft, params: AuthIdParams): Promise<TypeRecipe> {
       const { authId } = params;
       if (!authId) { throw new UnauthorizedError(); }
 
       const [ image, nutrition ] = await Promise.all([
-         recipe.image ? this.imagesService.saveImage("recipes", recipe.image.filename, authId) : undefined,
-         this.getNutrition(recipe.ingredientList),
+         recipeDraft.image ? this.imagesService.saveImage("recipes", recipeDraft.image.filename, authId) : undefined,
+         this.getNutrition(recipeDraft.ingredientList),
       ]);
 
-      const completedRecipe: Omit<TypeRecipe, "_id"> = {
-         ...recipe,
-         ownerId: authId,
-         image,
-         nutrition,
-      }
+      const mongooseRecord = await this.repository.create({ ...recipeDraft, ownerId: authId, image, nutrition });
 
-      const mongooseRecord = await this.repository.create(completedRecipe);
-
-      return {
-         ...completedRecipe,
-         _id: mongooseRecord._id.toString(),
-      }
+      return removeMongooseNoise(mongooseRecord) as TypeRecipe;
    }
 
 

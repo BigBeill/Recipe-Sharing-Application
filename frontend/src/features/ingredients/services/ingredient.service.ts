@@ -1,4 +1,4 @@
-import { IngredientGroupType, IngredientType } from "../domain/ingredient.types";
+import { IngredientConversionType, IngredientGroupType, IngredientType } from "../domain/ingredient.types";
 import { PaginatedListType } from "@/shared/domain/shared.types";
 import type {
    TypeIngredientApi,
@@ -9,8 +9,8 @@ import type {
 export function createIngredientService(api: TypeIngredientApi) {
    return {
 
-      conversionOptionList: (ingredientId: number) => {
-         return api.conversionOptionList(ingredientId);
+      searchConversion: (ingredientId: number): Promise<PaginatedListType<IngredientConversionType>> => {
+         return api.searchConversion(ingredientId);
       },
 
       get: (ingredientId: number, params?: TypeIngredientServiceGetParams): Promise<IngredientType> => {

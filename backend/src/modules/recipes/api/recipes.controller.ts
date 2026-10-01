@@ -3,8 +3,8 @@ import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.mid
 import { IdValidator } from "../../../common/validators/id.validator";
 import { recipesService } from "../../../container";
 import { SearchValidator } from "../domain/validators/search.validator";
-import { AddRecipeValidator } from "../domain/validators/addRecipe.Validator";
 import { RecipeValidator } from "../domain/validators/recipe.validator";
+import { ValidatorRecipeDraft } from "../domain/validators/recipeDraft.Validator";
 
 const service = recipesService;
 
@@ -50,12 +50,11 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
 
    .post( '/create',
       async ({ authId, body }) => {
-         const { recipe } = body;
-         const newRecipe = await service.createRecipe(recipe, { authId })
+         const newRecipe = await service.createRecipe(body, { authId })
          return { data: newRecipe }
       },
       {
-         body: AddRecipeValidator
+         body: ValidatorRecipeDraft
       }
    )
 
@@ -63,8 +62,7 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
 
    .put( '/update',
       async ({ authId, body }) => {
-         const { recipe } = body;
-         const updatedRecipe = await service.updateRecipe(recipe, { authId })
+         const updatedRecipe = await service.updateRecipe(body, { authId })
          return { data: updatedRecipe }
       },
       {

@@ -1,18 +1,66 @@
 @use '@/shared/styles/variables' as *;
 
 .wrapper {
-   display: flex;
-   gap: 0.3rem;
+   margin: 1.2rem 0rem;
+   position: relative;
+   display: grid;
+   row-gap: 0.3rem;
 
-   .searchBar {
+   grid-template-areas:
+      "supportingInputs supportingInputs"
+      "mainInput submitButton";
+   grid-template-columns: 1fr 3rem;
+   grid-template-rows: 1fr auto;
+
+   transition: grid-template-rows 250ms ease, row-gap 250ms ease;
+
+   &:has(> .supportingInputs.collapsed) {
+      grid-template-rows: 0fr auto;
+      row-gap: 0rem;
+   }
+}
+
+.mainInput {
+   grid-area: mainInput;
+
+   margin-top: 0rem;
+}
+
+.hidden {
+   display: none !important;
+}
+
+.supportingInputs {
+   grid-area: supportingInputs;
+   display: flex;
+   align-items: flex-end;
+   gap: 1.2rem;
+
+   min-height: 0;
+   overflow: hidden;
+   transition: visibility 0s;
+
+   &.collapsed {
+      visibility: hidden;
+      transition: visibility 0s 250ms;
+   }
+
+   > * {
+      margin-bottom: 0rem;
+   }
+   > .primary {
       flex: 1;
-      position: relative;
+   }
+   > :not(.primary) {
+      width: 6rem;
    }
 }
 
 .submitButtonWrapper {
+   grid-area: submitButton;
+   justify-content: center;
    align-self: center;
-   
+
    button {
       font-size: 1.5rem;
       background-color: transparent;

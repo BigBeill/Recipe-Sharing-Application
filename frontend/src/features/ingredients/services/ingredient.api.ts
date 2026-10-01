@@ -13,9 +13,9 @@ export type TypeIngredientServiceSearchParams = {
 export function createIngredientApi(call: TypeApiCaller) {
    return {
 
-   conversionOptionList: (ingredientId: number) =>
-      call<IngredientConversionType[]>({
-         url: `/ingredients/conversionOptionList/${ingredientId}`,
+   searchConversion: (ingredientId: number) =>
+      call<PaginatedListType<IngredientConversionType>>({
+         url: `/ingredients/searchConversion/${ingredientId}`,
          method: 'get',
       }),
    get: (ingredientId: number, params?: TypeIngredientServiceGetParams) =>

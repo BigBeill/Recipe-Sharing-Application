@@ -2,8 +2,8 @@ import Elysia from "elysia";
 import { ingredientsService } from "../../../container";
 import { SearchValidator } from "../domain/validators/search.validator";
 import { PostgresIdValidator } from "../../../common/validators/postgresId.validator";
-import { SearchConversionValidator } from "../domain/validators/searchConversion.validator";
 import { GetValidator } from "../domain/validators/get.validator";
+import { PaginationValidator } from "../../../common/validators/pagination.validator";
 
 const service = ingredientsService;
 
@@ -14,7 +14,7 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
    .get( '/get/:_id',
       async ({ params, query }) => {
          const { _id } = params;
-         const ingredient = await service.getIngredient(_id, query);
+         const ingredient = await service.getIngredient(_id);
          return {
             data: ingredient
          };
@@ -42,16 +42,18 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
 
 
 
-   .get( '/searchConversion',
-      async ({ query }) => {
-         const { food_id, skip = 0, limit = 32  } = query;
+   .get( '/searchConversion/:_id',
+      async ({ params, query }) => {
+         const { _id: food_id } = params;
+         const { skip = 0, limit = 32  } = query;
          const conversionList = await service.searchConversion(food_id, { skip, limit });
          return { 
             data: conversionList 
          };
       },
       {
-         query: SearchConversionValidator,
+         params: PostgresIdValidator,
+         query: PaginationValidator,
       }
    )
 

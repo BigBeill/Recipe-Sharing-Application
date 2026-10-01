@@ -1,8 +1,30 @@
 /*
    * @/shared/view/components/Input.component.tsx
-   * Exports 2 components
+   * Exports 3 components
+   *    - InputNumber
    *    - InputString
-   *    - InputChooseString
+   *    - InputChooseValue
+   * 
+   * 
+   * 
+   **   <InputNumber />
+   * Designed for letting the user input a custom string
+   * 
+   * expected props: {
+   *    label: string;
+   *    dataRef: Ref<DataHandle<string>>;
+   *    initial?: string;
+   *    readOnlyOptions?: {
+   *       condition: boolean;
+   *       placeholder: string;
+   *    }
+   * }
+   * && any other props you would expect to find in the respected component type
+   * 
+   * This component will prompt the user to enter a number, and store the number for the parent to use
+   * The string can be accessed through ref using the { DataHandle<string> } getData + setData properties
+   * 
+   * readOnlyOptions provides the parent with the ability to show an uneditable version of the string if { condition } is true ({ placeholder } is whats shown if the string is empty)
    * 
    * 
    * 
@@ -18,7 +40,6 @@
    *       condition: boolean;
    *       placeholder: string;
    *    }
-   *    nestedComponentList?: React.ReactElement[]
    * }
    * && any other props you would expect to find in the respected component type
    * 
@@ -27,11 +48,10 @@
    * 
    * readOnlyOptions provides the parent with the ability to show an uneditable version of the string if { condition } is true ({ placeholder } is whats shown if the string is empty)
    * 
-   * nestedComponentList lets the user add secondary react components that sit beside the main component, since <InputString /> is set to take up 100% of the width
    * 
    * 
    * 
-   **   <InputChooseString />
+   **   <InputChooseValue />
    * Designed for letting the user choose from a selection of already defined strings
    * 
    * expected props: {
@@ -54,8 +74,49 @@
 
 
 import styles from './styles/inputs.module.scss';
-import { cloneElement, Ref, useId, useImperativeHandle, useState } from 'react';
+import { Ref, useId, useImperativeHandle, useState } from 'react';
 import { DataHandle } from '../../domain/shared.types';
+
+
+
+
+
+
+type InputNumberBaseProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'type'> & {
+   label: string;
+   ref?: Ref<DataHandle<number>>;
+   initial?: number;
+   readOnlyOptions?: {
+      condition: boolean;
+      placeholder: string;
+   };
+}
+
+export function InputNumber({ label, initial, ref, className, readOnlyOptions, ...rest }: InputNumberBaseProps) {
+   const id = useId();
+   const [value, setValue] = useState<number>(initial || 0);
+
+   useImperativeHandle(ref, () => ({
+      getData: () => value,
+      setData: setValue,
+   }),[value]);
+
+   return (
+      <div className={ [styles.inputWrapper, className].filter(Boolean).join(" ") }>
+         { (readOnlyOptions?.condition === true) ? (
+            <>
+               <h4>{ label }</h4>
+               <p>{ value || readOnlyOptions.placeholder }</p>
+            </>
+         ) : (
+            <>
+               <label htmlFor={ id }>{ label }</label>
+               <input id={ id } type='number' value={ value } onChange={ (event) => setValue(Number(event.target.value)) } { ...rest } />
+            </>) 
+         }
+      </div>
+   );
+}
 
 
 
@@ -75,83 +136,44 @@ type InputStringBaseProps = {
 type InputTextProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'type'> & InputStringBaseProps;
 type InputTextAreaProps = React.ComponentPropsWithoutRef<'textarea'> & InputStringBaseProps;
 
-type InputStringVariant = ( InputTextProps & { type: 'text' } ) | ( InputTextAreaProps & { type: 'textarea' } );
-
-type InputStringProps = InputStringVariant & {
-   nestedComponentList?: React.ReactElement<{ className?: string }>[];
-};
+type InputStringProps = ( InputTextProps & { type: 'text' } ) | ( InputTextAreaProps & { type: 'textarea' } );
 
 
 
-export function InputString({ nestedComponentList, ...props }: InputStringProps) {
-   let inputComponent: React.ReactElement
-   if (props.type === 'text') { 
+export function InputString({ className, label, initial, ref, readOnlyOptions, ...props }: InputStringProps) {
+   const id = useId();
+   const [string, setString] = useState<string>(initial ?? '');
+
+   useImperativeHandle(ref, () => ({
+      getData: () => string,
+      setData: setString
+   }), [string]);
+
+   // * grab the actual input component
+   let inputComponent: React.ReactElement;
+   if (props.type === 'text') {
       const { type, ...rest } = props;
-      inputComponent = <InputText { ...rest } />; 
+      inputComponent = <input id={ id } type='text' value={ string } onChange={ (event) => setString(event.target.value) } { ...rest } />
    }
    else if (props.type === 'textarea') {
       const { type, ...rest } = props; 
-      inputComponent = <InputTextArea { ...rest } />; 
+      inputComponent = <textarea id={ id } value={ string } onChange={ (event) => { setString(event.target.value) } } { ...rest } />
    }
    else { throw new Error('@/shared/view/components/input.components.InputString received an invalid { type } field'); }
-
-   return (
-      <div className={ styles.componentWrapper }>
-         { inputComponent }
-         { nestedComponentList?.map((component, index) => {
-            return cloneElement(component, {
-               key: component.key ?? index,
-               className: [ component.props.className, styles.secondaryInput].filter(Boolean).join(' '),
-            })
-         }) }
-      </div>
-   )
-}
-
-function InputText({ className, label, ref, readOnlyOptions, initial, ...rest }: InputTextProps) {
-   const id = useId();
-   const [value, setValue] = useState(initial || '');
-
-   useImperativeHandle(ref, () => ({
-      getData: () => value,
-      setData: setValue,
-   }),[value]);
 
    return (
       <div className={ [styles.inputWrapper, className].filter(Boolean).join(" ") }>
          { (readOnlyOptions?.condition === true) ? (
             <>
                <h4>{ label }</h4>
-               <p>{ value || readOnlyOptions.placeholder }</p>
+               <p>{ string || readOnlyOptions.placeholder }</p>
             </>
          ) : (
             <>
                <label htmlFor={ id }>{ label }</label>
-               <input id={ id } type='text' value={ value } onChange={ (event) => setValue(event.target.value) } { ...rest } />
+               { inputComponent }
             </>) 
          }
-      </div>
-   )
-}
-
-function InputTextArea({ className, label, ref, initial, readOnlyOptions, ...rest }: InputTextAreaProps) {
-   const id = useId();
-   const [value, setValue] = useState<string>(initial || '');
-
-   useImperativeHandle(ref, () => ({
-      getData: () => value,
-      setData: setValue
-   }), [value]);
-
-   return (
-      <div className={ [styles.inputWrapper, className].filter(Boolean).join(" ") }>
-         { (readOnlyOptions?.condition === true) ? (<>
-            <h4>{ label }</h4>
-            <p>{ value || readOnlyOptions.placeholder }</p>
-         </>) : (<>
-            <label htmlFor={ id } >{ label }</label>
-            <textarea id={ id } value={ value } onChange={ (event) => { setValue(event.target.value) } } { ...rest } />
-         </>) }
       </div>
    );
 }
@@ -161,11 +183,9 @@ function InputTextArea({ className, label, ref, initial, readOnlyOptions, ...res
 
 
 
-type InputChooseStringT = string | number | readonly string[];
-
-type InputChooseStringBaseProps<T extends InputChooseStringT> = {
+type InputChooseValueBaseProps<T> = {
    label: string;
-   ref?: Ref<DataHandle<T>>;
+   ref?: Ref<DataHandle<T | undefined>>;
    initial?: T;
    optionList: {
       label: string;
@@ -173,15 +193,14 @@ type InputChooseStringBaseProps<T extends InputChooseStringT> = {
    }[];   
 }
 
-type InputRadioProps<T extends InputChooseStringT> = React.ComponentPropsWithoutRef<'fieldset'> & InputChooseStringBaseProps<T>;
-type InputSelectProps<T extends InputChooseStringT> = React.ComponentPropsWithoutRef<'select'> & InputChooseStringBaseProps<T>;
+type InputRadioProps<T> = React.ComponentPropsWithoutRef<'fieldset'> & InputChooseValueBaseProps<T>;
+type InputSelectProps<T> = React.ComponentPropsWithoutRef<'select'> & InputChooseValueBaseProps<T>;
 
-type InputChooseStringProps<T extends InputChooseStringT> = ( InputRadioProps<T> & { type: 'radio' } ) | ( InputSelectProps<T> & { type: 'select' } );
+type InputChooseValueProps<T> = ( InputRadioProps<T> & { type: 'radio' } ) | ( InputSelectProps<T> & { type: 'select' } );
 
 
 
-export function InputChooseString<T extends InputChooseStringT>({ ...props }: InputChooseStringProps<T>) {
-   if ( props.optionList.length === 0) { throw new Error('@/shared/view/components/input.components.InputChooseString received an invalid { optionList } field'); }
+export function InputChooseValue<T>({ ...props }: InputChooseValueProps<T>) {
    if (props.type === 'radio') {
       const { type, ...rest } = props;
       return <InputRadio { ...rest } />;
@@ -190,12 +209,12 @@ export function InputChooseString<T extends InputChooseStringT>({ ...props }: In
       const { type, ...rest } = props;
       return <InputSelect { ...rest } /> 
    }
-   else { throw new Error('@/shared/view/components/input.components.InputChooseString received an invalid { type } field'); }
+   else { throw new Error('@/shared/view/components/input.components.InputChooseValue received an invalid { type } field'); }
 }
 
-function InputRadio<T extends InputChooseStringT>({ className, label, ref, optionList, initial, ...rest }: InputRadioProps<T>) {
+function InputRadio<T>({ className, label, ref, optionList, initial, ...rest }: InputRadioProps<T>) {
    const id = useId();
-   const [choice, setChoice] = useState<T>(initial ?? optionList[0].value);
+   const [choice, setChoice] = useState<T | undefined>(initial);
 
    useImperativeHandle(ref, () => ({
       getData: () => choice,
@@ -207,7 +226,7 @@ function InputRadio<T extends InputChooseStringT>({ className, label, ref, optio
          <legend>{ label }</legend>
          { optionList.map((option, index) => (
             <div key={ index }>
-               <input type='radio' id={ `${ id }-${ index }` } name={ id } value={ option.value } checked={ choice === option.value } onChange={() => { setChoice(option.value); } } />
+               <input type='radio' id={ `${ id }-${ index }` } name={ id } value={ option.label } checked={ choice === option.value } onChange={() => { setChoice(option.value); } } />
                <label htmlFor={ `${ id }-${ index }` }>{ option.label }</label>
             </div>
          )) }
@@ -215,13 +234,14 @@ function InputRadio<T extends InputChooseStringT>({ className, label, ref, optio
    );
 }
 
-function InputSelect<T extends InputChooseStringT>({ className, label, ref, optionList, initial, ...rest }: InputSelectProps<T>) {
+function InputSelect<T>({ className, label, ref, optionList, initial, ...rest }: InputSelectProps<T>) {
    const id = useId();
-   const [choice, setChoice] = useState<T>(initial ?? optionList[0].value);
+   const [choice, setChoice] = useState<{ label: string, value: T } | undefined>(undefined);
+
 
    useImperativeHandle(ref, () => ({
-      getData: () => choice,
-      setData: setChoice,
+      getData: () => choice?.value,
+      setData: () => undefined,
    }), [choice]);
 
    return (
@@ -229,12 +249,12 @@ function InputSelect<T extends InputChooseStringT>({ className, label, ref, opti
          <label htmlFor={ id }>{ label }</label>
          <select
             id={ id }
-            value={ choice }
-            onChange={ (e) => { setChoice(optionList[e.currentTarget.selectedIndex].value); } }
+            value={ choice?.label }
+            onChange={ (event) => { setChoice(optionList[event.currentTarget.selectedIndex]); } }
             { ...rest }
          >
             { optionList.map((option, index) => (
-               <option key={ index } value={ option.value }>{ option.label }</option>
+               <option key={ index } value={ option.label }>{ option.label }</option>
             )) }
          </select>
       </div>

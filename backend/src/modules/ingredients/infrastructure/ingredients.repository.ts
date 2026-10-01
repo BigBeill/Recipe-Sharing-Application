@@ -70,7 +70,7 @@ export class IngredientsRepository {
       const conversionFactorValueList = await postgresConnection.query( 'SELECT value FROM conversion_factor WHERE food_id = $1 AND measure_id = $2 LIMIT 1', [ food_id, measure_id ] );
       if (!conversionFactorValueList.rows[0]) { throw new NotFoundError('ingredients.repository.getConversion ran into and issue finding conversion_factor with food_id: ' + food_id + ' and measure_id: ' + measure_id); }
       
-      return { food_id, measure_id, value: calculateTrueConversionFactorValue(conversionFactorValueList.rows[0].conversion_factor, number), measure_description: string };
+      return { food_id, measure_id, value: calculateTrueConversionFactorValue(conversionFactorValueList.rows[0].value, number), measure_description: string };
    }
 
 
@@ -110,7 +110,7 @@ export class IngredientsRepository {
       const descriptionConditionList = (description?.trim().split(/\s+/) ?? []).filter(Boolean).map((entry) => {
          return { column: 'description', operation: 'ILIKE', value: `%${ entry }%` };
       });
-      const { list, count } = await postgresQueryBuilder<TypeIngredient>('SELECT * FROM food', { 
+      const { list, count } = await postgresQueryBuilder<TypeIngredient>('SELECT _id, description FROM food', { 
          where: [
             ...descriptionConditionList,
             ...(food_group_id ? [{ column: 'food_group_id', operation: '=', value: `${food_group_id}` }] : []),

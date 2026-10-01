@@ -19,7 +19,7 @@ export function createRecipeApi(call: TypeApiCaller ) {
          call({
             url: '/recipes/create',
             method: 'post',
-            body: { recipe: recipe }
+            body: recipe
          }),
       
       delete: (recipeId: string): Promise<void> => 

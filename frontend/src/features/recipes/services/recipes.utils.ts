@@ -38,8 +38,8 @@ export function createRecipeFormData(recipe: RecipeDraft | RecipeType, imageBuff
    if ("_id" in recipe) { formData.append("_id", recipe._id); }
 	formData.append("title", recipe.title);
 	formData.append("description", recipe.description);
-	formData.append("ingredients", JSON.stringify(recipe.ingredientList));
-	formData.append("instructions", JSON.stringify(recipe.instructionList));
+	formData.append("ingredientList", JSON.stringify(recipe.ingredientList));
+	formData.append("instructionList", JSON.stringify(recipe.instructionList));
 	formData.append("visibility", recipe.visibility);
 	if (imageBuffer instanceof File) { formData.append("image", imageBuffer); }
 
