@@ -1,14 +1,16 @@
+@use '@/shared/styles/variables' as *;
+
 .paginationBar {
    flex: 0 0 fit-content;
    margin: auto;
    width: fit-content;
    height : fit-content;
-   background-color: var(--background-color);
+   background-color: $color-background;
    display: flex;
    justify-content: center;
    overflow: hidden;
    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-   border: 0.06rem solid var(--text-color-dark);
+   border: 0.06rem solid $color-text;
    border-radius: 3rem;
 
    .primaryBlock {
@@ -18,7 +20,7 @@
 
    > * {
       box-sizing: border-box;
-      border: 0.06rem solid var(--text-color-dark);
+      border: 0.06rem solid $color-text;
       border-top: 0rem;
       border-bottom: 0rem;
       margin: 0rem;

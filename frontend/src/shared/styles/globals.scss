@@ -9,16 +9,6 @@
    letter-spacing: 1px;
    // font-family: 'Coolvetica', sans-serif;
    font-family: 'Archivo', sans-serif;
-   background-color: #f5f8fa;
-
-   // define color variables used throughout the scss files
-   --primary-color: #065F46;
-   --secondary-color: #065f46;
-
-   --background-color: #f5f8fa;
-   --supporting-color: #e2e2e2;
-   --text-color-main: grey;
-   --text-color-dark: black;
 }
 
 body {
@@ -65,7 +55,7 @@ the design resembles a sheet of printed paper (large, squared corners, plain bac
    box-sizing: border-box;
    display: block;
    padding: 0.6rem 3rem;
-   background-color: var(--background-color);
+   background-color: $color-background;
    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
@@ -100,22 +90,38 @@ adds a fixed height, flexbox layout, and custom scrollbar styling
    }
 
    ::-webkit-scrollbar-thumb {
-      background-color: var(--primary-color); /* color of the scrollbar thumb */
+      background-color: $color-background; /* color of the scrollbar thumb */
       border-radius: 0.3rem; /* rounded corners */
    }
    
    /* Hover state of the thumb */
    ::-webkit-scrollbar-thumb:hover {
-      background-color: var(--primary-color);
+      background-color: $color-primary;
       cursor: pointer;
    }
    
    /* Handle when scrollbar is in a drag state */
    ::-webkit-scrollbar-thumb:active {
-      background-color: var(--primary-color);
+      background-color: $color-primary;
    }
    ::-webkit-scrollbar-track {
       background: transparent; /* color of the scrollbar track */
+   }
+}
+
+/*
+Warning content class
+this extends the standard content class with additional styles to represent a warning message
+adds an reddish-orange design to the block
+*/
+.warningContent {
+   @extend .standardContent;
+   border-left: 0.3rem solid #9f0712;
+   background-color: color-mix(in oklch, $color-background 90%, #FF8904 10%);
+
+   h3 {
+      color: #9f0712;
+      font-weight: bold;
    }
 }
 
@@ -132,7 +138,7 @@ the design follows a more modern aesthetic (rounded corners, shadow, plain backg
    box-sizing: border-box;
    display: block;
    padding: 0.6rem 3rem 3.4rem 3rem;
-   background-color: var(--background-color);
+   background-color: $color-background;
    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
    border-radius: 0.6rem;
 
@@ -171,22 +177,6 @@ adds {cursor: pointer;}, and specific padding
 }
 
 /*
-Warning content class
-this extends the standard content class with additional styles to represent a warning message
-adds an reddish-orange design to the block
-*/
-.warningContent {
-   @extend .standardContent;
-   border-left: 0.3rem solid #9f0712;
-   background-color: color-mix(in oklch, var(--background-color) 90%, #FF8904 10%);
-
-   h3 {
-      color: #9f0712;
-      font-weight: bold;
-   }
-}
-
-/*
 Content collection class
 this is a container class for displaying an array of content blocks
 to use: must add a direct child with the class 'collection' which will be the flexbox container for the content blocks
@@ -214,7 +204,7 @@ to use: must add a direct child with the class 'collection' which will be the fl
    }
 
    &::-webkit-scrollbar-thumb {
-      background-color: var(--background-color);
+      background-color: $color-background;
       border-radius: 0.3rem;
    }
 
@@ -305,27 +295,31 @@ hides an element visually but keeps it accessible to screen readers
 
 /* ------------ universally applied css ------------ */
 
-p {
-   white-space: pre-line;
-}
+@layer defaultPrimitives {
+   h1 {
+      font-size: 3rem;
+      text-decoration: underline;
+      text-decoration-color: $color-primary;
+   }
 
-h1 {
-   font-size: 3rem;
-}
+   h2 {
+      margin: 1.2rem 0rem;
+      width: fit-content;
+      font-size: 3rem;
+      text-decoration: underline;
+      text-decoration-color: $color-primary;
+   }
 
-h2 {
-   text-decoration: underline $color-primary;
-   text-decoration-thickness: 0.2rem;
-}
+   h3{
+      margin: 1.2rem 0rem 0rem;
+      font-size: 1.8rem;
+      font-weight: bold;
+   }
 
-h3 {
-   margin-top: 2rem;
-   margin-left: 0.5rem;
-   margin-bottom: 0.2rem;
-   font-weight: 100;
-   font-size: 24px;
+   p {
+      white-space: pre-line;
+   }
 }
-
 
 /* remove arrows from number input */
 /* Chrome, Safari, Edge, Opera */
