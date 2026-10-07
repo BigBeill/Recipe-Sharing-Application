@@ -10,6 +10,11 @@ import NotebookPage from '@/shared/view/pages/Notebook.page';
 import { NotebookComponentDefault } from '@/shared/view/components/notebookPageSpecific/default.notebookComponent';
 import { FullscreenPage } from '@/shared/view/pages/Fullscreen.page';
 import NutritionList from '@/features/ingredients/view/components/NutritionList.component';
+import { ButtonOval, ButtonShielded } from '@/shared/view/components/Button.components';
+import { recipeService } from '../../services/recipes.service.client';
+import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/features/auth/providers/AuthProvider';
 
 interface Props {
    recipe: RecipeType;
@@ -23,8 +28,8 @@ export default function RecipePage ({ recipe }: Props) {
       <>
          <NotebookPage components={ { 
             list: [
-               <TitleView recipe={ recipe }/>, 
-               <InstructionView recipe={ recipe } onClick={ () => fullscreenRef.current!.setData(true) } />
+               <TitleShard recipe={ recipe }/>, 
+               <InstructionShard recipe={ recipe } onClick={ () => fullscreenRef.current!.setData(true) } />
             ], 
             count: 2, 
             firstItemIndex: 0 
@@ -35,33 +40,47 @@ export default function RecipePage ({ recipe }: Props) {
    )
 }
 
-function TitleView({ recipe }: Props) {
+function TitleShard({ recipe }: Props) {
+   const { session } = useAuth();
+   const router = useRouter();
+
+   const deleteMutator = useServiceMutation(async () => {
+      await recipeService.delete(recipe._id);
+      router.replace('recipes');
+   });
+
+   function handleEdit() {
+      router.push(`/recipes/${recipe._id}/edit`);
+   }
+
    return (
-      <NotebookComponentDefault>
-         <div className={ styles.wrapper } >
-            <h2 className={ styles.heading2 }>{ recipe.title }</h2>
+      <NotebookComponentDefault className={ styles.shardWrapper }>
+         <h2 className={ styles.heading2 }>{ recipe.title }</h2>
 
-            <div className={ styles.shareSpace }>
-               <ImageDisplay packagedImage={ recipe.image } className={ styles.photo } />
-               <NutritionList nutrition={ recipe.nutrition } />
-            </div>
+         <div className={ styles.imageWrapper }>
+            <ImageDisplay packagedImage={ recipe.image } className={ styles.photo } />
+            <NutritionList nutrition={ recipe.nutrition } />
+         </div>
 
-            <div className="description">
-               <h3>Description</h3>
-               <p>{ recipe.description }</p>
-            </div>
+         <div className={ styles.descriptionWrapper }>
+            <h3>Description</h3>
+            <p>{ recipe.description }</p>
+         </div>
+         <div className={ [styles.buttonWrapper, ...(session?.userId === recipe.ownerId ? [] : [styles.hidden])].filter(Boolean).join(' ') }>
+            <ButtonShielded message='DeleteRecipe' onClick={ deleteMutator.send }/>
+            <ButtonOval onClick={ handleEdit }>Edit Recipe</ButtonOval>
          </div>
       </NotebookComponentDefault>
    );
 }
 
-function InstructionView({ recipe, ...rest }: Props & ComponentPropsWithoutRef<'div'>) {
+function InstructionShard({ recipe, onClick }: Props & ComponentPropsWithoutRef<'div'>) {
 
    return (
-      <NotebookComponentDefault { ...rest }>
+      <NotebookComponentDefault className={ styles.shardWrapper} onClick={ onClick }>
          <div className={ styles.wrapper } >
-            <h2>How To Make</h2>
-            <h3>Ingredients</h3>
+            <h3>How To Make</h3>
+            <h4>Ingredients</h4>
             <ul className={ styles.list }>
                { recipe.ingredientList.map((ingredient, index) => (
                   <li key={ index }>

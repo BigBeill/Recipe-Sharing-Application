@@ -164,39 +164,18 @@ export class RecipesService {
 
 
 
-   async updateRecipe(recipe: Omit<TypeRecipe, 'nutrition'> & {nutrition?: TypeNutrition}, params: AuthIdParams): Promise<boolean> {
+   async updateRecipe(_id: string, recipeDraft: TypeRecipeDraft, params: AuthIdParams): Promise<boolean> {
       const { authId } = params;
 
-      const oldMongooseRecord = await this.repository.get(recipe._id);
-      if(!oldMongooseRecord) { throw new NotFoundError('recipe not found'); }
-      if (oldMongooseRecord.ownerId.toString() !== authId) { throw new UnauthorizedError(); }
+      const oldRecipeRecord = await this.repository.get(_id);
+      if (oldRecipeRecord.ownerId.toString() !== authId) { throw new UnauthorizedError(); }
 
-      let recalculateNutrition = false;
-      if (!recipe.nutrition || recipe.ingredientList.length !== oldMongooseRecord.ingredientList.length) { recalculateNutrition = true; }
-      else {
-         recipe.ingredientList.forEach((ingredient, index) => {
-            const oldIngredient = oldMongooseRecord.ingredientList[index]!;
-            if (
-                  !oldIngredient.portion
-               || !ingredient.portion
-               || ingredient._id !== oldIngredient._id 
-               || ingredient.portion._id !== oldIngredient.portion._id
-               || ingredient.portion.amount !== oldIngredient.portion.amount
-            ) { recalculateNutrition = true; }
-         });
-      }
+      const newRecipeNutrition = await this.getNutrition(recipeDraft.ingredientList);
 
-      if (recalculateNutrition) {
-         recipe.nutrition = await this.getNutrition(recipe.ingredientList);
-      }
+      if (recipeDraft.image && recipeDraft.image.filename !== oldRecipeRecord.image?.filename) { await this.imagesService.saveImage('recipes', recipeDraft.image.filename, authId); }
 
-      if (recipe.image && recipe.image.filename !== oldMongooseRecord.image?.filename) { await this.imagesService.saveImage('recipes', recipe.image.filename, authId); }
-
-      // @ts-expect-error - nutrition is guaranteed to be defined by this point
-      await this.repository.updateRecipe(recipe);
+      await this.repository.update({ _id, ownerId: authId, nutrition: newRecipeNutrition, ...recipeDraft });
       return true;
    }
-
-
    
 }

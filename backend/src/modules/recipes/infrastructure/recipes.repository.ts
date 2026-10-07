@@ -4,6 +4,8 @@ import { escapeRegex } from "../../../common/utils/filter";
 import { RecipeModel, type RecipeRecord } from "../../../database/schemas/recipe.schema";
 import { dehydrateRecipe } from "../application/recipes.dehydrate";
 import type { TypeRecipe } from "../domain/recipes.types";
+import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
+import { NotFoundError } from "elysia";
 
 
 interface GetRecipeListParams {
@@ -39,8 +41,10 @@ export class RecipesRepository {
 
 
    
-   async get(_id: string): Promise<RecipeRecord | null> {
-      return RecipeModel.findOne({ _id }).lean<RecipeRecord | null>();
+   async get(_id: string): Promise<RecipeRecord> {
+      const record = await RecipeModel.findOne({ _id }).lean<RecipeRecord | null>();
+      if (!record) { throw new NotFoundError(`Database could no find recipe with id: ${ _id }`); }
+      return record;
    }
 
 

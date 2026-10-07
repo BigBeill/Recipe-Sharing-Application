@@ -3,7 +3,6 @@ import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.mid
 import { IdValidator } from "../../../common/validators/id.validator";
 import { recipesService } from "../../../container";
 import { SearchValidator } from "../domain/validators/search.validator";
-import { RecipeValidator } from "../domain/validators/recipe.validator";
 import { ValidatorRecipeDraft } from "../domain/validators/recipeDraft.Validator";
 
 const service = recipesService;
@@ -60,12 +59,14 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
 
 
 
-   .put( '/update',
-      async ({ authId, body }) => {
-         const updatedRecipe = await service.updateRecipe(body, { authId })
+   .put( '/update/:_id',
+      async ({ authId, body, params }) => {
+         const { _id } = params;
+         const updatedRecipe = await service.updateRecipe(_id, body, { authId })
          return { data: updatedRecipe }
       },
       {
-         body: RecipeValidator
+         params: IdValidator,
+         body: ValidatorRecipeDraft
       }
    )

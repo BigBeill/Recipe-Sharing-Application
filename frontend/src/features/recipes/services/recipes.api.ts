@@ -46,7 +46,7 @@ export function createRecipeApi(call: TypeApiCaller ) {
          call({
             url:`/recipes/update/${recipeId}`,
             method: 'put',
-            body: { recipe: recipe },
+            body: recipe,
          })
 
    }

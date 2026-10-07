@@ -13,12 +13,13 @@ export default function LandingPage() {
    return (
       <>
         <section className="splitSpace" style={{ paddingBottom: '6rem', }}>
-            {/* Main title card */}
+
             <div className="standardContent" style={{ marginTop: '6rem',}}>
                <h1>Welcome to Big Beill's Kitchen</h1>
                <p style={{ fontSize: '1.2rem' }}> Discover, create, and share amazing recipes with a community of food enthusiasts </p>
                <LandingPageLinks />
             </div>
+
             <AnimationCrooked>
                <MiniComponent>
                   <ServerLazyLoad renderChildren={ async () => {
@@ -29,7 +30,6 @@ export default function LandingPage() {
             </AnimationCrooked>
          </section>
 
-         {/* Features Section */}
          <section className="contentCollection centerText">
             <h2 className="screenReaderOnly">Links To Core Features</h2>
             <div className="collection">
@@ -54,7 +54,6 @@ export default function LandingPage() {
             </div>
          </section>
 
-         {/* Quick Access Section */}
          <section className="contentCollection centerText">
             <h2 className="screenReaderOnly">Quick Access Links</h2>
             <div className="collection">
@@ -81,7 +80,6 @@ export default function LandingPage() {
             </div>
          </section>
 
-         {/* Info Section */}
          <section className="splitSpace" style={{marginTop: '6rem',}}>
             <h2 className="screenReaderOnly">Additional Information</h2>
             <div className="standardContent">
