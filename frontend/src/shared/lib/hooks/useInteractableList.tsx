@@ -24,11 +24,7 @@ interface ListItem<T> {
 }
 
 export function useInteractableList<T>({ initial, ref, renderItemContent, renderItemOptions, renderItemHeader }: ComponentProps<T>) {
-
-   useEffect (() => {
-      console.log("instance of useInteractableList created");
-   }, [])
-
+   
    const nextId = useRef(0); // for simplicity, once an ID has been assigned, it will never be reassigned in this list, even if deleted (unless a list reset happens)
    const [list, setList] = useState<ListItem<T>[]>(() => assignIds(initial));
 

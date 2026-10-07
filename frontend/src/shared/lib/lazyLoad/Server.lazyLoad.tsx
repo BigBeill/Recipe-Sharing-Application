@@ -24,7 +24,7 @@ async function LazyLoadPage({ renderChildren }: Omit<LazyLoadProps, "fallback">)
          return (<StateErrorPage error={ error } />); 
       }
       else {
-         return (<StateErrorPage/>)
+         return (<StateErrorPage />)
       }
    }
 }

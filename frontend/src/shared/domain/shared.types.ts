@@ -8,7 +8,6 @@ export type ServiceStateType<T> =
    | { status: 'idle' }
    | { status: 'loading' }
    | { status: 'ready'; data: T }
-   | { status: 'not-found' }
    | { status: 'error'; error: Error };
 
 export type PaginatedListType<T> = {

@@ -10,6 +10,10 @@ import { ButtonIconList } from '@/shared/view/components/Button.components';
 import { IngredientConversionType, IngredientType } from '../../domain/ingredient.types';
 import { ingredientService } from '../../services/ingredient.service.client';
 import harvestRefsObject from '@/shared/lib/harvestRefsObject';
+import { StateLoadingInsert } from '@/shared/view/states/Loading.states';
+import { StateErrorInsert } from '@/shared/view/states/Error.states';
+import { ErrorNotFound } from '@/shared/domain/errorClasses';
+import ClientLazyLoad from '@/shared/lib/lazyLoad/Client.lazyLoad';
 
 type ComponentProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onSubmit' | 'type'> & {
    extendedRequirements?: boolean
@@ -21,31 +25,30 @@ export default function IngredientSearch({ extendedRequirements = false, onSubmi
 
    // Used if { extendedRequirements } is true
    const [ingredient, setIngredient] = useState<IngredientType | null>(null);
-   const [conversionOptions, setConversionOptions] = useState<PaginatedListType<IngredientConversionType>>({ list: [], count: 0, firstItemIndex: 0 });
    const refs = {
       label: useRef<DataHandle<string>>(null),
       amount: useRef<DataHandle<number>>(null),
       unit: useRef<DataHandle<IngredientConversionType | undefined>>(null),
    }
 
-   const emptyIngredientOptions = { list: [], count: 0, firstItemIndex: 0 };
-   const [ingredientOptions, setIngredientOptions] = useState<PaginatedListType<IngredientType>>(emptyIngredientOptions);
+   const emptyPaginatedList = { list: [], count: 0, firstItemIndex: 0 };
 
    // * Fetches a list of ingredient containing words in { searchTerm } --> on response sets { setIngredientOptions }
    const ingredientOptionsState = useServiceState(async() => {
-      let response: PaginatedListType<IngredientType>;
-
-      if (searchTerm.length < 3 || ingredient !== null) { response = emptyIngredientOptions; }  // ? Don't send a fetch request if { searchTerm } is less than 3 character long
-      else { response = await ingredientService.search({ description: searchTerm }) }
-
-      setIngredientOptions(response);
-      return response;
+      if (searchTerm.length < 3 || ingredient !== null) { return emptyPaginatedList; }  // ? Don't send a fetch request if { searchTerm } is less than 3 character long
+      else { return ingredientService.search({ description: searchTerm }) }
    }, [searchTerm]);
+
+   // * Fetches a list of conversion options for { ingredient }
+   const conversionOptionsState = useServiceState(async () => {
+      if (!ingredient) { return emptyPaginatedList }
+      else { return ingredientService.searchConversion(ingredient._id); }
+   },[ingredient])
 
    // * if { extendedRequirements == false } call { onSubmit } and reset the input
    // * else save the selected ingredient using { setIngredient } 
-   function handleOptionSelect(ingredient: IngredientType) {
-      setIngredientOptions(emptyIngredientOptions);
+   function handleIngredientSelect(ingredient: IngredientType) {
+      ingredientOptionsState.overrideOutput(emptyPaginatedList);
 
       if (!extendedRequirements) { 
          setSearchTerm('');
@@ -69,7 +72,7 @@ export default function IngredientSearch({ extendedRequirements = false, onSubmi
 
    async function handleSubmit() {
       if (!extendedRequirements) { forceSubmit(); }
-      else if (ingredient) { 
+      else if (ingredient !== null) { 
          const harvestedData = harvestRefsObject(refs);
          if(!harvestedData.amount || !harvestedData.unit) { return; }
          onSubmit({ 
@@ -86,7 +89,7 @@ export default function IngredientSearch({ extendedRequirements = false, onSubmi
       }
       else {
          const ingredientsState = await ingredientOptionsState.waitForLoad();
-         if (ingredientsState.status === 'ready') { handleOptionSelect(ingredientsState.data.list[0]); }
+         if (ingredientsState.status === 'ready') { handleIngredientSelect(ingredientsState.data.list[0]); }
       }
    }
 
@@ -94,12 +97,6 @@ export default function IngredientSearch({ extendedRequirements = false, onSubmi
    function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
       if (event.key === "Enter") { handleSubmit(); }
    }
-
-   // *  Call { setConversionOptionList } --> when { ingredient } is defined
-   useServiceState(async () => {
-      if (!ingredient) { setConversionOptions({ list: [], count: 0, firstItemIndex: 0 }) }
-      else { setConversionOptions(await ingredientService.searchConversion(ingredient._id)); }
-   }, [ingredient]);
 
    function handleChange(value: string) {
       setSearchTerm(value);
@@ -109,26 +106,33 @@ export default function IngredientSearch({ extendedRequirements = false, onSubmi
    return (
       <div className={ [styles.wrapper, className].filter(Boolean).join(" ") }>
 
-         { // ? hovering list --> exists when { ingredientOptions } isn't empty
-            ingredientOptions.count > 0 ? (
-               <ul className={ styles.searchList }>
-                  { ingredientOptions.list.toReversed().map((ingredient, index) => (
-                     <li
-                        key={index}
-                        onClick={ () => handleOptionSelect(ingredient) }
-                     >
-                        { ingredient.commonName ? ingredient.commonName : ingredient.description }
-                     </li>
-                  ))}
-               </ul>
-            ) : null
-         }
+         <ClientLazyLoad serviceState={ ingredientOptionsState } isFullPage={ false } className={ styles.overrideInsert } > 
+            { (ingredientOptions) => {
+               if(ingredientOptions.list.length === 0) { return null; }
+               else { return (
+                  <ul className={ styles.ingredientOptionsList }>
+                     { ingredientOptions.list.toReversed().map((ingredient, index) => (
+                        <li key={index} onClick={ () => handleIngredientSelect(ingredient) } >
+                           { ingredient.commonName ? ingredient.commonName : ingredient.description }
+                        </li>
+                     )) }
+                  </ul>
+               ); }
+             } }
+         </ClientLazyLoad>
 
-         <div className={ [styles.supportingInputs, ...(!ingredient ? [styles.hidden] : [])].filter(Boolean).join(' ') } >
-            <InputString type="text" ref={ refs.label } label='Label' placeholder='(Optional)' className={ styles.primary } />
-            <InputNumber ref={ refs.amount } label='amount' />
-            <InputChooseValue type='select' ref={ refs.unit } label='Units' optionList={ conversionOptions.list.map((option) => { return { label: option.measure_description, value: option } }) } />
-         </div>
+         <ClientLazyLoad serviceState={ conversionOptionsState } isFullPage={ false } className={ styles.overrideInsert } >
+            { (conversionOptions) => {
+               if (conversionOptions.list.length === 0){ return null; }
+               return (
+                  <div className={ [styles.supportingInputs, ...(!ingredient ? [styles.hidden] : [])].filter(Boolean).join(' ') } >
+                     <InputString type="text" ref={ refs.label } label='Label' placeholder='(Optional)' className={ styles.primary } />
+                     <InputNumber ref={ refs.amount } label='amount' />
+                     <InputChooseValue type='select' ref={ refs.unit } label='Units' optionList={ conversionOptions.list.map((option) => { return { label: option.measure_description, value: option } }) } />
+                  </div>
+               );
+            } }
+         </ClientLazyLoad>
 
          <InputString
             type="text"

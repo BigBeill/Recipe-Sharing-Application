@@ -60,8 +60,6 @@ export default function SearchRecipePage() {
          limit: (page === 1 ? groupSize : groupSize * 2)
       });
 
-      console.log(response);
-
       let newComponents = []
 
       for (let i = 0; i < response.list.length; i += groupSize) {

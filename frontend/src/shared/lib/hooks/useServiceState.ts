@@ -1,7 +1,6 @@
 import "client-only";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ErrorNotFound } from "../api/errorClasses";
 import { ServiceStateType } from "@/shared/domain/shared.types";
 
 type SettledState<T> = Exclude<ServiceStateType<T>, { status: 'loading' }>;
@@ -22,9 +21,7 @@ export default function useServiceState<T>(fetcher: () => Promise<T>, refetchOn:
 
       const settled: Promise<SettledState<T>> = fetcher().then(
          (data) => ({ status: 'ready', data }),
-         (error) => error instanceof ErrorNotFound
-            ? { status: 'not-found' }
-            : { status: 'error', error }
+         (error) => ({ status: 'error', error })
       );
 
       settledRef.current = settled;

@@ -18,10 +18,6 @@ interface ComponentProps {
 
 export default function EditRecipeShardSetInstructionList ({ refs, initial }: ComponentProps) {
 
-   useEffect (() => {
-      console.log("instance of EditRecipeInstructionView created");
-   }, [])
-
    const newInstructionRef = useRef<DataHandle<string>>(null);
 
    const instructionList = useInteractableList({

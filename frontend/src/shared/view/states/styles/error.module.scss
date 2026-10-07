@@ -1,20 +1,22 @@
 @use './stateDefaults';
 
-.insert {
-   @extend .insertDefault;
-   border: 0.1rem solid #991b1b;
-   background-color: rgb(153, 27, 27, .5);
+@layer defaults {
+   .insertWrapper {
+      @extend .insertDefault;
+      border: 0.1rem solid #991b1b;
+      background-color: rgb(153, 27, 27, .5);
 
-   p {
-      margin: 0rem;
-   }
+      p {
+         margin: 0rem;
+      }
 
-   ul {
-      margin: 0rem;
-      padding: 0rem 0.6rem;
+      ul {
+         margin: 0rem;
+         padding: 0rem 0.6rem;
 
-      li {
-         margin: 0.3rem 0rem;
+         li {
+            margin: 0.3rem 0rem;
+         }
       }
    }
 }

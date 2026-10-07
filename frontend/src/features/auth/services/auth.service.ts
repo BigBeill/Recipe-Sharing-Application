@@ -1,5 +1,5 @@
 import { checkValidEmail, checkValidPassword } from "./auth.utils";
-import { ErrorValidation } from "@/shared/lib/api/errorClasses";
+import { ErrorValidation } from "@/shared/domain/errorClasses";
 import type {
    TypeAuthApi,
    TypeAuthServiceLoginParams,
@@ -27,7 +27,7 @@ export function createAuthService(api: TypeAuthApi) {
       register: (params: Omit<TypeAuthServiceRegisterParams, 'password'> & { passwordOne: string, passwordTwo: string }): Promise<{ _id: string }> => {
          checkValidEmail(params.email);
          checkValidPassword(params.passwordOne);
-         if (params.passwordOne != params.passwordTwo) { throw new ErrorValidation([{ field: 'passwords', issueList: ['do not match'] }]); }
+         if (params.passwordOne != params.passwordTwo) { throw new ErrorValidation('Register validation failed', [{ field: 'passwords', reasonList: ['do not match'] }]); }
          return api.register({ name: params.name, email: params.email, password: params.passwordOne });
       },
 

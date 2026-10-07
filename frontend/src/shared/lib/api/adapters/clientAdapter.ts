@@ -1,7 +1,7 @@
 import 'client-only';
 import buildRequest from '../buildRequest';
 import parseResponse from '../parseResponse';
-import { ErrorUnauthorized } from '../errorClasses';
+import { ErrorUnauthorized } from '../../../domain/errorClasses';
 import type { TypeApiAdapter, TypeApiRequestConfig, TypePreparedRequest } from '../types';
 
 const NO_REFRESH_URLS = new Set(['/auth/login', '/auth/register', '/auth/refresh']);
