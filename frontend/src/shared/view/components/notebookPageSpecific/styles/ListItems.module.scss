@@ -40,4 +40,9 @@
    &:last-child {
       border-bottom: none;
    }
+
+   &:hover {
+      cursor: pointer;
+      background: color-mix(in srgb, $color-background, black 12%);
+   }
 }
