@@ -33,7 +33,7 @@ export default function EditRecipeShardSetImage ({ refs, initial }: ComponentPro
             type='radio'
             initial={ initial?.visibility }
             label="Recipe Visibility" 
-            ref={ refs.visibility as Ref<DataHandle<string | undefined>> }
+            ref={ refs.visibility as Ref<DataHandle<string>> }
             optionList={ [
                { value: 'public', label: "Public - Anyone can view this recipe" },
                { value: 'private', label: "Private - You and friends can view this recipe" },
