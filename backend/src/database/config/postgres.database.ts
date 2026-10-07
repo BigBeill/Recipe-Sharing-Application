@@ -18,4 +18,8 @@ postgresConnection.connect((error, client, release) => {
   release();
 });
 
+postgresConnection.on('error', (error) => {
+  console.error('PostgreSQL pool client error:', error.message);
+});
+
 export default postgresConnection;
