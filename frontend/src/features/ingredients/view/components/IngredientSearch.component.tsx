@@ -4,15 +4,12 @@ import styles from './styles/ingredientSearch.module.scss';
 import { useRef, useState } from "react";
 import { InputChooseValue, InputNumber, InputString } from "@/shared/view/components/Input.components";
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
-import { DataHandle, PaginatedListType } from "@/shared/domain/shared.types";
+import { DataHandle } from "@/shared/domain/shared.types";
 import useServiceState from '@/shared/lib/hooks/useServiceState';
 import { ButtonIconList } from '@/shared/view/components/Button.components';
 import { IngredientConversionType, IngredientType } from '../../domain/ingredient.types';
 import { ingredientService } from '../../services/ingredient.service.client';
 import harvestRefsObject from '@/shared/lib/harvestRefsObject';
-import { StateLoadingInsert } from '@/shared/view/states/Loading.states';
-import { StateErrorInsert } from '@/shared/view/states/Error.states';
-import { ErrorNotFound } from '@/shared/domain/errorClasses';
 import ClientLazyLoad from '@/shared/lib/lazyLoad/Client.lazyLoad';
 
 type ComponentProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onSubmit' | 'type'> & {

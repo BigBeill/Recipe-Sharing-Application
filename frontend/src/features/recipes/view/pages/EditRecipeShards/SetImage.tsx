@@ -31,7 +31,7 @@ export default function EditRecipeShardSetImage ({ refs, initial }: ComponentPro
 
          <InputChooseValue<string>
             type='radio'
-            initial={ initial?.visibility }
+            initial={ initial ? { label: (initial.visibility.charAt(0).toUpperCase() + initial.visibility.slice(1)), value: initial.visibility } : undefined }
             label="Recipe Visibility" 
             ref={ refs.visibility as Ref<DataHandle<string>> }
             optionList={ [
