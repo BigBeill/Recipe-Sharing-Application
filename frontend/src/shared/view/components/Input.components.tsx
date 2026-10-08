@@ -58,7 +58,10 @@
    *    type: 'radio' | 'select'
    *    label: string;
    *    ref: Ref<DataHandle<T>>;
-   *    initial?: T;
+   *    initial?: {
+   *       label: string;
+   *       value: T;
+   *    };
    *    optionList: {
    *       label: string;
    *       value: T;
@@ -68,6 +71,8 @@
    * 
    * This component will prompt the user to select a string from { optionList }, and store the choice for the parent to use
    * The string can be accessed through ref using the { DataHandle<T> } getData + setData properties
+   * 
+   * initial should be set to the label 
 */
 
 
@@ -186,7 +191,10 @@ export function InputString({ className, label, initial, ref, readOnlyOptions, .
 type InputChooseValueBaseProps<T> = {
    label: string;
    ref?: Ref<DataHandle<T>>;
-   initial?: T;
+   initial?: {
+      label: string;
+      value: T;
+   };
    optionList: {
       label: string;
       value: T;
@@ -201,7 +209,7 @@ type InputChooseValueProps<T> = ( InputRadioProps<T> & { type: 'radio' } ) | ( I
 
 
 export function InputChooseValue<T>({ ...props }: InputChooseValueProps<T>) {
-    if (props.optionList.length === 0) { throw new Error("@/shared/view/components/input.components.tsx --> InputChooseValue.  { optionList } was empty, at least one list item is required."); }
+   if (props.optionList.length === 0) { throw new Error("@/shared/view/components/input.components.tsx --> InputChooseValue.  { optionList } was empty, at least one list item is required."); }
    if (props.type === 'radio') {
       const { type, ...rest } = props;
       return <InputRadio { ...rest } />;
@@ -215,7 +223,7 @@ export function InputChooseValue<T>({ ...props }: InputChooseValueProps<T>) {
 
 function InputRadio<T>({ className, label, ref, optionList, initial, ...rest }: InputRadioProps<T>) {
    const id = useId();
-   const [choice, setChoice] = useState<{ label: string, value: T }>(optionList[0]);
+   const [choice, setChoice] = useState<{ label: string, value: T }>(initial || optionList[0]);
 
    useImperativeHandle(ref, () => ({
       getData: () => choice.value,
@@ -223,11 +231,11 @@ function InputRadio<T>({ className, label, ref, optionList, initial, ...rest }: 
    }),[choice]);
    
    return (
-      <fieldset className={ [styles.inputRadioButtons, className].filter(Boolean).join(" ") } { ...rest }>
+      <fieldset className={ [styles.inputWrapper, className].filter(Boolean).join(" ") } { ...rest }>
          <legend>{ label }</legend>
          { optionList.map((option, index) => (
-            <div key={ index }>
-               <input type='radio' id={ `${ id }-${ index }` } name={ id } value={ option.label } checked={ choice === option.value } onChange={() => { setChoice(option); } } />
+            <div key={ index } style={ {  } }>
+               <input type='radio' id={ `${ id }-${ index }` } name={ id } value={ option.label } checked={ choice.label === option.label } onChange={() => { setChoice(option); } } />
                <label htmlFor={ `${ id }-${ index }` }>{ option.label }</label>
             </div>
          )) }
@@ -237,7 +245,7 @@ function InputRadio<T>({ className, label, ref, optionList, initial, ...rest }: 
 
 function InputSelect<T>({ className, label, ref, optionList, initial, ...rest }: InputSelectProps<T>) {
    const id = useId();
-   const [choice, setChoice] = useState<{ label: string, value: T }>(optionList[0]);
+   const [choice, setChoice] = useState<{ label: string, value: T }>(initial || optionList[0])
 
    useImperativeHandle(ref, () => ({
       getData: () => choice?.value,

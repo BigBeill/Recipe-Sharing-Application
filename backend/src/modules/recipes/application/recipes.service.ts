@@ -155,6 +155,7 @@ export class RecipesService {
       }
 
       const recipes = await this.repository.search({ title, authId, ownerIdList: allowedOwnerIdList, ingredientIdList, visibilityList, skip, limit });
+      console.log("recipes leaving search:", recipes);
 
       return {
          ...recipes,

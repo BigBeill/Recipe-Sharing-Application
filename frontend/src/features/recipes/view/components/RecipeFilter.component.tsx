@@ -13,7 +13,10 @@ import useServiceState from "@/shared/lib/hooks/useServiceState";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { ButtonOval } from "@/shared/view/components/Button.components";
 import IngredientSearch from "@/features/ingredients/view/components/IngredientSearch.component";
-import { InputString } from "@/shared/view/components/Input.components";
+import { InputChooseValue, InputString } from "@/shared/view/components/Input.components";
+import harvestRefsObject from "@/shared/lib/harvestRefsObject";
+
+
 
 export default function RecipeFilterComponent() {
 
@@ -24,16 +27,20 @@ export default function RecipeFilterComponent() {
    const title = searchParams.get('title') || '';
    const ingredients = searchParams.get('ingredients');
    const ingredientIdList = useMemo(() => { return ingredients ? ingredients.split(',').map(Number) : [] }, [ingredients] );
-   const category = searchParams.get('category');
+   const category: 'public' | 'friends' | 'personal' = (searchParams.get('category') || 'public') as 'public' | 'friends' | 'personal';
 
-   const titleRef = useRef<DataHandle<string>>(null);
-   const ingredientListRef = useRef<DataHandle<IngredientType[]>>(null);
-   const categoryRef = useRef<DataHandle<"public" | "friends" | "personal">>(null);
+   const refs = {
+      title: useRef<DataHandle<string>>(null),
+      ingredientList: useRef<DataHandle<IngredientType[]>>(null),
+      category: useRef<DataHandle<"public" | "friends" | "personal">>(null),
+   }
+
+   const categoryOptionList: { label: string, value: 'public' | 'friends' | 'personal' }[] = [ { label: 'Public', value: 'public' }, { label: 'Friends', value: 'friends' }, { label: 'Personal', value: 'personal' } ];
 
    // * create and track a list of all user added ingredients
    const ingredientList = useInteractableList({
       initial: [],
-      ref: ingredientListRef,
+      ref: refs.ingredientList,
       renderItemContent: (item: IngredientType) => {
          if (item.commonName) { return (<p>{ item.commonName }</p>) }
          else if (item.portion) { return (<p>{ item.portion.amount } { item.portion.description } of [{ item.description }]</p>)  }
@@ -42,11 +49,11 @@ export default function RecipeFilterComponent() {
       renderItemOptions: (item: IngredientType, index: number) => (
          <FontAwesomeIcon
             role='button'
-            tabIndex={0}
-            aria-label={`Remove ingredient ${index + 1}`}
-            icon={faCircleXmark}
-            style={{color: "#575757",}}
-            onClick={() => ingredientList.removeIndex(index)} 
+            tabIndex={ 0 }
+            aria-label={ `Remove ingredient ${ index + 1 }` }
+            icon={ faCircleXmark }
+            style={ { color: "#575757" } }
+            onClick={ () => ingredientList.removeIndex(index) } 
          />
       ), 
    });
@@ -54,10 +61,10 @@ export default function RecipeFilterComponent() {
    // * get a list of all ingredients as listed by there id's in the url
    useServiceState(async () => {
       const urlIds = new Set(ingredientIdList);
-      const prunedIngredientList = ingredientListRef.current!.getData().filter((ingredient) => urlIds.has(ingredient._id));
+      const prunedIngredientList = refs.ingredientList.current!.getData().filter((ingredient) => urlIds.has(ingredient._id));
 
       // ? get ingredientIdList without any already known ingredients
-      const currentIds = new Set(ingredientListRef.current!.getData().map((ingredient) => ingredient._id));
+      const currentIds = new Set(refs.ingredientList.current!.getData().map((ingredient) => ingredient._id));
       const newIdList = ingredientIdList.filter((id) => !currentIds.has(id));
 
       // ? fetch all unknown ingredients from the server
@@ -67,16 +74,16 @@ export default function RecipeFilterComponent() {
          })
       );
 
-      ingredientListRef.current!.setData([...prunedIngredientList, ...newIngredientList]);
+      refs.ingredientList.current!.setData([...prunedIngredientList, ...newIngredientList]);
    }, [ingredientIdList]);
 
    // * grab user entered data from url and add them to { URLsearchParams }
    function handleFormSubmit() {
-      const updatedParams = new URLSearchParams()
-      const title = titleRef.current!.getData()
-      const ingredientList = ingredientListRef.current!.getData();
-      if(title) { updatedParams.set('title', title); }
-      if(ingredientList.length !== 0) { updatedParams.set('ingredientIdList', ingredientList.map((ingredient) => ingredient._id).join(',')); }
+      const updatedParams = new URLSearchParams();
+      const data = harvestRefsObject(refs);
+      if(data.title) { updatedParams.set('title', data.title); }
+      if(data.ingredientList.length !== 0) { updatedParams.set('ingredientIdList', data.ingredientList.map((ingredient) => ingredient._id).join(',')); }
+      if(data.category !== 'public'){ updatedParams.set('category', data.category); }
       router.push(`${pathname}?${updatedParams}`);
    }
 
@@ -84,11 +91,12 @@ export default function RecipeFilterComponent() {
       <NotebookComponentDefault className={ styles.notebookPage }>
          <h1 className={ styles.header } >Public Recipes</h1>
 
-         <InputString type='text' className={ styles.input } label='Name' initial={ title } ref={ titleRef } placeholder='Search for a recipe by name' />
+         <InputString type='text' className={ styles.titleInput } label='Name' initial={ title } ref={ refs.title } placeholder='Search for a recipe by name' />
          { ingredientList.htmlView }
-         <IngredientSearch placeholder='Describe an ingredient you would like to be include in your recipe' onSubmit={ ingredientList.addItem } />
+         <InputChooseValue<'public' | 'friends' | 'personal'> type="radio" label="Recipe type" className={ styles.categoryInput } ref={ refs.category } optionList={ categoryOptionList } initial={ { label: (category.charAt(0).toUpperCase() + category.slice(1)), value: category } } />
+         <IngredientSearch className={ styles.ingredientInput } placeholder='Describe an ingredient you would like to be include in your recipe' onSubmit={ ingredientList.addItem } />
 
-         <ButtonOval className={ styles.submitButton } showLoading={ true } onClick={ handleFormSubmit }>search</ButtonOval>
+         <ButtonOval className={ styles.searchButton } showLoading={ true } onClick={ handleFormSubmit }>search</ButtonOval>
       </NotebookComponentDefault>
    );
 }

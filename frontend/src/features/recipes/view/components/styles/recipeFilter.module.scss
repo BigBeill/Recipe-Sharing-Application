@@ -1,18 +1,40 @@
 .notebookPage {
-   display: flex;
-   flex-direction: column;
+   display: grid;
+   grid-template-areas:
+      "header header"
+      "titleInput titleInput"   
+      "ingredientList categoryInput"
+      "ingredientInput ingredientInput"
+      "searchButton searchButton";
+   grid-template-columns: 1fr 9rem;
+   column-gap: 0.6rem;
+   grid-template-rows: min-content min-content 1fr min-content min-content;
    overflow: hidden;
 }
 
-.input {
+.header {
+   grid-area: header;
+   margin: 1.2rem 0rem;
+}
+
+.titleInput {
+   grid-area: titleInput;
    margin-top: 0rem;
 }
 
-.header {
-   margin-top: 3rem;
-   margin-bottom: 1.5rem
+.ingredientList {
+   grid-area: ingredientList;
+
 }
 
-.submitButton {
-   margin-bottom: 3rem;
+.categoryInput {
+   grid-area: categoryInput;
+}
+
+.ingredientInput { 
+   grid-area: ingredientInput;
+}
+
+.searchButton {
+   grid-area: searchButton;
 }

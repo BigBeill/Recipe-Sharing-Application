@@ -23,7 +23,7 @@ export default function SearchRecipePage() {
 
    const title: string =  searchParams.get('title') || '';
    const ingredientIdListParam = searchParams.get('ingredientIdList');
-   const category = searchParams.get('category') as "public" | "friends" | "personal" || 'public';
+   const category = (searchParams.get('category') || 'public') as "public" | "friends" | "personal";
    const ingredientIdList = useMemo(() => { return ingredientIdListParam ? ingredientIdListParam.split(',').map(Number) : [] }, [ingredientIdListParam] );
    const page: number = Number(searchParams.get('page')) || 1;
 
@@ -50,9 +50,9 @@ export default function SearchRecipePage() {
       const response = await recipeService.search({
          title,
          visibilityList: [...(
-            sessionStatus ? ['public']
+            !sessionStatus ? ['public']
             : category === 'public' ? ['public', 'private', 'personal']
-            : category === 'friends' ? ['private, personal']
+            : category === 'friends' ? ['private', 'personal']
             : ['personal']
          ) as ('public' | 'private' | 'personal')[]],
          ingredientIdList,

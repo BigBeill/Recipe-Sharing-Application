@@ -50,6 +50,7 @@ export class RecipesRepository {
 
    
    async search(params: GetRecipeListParams): Promise<PaginatedListType<RecipeRecord>> {
+      console.log("params sent to search:", params);
 
       const { title, ownerIdList, ingredientIdList, visibilityList, authId, friendIdList = [], skip, limit } = params;
 
@@ -58,15 +59,18 @@ export class RecipesRepository {
       if (visibilityList.includes('private') && !authId) { throw new Error('recipes.repository.search prop { visibilityList } includes the value "private" however a valid { authId } was not provided'); }
       if (visibilityList.includes('personal') && !authId){ throw new Error('recipes.repository.search prop { visibilityList } includes "personal" however a valid { authId } was not provided'); }
 
+      const recipeAccessConditionList = [
+         ...(visibilityList.includes('public') ? [{ visibility: 'public' }] : []),
+         ...(visibilityList.includes('private') ? [{ $or: [{ visibility: 'public' }, { visibility: 'private' }], ownerId: { $in: [...friendIdList, ...(authId ? [authId] : [])].map(id => new Types.ObjectId(id)) } }] : []),
+         ...(visibilityList.includes('personal') ? [{ $or: [{ visibility: 'public'}, { visibility: 'private' }, {visibility: 'personal'}], ownerId: new Types.ObjectId(authId) }] : []),
+      ]
+
+      console.log("allowedConditions", recipeAccessConditionList)
+
       const [result] = await RecipeModel.aggregate([
          {
             $match: {
-               visibility: { $in: visibilityList },
-               $or: [
-                  { visibility: 'public' },
-                  { visibility: 'private', ownerId: { $in: [...friendIdList, ...(authId ? [authId] : [])].map(id => new Types.ObjectId(id)) } },
-                  { visibility: 'personal', ownerId: new Types.ObjectId(authId) },
-               ],
+               $or: recipeAccessConditionList,
                ...(ingredientIdList?.length ? { 'ingredientList._id': { $all: ingredientIdList } } : {}),
                ...(title && { title: { $regex: escapeRegex(title), $options: 'i' } }),
             } 
