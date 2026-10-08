@@ -50,7 +50,7 @@ export default function SearchRecipePage() {
       const response = await recipeService.search({
          title,
          visibilityList: [...(
-            !sessionStatus ? ['public']
+            sessionStatus == 'guest' ? ['public']
             : category === 'public' ? ['public', 'private', 'personal']
             : category === 'friends' ? ['private', 'personal']
             : ['personal']
