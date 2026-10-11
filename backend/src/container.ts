@@ -1,14 +1,14 @@
 import { createContainer, asClass } from "awilix";
-import { AuthRepository } from "./modules/auth/auth.repository";
-import { RecipesRepository } from "./modules/recipes/infrastructure/recipes.repository";
-import { UsersRepository } from "./modules/users/users.repository";
-import { AuthService } from "./modules/auth/auth.service";
-import { ImagesService } from "./modules/images/images.service";
-import { RecipesService } from "./modules/recipes/application/recipes.service";
-import { UsersService } from "./modules/users/users.service";
-import { IngredientsRepository } from "./modules/ingredients/infrastructure/ingredients.repository";
-import { IngredientsService } from "./modules/ingredients/application/ingredients.service";
-import { PermissionsService } from "./modules/permissions/permissions.service";
+import { AuthRepository } from "./features/auth/auth.repository";
+import { RecipesRepository } from "./features/recipes/infrastructure/recipes.repository";
+import { AuthService } from "./features/auth/auth.service";
+import { ImagesService } from "./features/images/images.service";
+import { RecipesService } from "./features/recipes/application/recipes.service";
+import { UsersService } from "./features/users/application/users.service";
+import { IngredientsRepository } from "./features/ingredients/infrastructure/ingredients.repository";
+import { IngredientsService } from "./features/ingredients/application/ingredients.service";
+import { PermissionsService } from "./features/permissions/permissions.service";
+import { UsersRepository } from "./features/users/infrastructure/users.repository";
 
 const container = createContainer();
 

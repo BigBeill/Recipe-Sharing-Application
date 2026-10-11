@@ -1,7 +1,7 @@
 import { app } from './app';
-import { env } from './config/env';
-import { connectMongoose, disconnectMongoose } from './database/config/mongoose.database';
-import postgresConnection from './database/config/postgres.database';
+import { connectMongoose, disconnectMongoose } from './externalResources/database/mongo/config.mongoDatabase';
+import postgresConnection from './externalResources/database/postgre/config.postgreDatabase';
+import { env } from './global/config/env.config';
 
 await connectMongoose();
 await postgresConnection.connect();

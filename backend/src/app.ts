@@ -1,17 +1,17 @@
 import { Elysia } from 'elysia';
-import { corsConfig } from './config/cors';
-import { errorHandler } from './plugins/errorHandler.plugin';
-import { logger } from './plugins/logger.plugin';
-import { authController } from './modules/auth/auth.controller';
-import { usersController } from './modules/users/users.controller';
+import { authController } from './features/auth/auth.controller';
+import { usersController } from './features/users/api/users.controller';
 import removeMongooseNoise from './common/utils/removeMongooseNoise';
-import { ingredientsController } from './modules/ingredients/api/ingredients.controller';
-import { imagesController } from './modules/images/images.controller';
-import { recipesController } from './modules/recipes/api/recipes.controller';
-import { jwksPlugin } from './modules/auth/jwk.plugin';
-import { cookieConfig } from './config/cookies';
-import { circuitBreaker } from './plugins/circuitBreaker.plugin';
-import { ipRateLimit } from './plugins/ipRateLimit.plugin';
+import { ingredientsController } from './features/ingredients/api/ingredients.controller';
+import { imagesController } from './features/images/images.controller';
+import { recipesController } from './features/recipes/api/recipes.controller';
+import { jwksPlugin } from './features/auth/jwk.plugin';
+import { circuitBreaker } from './global/security/circuitBreaker.root';
+import { cookieConfig } from './global/config/cookies.config';
+import { ipRateLimit } from './global/security/ipRateLimit.root';
+import { errorHandler } from './global/departingData/errorHandler.root';
+import { corsConfig } from './global/config/cors.config';
+import { logger } from './global/departingData/logger.root';
 
 export const app = new Elysia({ normalize: false, cookie: cookieConfig })
    .use(circuitBreaker({ limit: 2000, windowMs: 10_000, cooldownMs: 30_000 }))
