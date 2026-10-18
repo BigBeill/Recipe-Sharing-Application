@@ -2,11 +2,11 @@ import { Pool } from 'pg';
 import { env } from '../../../global/config/env.config';
 
 const postgresConnection = new Pool({
-   host: env.POSTGRES_DB_HOST,
-   user: env.POSTGRES_DB_USER,
-   database: env.POSTGRES_DB_DATABASE,
-   password: env.POSTGRES_DB_PASSWORD,
-   port: env.POSTGRES_DB_PORT,
+   host: env.POSTGRES_HOST,
+   user: env.POSTGRES_USER,
+   database: env.POSTGRES_DB,
+   password: env.POSTGRES_PASSWORD,
+   port: env.POSTGRES_PORT,
 });
 
 postgresConnection.connect((error, client, release) => {
