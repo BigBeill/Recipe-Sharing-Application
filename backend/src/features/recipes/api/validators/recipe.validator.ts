@@ -4,8 +4,8 @@ import { NutritionValidator } from "../../../../common/api/validators/nutrition.
 import { ValidatorRecipeDraft } from "./recipeDraft.Validator";
 
 export const RecipeValidator = t.Object({
-   ...IdValidator.properties,
-   ownerId: IdValidator.properties._id,
+   _id: IdValidator,
+   ownerId: IdValidator,
+   nutrition: t.Optional(NutritionValidator),
    ...ValidatorRecipeDraft.properties,
-   nutrition: t.Optional( NutritionValidator.properties.nutrition),
-})
+});

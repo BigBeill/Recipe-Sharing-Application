@@ -4,7 +4,7 @@ import { IngredientValidator } from "../../../ingredients/api/validators/ingredi
 export const ValidatorRecipeDraft = t.Object({
    title: t.String(),
    description: t.String(),
-   ingredientList: t.Array( IngredientValidator.properties.ingredient ),
+   ingredientList: t.Array(IngredientValidator),
    instructionList: t.Array(t.String()),
    visibility: t.Union([
       t.Literal('public'),
