@@ -4,10 +4,17 @@ import { jwtVerify } from 'jose';
 import { publicKey } from './keys';
 import { UnauthorizedError } from '../../global/departingData/error.types';
 import { env } from '../../global/config/env.config';
+import { Types } from 'mongoose';
+
+
+
+const OBJECT_ID_HEX = /^[0-9a-fA-F]{24}$/;
+
+
 
 export const authenticateMiddleware = new Elysia({ name: 'authenticate' }).derive(
    { as: 'scoped' },
-   async ({ cookie: { accessToken } }): Promise<{ authId?: string }> => {
+   async ({ cookie: { accessToken } }): Promise<{ authId?: Types.ObjectId }> => {
       const token = accessToken?.value as string;
       if (!token) { return { authId: undefined } }
       
@@ -17,7 +24,9 @@ export const authenticateMiddleware = new Elysia({ name: 'authenticate' }).deriv
             audience: env.AUTH_AUDIENCE,
             algorithms: ['ES256'],
          });
-         return { authId: payload.sub };
+
+         if (!payload.sub || !OBJECT_ID_HEX.test(payload.sub)) { return { authId: undefined } }
+         return { authId: new Types.ObjectId(payload.sub) };
       } catch (error) {
          return { authId: undefined }
       }
@@ -25,10 +34,10 @@ export const authenticateMiddleware = new Elysia({ name: 'authenticate' }).deriv
 )
 
 export const authorizeMiddleware = new Elysia({ name: 'authorize' })
-.use(authenticateMiddleware) //? does this mean authenticateMiddleware is running twice if its used earlier or the same instance is being used again?
+.use(authenticateMiddleware)
 .derive(
    { as: 'scoped' },
-   ({ authId }): { authId: string } => {
+   ({ authId }): { authId: Types.ObjectId } => {
       if (!authId) { throw new UnauthorizedError('Invalid or expired token'); }
       return { authId }
    },

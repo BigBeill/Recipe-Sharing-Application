@@ -1,9 +1,9 @@
 import { Elysia } from 'elysia';
-import { authController } from './features/auth/auth.controller';
+import { authController } from './features/auth/api/auth.controller';
 import { usersController } from './features/users/api/users.controller';
 import removeMongooseNoise from './common/utils/removeMongooseNoise';
 import { ingredientsController } from './features/ingredients/api/ingredients.controller';
-import { imagesController } from './features/images/images.controller';
+import { imagesController } from './features/images/api/images.controller';
 import { recipesController } from './features/recipes/api/recipes.controller';
 import { jwksPlugin } from './features/auth/jwk.plugin';
 import { circuitBreaker } from './global/security/circuitBreaker.root';

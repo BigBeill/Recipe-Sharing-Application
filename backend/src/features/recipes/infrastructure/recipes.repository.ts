@@ -1,28 +1,30 @@
 import { Types } from "mongoose";
 import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import { escapeRegex } from "../../../common/utils/filter";
-import { RecipeModel, type RecipeRecord } from "../../../externalResources/database/mongo/schemas/recipe.schema";
+import { RecipeModel, type RecipeRecord } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
 import { dehydrateRecipe } from "../application/recipes.dehydrate";
 import type { TypeRecipe } from "../domain/recipes.types";
-import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
 import { NotFoundError } from "elysia";
 
 
-interface GetRecipeListParams {
+
+interface SearchParams {
    // ? main constraints
    title?: string;
-   ownerIdList?: string[];
+   ownerIdList?: Types.ObjectId[];
    ingredientIdList?: number[];
    visibilityList: ('public' | 'private' | 'personal')[];
 
    // ? supporting data
-   authId?: string; // Required if { visibilityList } contains 'private' or 'personal'
-   friendIdList?: string[]; // ? for filtering when looking for 'private recipes
+   authId?: Types.ObjectId; // Required if { visibilityList } contains 'private' or 'personal'
+   friendIdList?: Types.ObjectId[]; // ? for filtering when looking for 'private recipes
 
    // ? operationalConstraints
    skip?: number;
    limit?: number;
 }
+
+
 
 export class RecipesRepository {
 
@@ -35,13 +37,13 @@ export class RecipesRepository {
 
 
 
-   async delete(_id: string): Promise<void> {
+   async delete(_id: Types.ObjectId): Promise<void> {
       await RecipeModel.deleteOne({ _id });
    }
 
 
    
-   async get(_id: string): Promise<RecipeRecord> {
+   async get(_id: Types.ObjectId): Promise<RecipeRecord> {
       const record = await RecipeModel.findOne({ _id }).lean<RecipeRecord | null>();
       if (!record) { throw new NotFoundError(`Database could no find recipe with id: ${ _id }`); }
       return record;
@@ -49,7 +51,7 @@ export class RecipesRepository {
 
 
    
-   async search(params: GetRecipeListParams): Promise<PaginatedListType<RecipeRecord>> {
+   async search(params: SearchParams): Promise<PaginatedListType<RecipeRecord>> {
       console.log("params sent to search:", params);
 
       const { title, ownerIdList, ingredientIdList, visibilityList, authId, friendIdList = [], skip, limit } = params;
@@ -64,8 +66,6 @@ export class RecipesRepository {
          ...(visibilityList.includes('private') ? [{ $or: [{ visibility: 'public' }, { visibility: 'private' }], ownerId: { $in: [...friendIdList, ...(authId ? [authId] : [])].map(id => new Types.ObjectId(id)) } }] : []),
          ...(visibilityList.includes('personal') ? [{ $or: [{ visibility: 'public'}, { visibility: 'private' }, {visibility: 'personal'}], ownerId: new Types.ObjectId(authId) }] : []),
       ]
-
-      console.log("allowedConditions", recipeAccessConditionList)
 
       const [result] = await RecipeModel.aggregate([
          {
@@ -100,4 +100,7 @@ export class RecipesRepository {
       );
       return updatedRecipe?.toObject() ?? null;
    }
+
+
+
 }

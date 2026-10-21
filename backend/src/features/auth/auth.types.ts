@@ -1,22 +1,29 @@
+import type { Types } from "mongoose";
 
-export interface AuthTokensType {
+export interface TypeAuthTokens {
    accessToken: string;
    refreshToken: string;
 }
 
-export interface AuthResultType {
-   userId: string;
-   tokens: AuthTokensType;
+export interface TypeAuthResult {
+   userId: Types.ObjectId;
+   tokens: TypeAuthTokens;
 }
 
-export interface JwtPayloadType {
-   authId: string;
+export interface TypeJwtPayload {
+   authId: Types.ObjectId;
    issued?: number;
    expires?: number;
 }
 
-export interface SavedTokenType {
-   userId: string;
+export interface TypeSavedRefreshToken {
+   userId: Types.ObjectId;
    hash: string;
    expiresAt: Date;
+}
+
+export interface TypeUserDraft {
+   name: string;
+   email: string;
+   passwordHash: string;
 }

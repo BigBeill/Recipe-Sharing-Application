@@ -1,6 +1,4 @@
 import { Schema, Types, model, type HydratedDocument } from 'mongoose';
-import { ImageSchema } from './image.schema';
-import type { ImageType } from '../../../../features/images/images.types';
 
 interface TypeTimestamps {
    createdAt: Date;
@@ -11,7 +9,7 @@ interface TypeDatabaseUser {
    name: string;
    email?: string;
    bio?: string;
-   image?: ImageType;
+   imageReferenceId?: Types.ObjectId;
 }
 
 interface TypeUserSecrets {
@@ -26,7 +24,7 @@ const userSchema = new Schema<UserModelType>(
       name: { type: String, required: true, unique:true },
       email: { type: String, required: true, unique:true, select: false },
       bio: String,
-      image: { type: ImageSchema, default: undefined, set: (v: unknown) => (v === null ? undefined : v) },
+      imageReferenceId: { type: Schema.Types.ObjectId },
       passwordHash: {type: String, required: true, select: false},
    }, { timestamps: true }
 );

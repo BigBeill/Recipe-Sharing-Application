@@ -4,8 +4,8 @@ import { readFileSync } from "fs";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const template = readFileSync("src/externalResources/email/templates/resetPassword.html", "utf-8");
 
-export async function sendPasswordResetEmail(toEmail: string, accountInformation: { username: string,  resetToken: string }): Promise<void> {
-   const html = template.replace("{{resetString}}", accountInformation.resetToken).replace("{{username}}", () => escapeHtml(accountInformation.username));
+export async function sendPasswordResetEmail(toEmail: string, accountInformation: { name: string,  resetToken: string }): Promise<void> {
+   const html = template.replace("{{resetString}}", accountInformation.resetToken).replace("{{username}}", () => escapeHtml(accountInformation.name));
 
    const { data, error } = await resend.emails.send({
       from: "no-reply@big-beills-kitchen.ca",

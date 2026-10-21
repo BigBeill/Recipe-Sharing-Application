@@ -1,99 +1,123 @@
+import type { Types } from "mongoose";
 import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import { escapeRegex } from "../../../common/utils/filter";
-import { FriendRequestModel, type FriendRequestRecord } from "../../../externalResources/database/mongo/schemas/friendRequest.schema";
-import { FriendshipModel, type FriendshipRecord } from "../../../externalResources/database/mongo/schemas/friendship.schema";
-import { UserModel, type UserRecord } from "../../../externalResources/database/mongo/schemas/user.schema";
-import type { ImageType } from "../../images/images.types";
-
-
-interface GetFolderListParams {
-   ownerId: string,
-   parentId?: string, 
-   skip?: number,
-   limit?: number,
-}
-
-type GetFriendRequestParams = 
-   | { _id: string, senderId?: string, receiverId?: string }
-   | { _id?: string, senderId: string, receiverId: string }
-
-type GetFriendshipParams = 
-   | { _id: string, firstUserId?: string, secondUserId?: string }
-   | { _id?: string, firstUserId: string, secondUserId: string }
+import { FriendRequestModel, type FriendRequestRecord } from "../../../externalResources/database/mongoose/schemas/friendRequest.schema";
+import { FriendshipModel, type FriendshipRecord } from "../../../externalResources/database/mongoose/schemas/friendship.schema";
+import { UserModel, type UserRecord } from "../../../externalResources/database/mongoose/schemas/user.schema";
+import type { TypeImage } from "../../images/domain/images.types";
+import type { TypeRelationship } from "../domain/users.types";
+import { NotFoundError } from "elysia";
 
 interface SearchUserParams {
-   _id?: string,
+   _id?: Types.ObjectId,
    name?: string,
+   email?: string
    skip?: number,
    limit?: number,
+   searchExact?: boolean,
 }
 
 interface UpdateUserParams {
    name?: string,
    email?: string,
    bio?: string,
-   image?: ImageType
+   image?: TypeImage
 }
 
 export class UsersRepository {
 
-   async createFriendRequest(userId: string, targetId: string): Promise<FriendRequestRecord> {
+   async createFriendRequest(userId: Types.ObjectId, targetId: Types.ObjectId): Promise<FriendRequestRecord> {
       const friendRequest = await FriendRequestModel.create({ senderId: userId, receiverId: targetId });
       return friendRequest.toObject();
    }
+
+
 
    async createFriendship(friendIds: [string, string]): Promise<FriendshipRecord> {
       const friendship = await FriendshipModel.create({ friendIds });
       return friendship.toObject();
    }
 
-   async deleteFriendRequest(_id: string) {
+
+
+   async deleteFriendRequest(_id: Types.ObjectId) {
       await FriendRequestModel.deleteOne({ _id });
    }
 
-   async deleteFriendship(_id: string) {
+
+
+   async deleteFriendship(_id: Types.ObjectId) {
       await FriendshipModel.deleteOne({ _id });
    }
 
-   async deleteUser(_id: string): Promise<void> {
+
+
+   async deleteUser(_id: Types.ObjectId): Promise<void> {
       await UserModel.deleteOne({ _id });
    }
 
-   async getExactUserList({name, email}: { name?: string, email?: string }): Promise<UserRecord[]> {
-      const conditions: any[] = [];
 
-      if (name) conditions.push({ name });
-      if (email) conditions.push({ email });
 
-      if (conditions.length === 0) { return []; }
+   async findRelationship(params: { ownerId: Types.ObjectId, targetId: Types.ObjectId, skipRequests?: boolean, skipFriendships?: boolean }): Promise<TypeRelationship | null> {
+      const { ownerId, targetId, skipRequests = false, skipFriendships = false } = params;
 
-      const userList = await UserModel.find({ $or: conditions }).lean();
-      return userList;
+      if (!skipRequests) {
+         const friendRequestRecord = await FriendRequestModel.findOne({
+            $or: [
+               { senderId: ownerId, receiverId: targetId },
+               { senderId: targetId, receiverId: ownerId },
+            ],
+         }).lean();
+
+         if (friendRequestRecord !== null) {
+            if (ownerId.equals(friendRequestRecord.senderId)) { return { _id: friendRequestRecord._id, ownerId, targetId, type: "requestSent" } }
+            else { return { _id: friendRequestRecord._id, ownerId, targetId, type: "requestReceived" } } 
+         }
+      }
+
+      if (!skipFriendships) {
+         const friendship = await FriendshipModel.findOne({ friendIds: { $all: [ownerId, targetId] } }).lean();
+         if (friendship != null) { return { _id: friendship._id, targetId, ownerId, type: 'friend' } }
+      }
+
+      return null;
    }
 
-   async getFriendRequest({ _id, senderId, receiverId }: GetFriendRequestParams): Promise<FriendRequestRecord | null> {
-      return FriendRequestModel.findOne({ ...(_id && { _id }), ...((senderId && receiverId) && { senderId, receiverId }) }).lean<FriendRequestRecord>();
+
+
+   async getFriendRequest(_id: Types.ObjectId): Promise<FriendRequestRecord> {
+      const friendRequestRecord = await FriendRequestModel.findOne({ _id }).lean();
+      if (!friendRequestRecord) { throw new NotFoundError(`Database could not find friend request with _id: ${ _id }`); }
+      else { return friendRequestRecord; }
    }
 
-   async getFriendship({ _id, firstUserId, secondUserId }: GetFriendshipParams): Promise<FriendshipRecord | null> {
-      return FriendshipModel.findOne({ 
-         ...(_id && { _id }), 
-         ...((firstUserId && secondUserId) && { friendIds: { $all: [firstUserId, secondUserId] } }),
-      }).lean<FriendshipRecord>();
+
+
+   async getFriendship(_id: Types.ObjectId): Promise<FriendshipRecord> {
+      const friendshipRecord = await FriendshipModel.findOne({ _id }).lean();
+      if (!friendshipRecord) { throw new NotFoundError(`Database could not find friendship with _id: ${ _id }`) }
+      else { return friendshipRecord; }
    }
 
-   async getFriendshipList(userId: string): Promise<FriendshipRecord[]> {
+
+
+   async getUser(_id: Types.ObjectId): Promise<UserRecord> {
+      const user = await UserModel.findOne({_id }).lean<UserRecord>();
+      if (!user) { throw new NotFoundError(`Database could not find user is _id: ${ _id } `); }
+      else { return user; }
+   }
+
+
+
+   async searchFriendship(userId: Types.ObjectId): Promise<FriendshipRecord[]> {
       return FriendshipModel.find({ 
          friendIds: { $in: [ userId ]}, 
       }).lean<FriendshipRecord[]>();
    }
 
-   async getUser(_id: string): Promise<UserRecord | null> {
-      const user = UserModel.findOne({_id }).lean<UserRecord>();
-      return user;
-   }
 
-   async searchUsers({ _id, name, skip, limit }: SearchUserParams): Promise<PaginatedListType<UserRecord>> {
+
+   async searchUser({ _id, name, email, skip, limit, searchExact = false }: SearchUserParams): Promise<PaginatedListType<UserRecord>> {
       const resultList = await UserModel.aggregate<{
          recordList: UserRecord[];
          countList: { count: number }[];
@@ -101,7 +125,14 @@ export class UsersRepository {
          {
             $match: {
                ...(_id && { _id }),
-               ...(name && { name: { $regex: escapeRegex(name), $options: 'i' } }),
+               ...(!searchExact ? {
+                  ...(name && { name: { $regex: escapeRegex(name), $options: 'i' } }),
+                  ...(email && { name: { $regex: escapeRegex(email), $options: 'i' } }),
+               } :
+               {
+                  ...(name && { name }),
+                  ...(email && { email }),
+               }),
             },
          },
          {
@@ -119,7 +150,9 @@ export class UsersRepository {
       return { list: recordList, count: countList[0]?.count ?? 0, firstItemIndex: skip ?? 0 }
    }
 
-   async updateUser(_id: string, { name, email, bio, image }: UpdateUserParams): Promise<UserRecord | null> {
+
+
+   async updateUser(_id: Types.ObjectId, { name, email, bio, image }: UpdateUserParams): Promise<UserRecord | null> {
       return UserModel.findByIdAndUpdate(
          _id,
          { $set: { 
@@ -131,4 +164,7 @@ export class UsersRepository {
          { new: true }
       ).lean<UserRecord>()
    }
+
+
+
 }

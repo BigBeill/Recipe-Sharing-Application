@@ -1,7 +1,5 @@
 import { Schema, Types, model, type HydratedDocument, type InferSchemaType } from 'mongoose';
-import { ImageSchema } from './image.schema';
 import type { TypeNutrition } from '../../../../features/recipes/domain/recipes.types';
-import type { ImageType } from '../../../../features/images/images.types';
 
 interface TypeTimestamps {
    createdAt: Date;
@@ -18,7 +16,7 @@ interface TypeDatabaseRecipe {
     ownerId: Types.ObjectId;
     title: string;
     description: string;
-    image?: ImageType;
+    imageReferenceId?: Types.ObjectId;
     ingredientList: TypeDatabaseIngredient[];
     instructionList: string[];
     nutrition: TypeNutrition;
@@ -63,7 +61,7 @@ const recipeSchema = new Schema<TypeDatabaseRecipe & TypeTimestamps>({
     ownerId: { type: Schema.Types.ObjectId, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
-    image: { type: ImageSchema, default: undefined, set: (v: unknown) => (v === null ? undefined : v), },
+    imageReferenceId: { type: Schema.Types.ObjectId },
     ingredientList: { type: [ingredientSchema], required: true },
     instructionList: { type: [String], required: true },
     nutrition: { type: nutritionSchema, required: true },

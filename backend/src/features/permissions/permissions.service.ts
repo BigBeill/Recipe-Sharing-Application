@@ -1,7 +1,6 @@
-import type { FriendRequestRecord } from "../../externalResources/database/mongo/schemas/friendRequest.schema";
-import type { FriendshipRecord } from "../../externalResources/database/mongo/schemas/friendship.schema";
-import type { RelationshipType } from "../users/domain/users.types";
+import type { Types } from "mongoose";
 import type { UsersRepository } from "../users/infrastructure/users.repository";
+import type { TypeRelationship } from "../users/domain/users.types";
 
 export class PermissionsService {
    private readonly repository: UsersRepository;
@@ -10,39 +9,18 @@ export class PermissionsService {
       this.repository = usersRepository;
    }
 
-   async defineRelationship({ authId, userId }: { authId: string, userId: string }): Promise<RelationshipType> {
-      const definingRelationship = { ownerId: userId, targetId: authId }
+   async defineRelationship(params: { authId: Types.ObjectId, targetId: Types.ObjectId }): Promise<TypeRelationship | null> {
+      const { authId, targetId } = params;
 
-      if (definingRelationship.ownerId = definingRelationship.targetId) { 
-         return { _id: "0", type: "self", ...definingRelationship }
-      }
+      if (authId.equals(targetId)) { return null; }
 
-      let relationship: FriendshipRecord | FriendRequestRecord | null;
-      relationship = await this.repository.getFriendship({ firstUserId: definingRelationship.ownerId, secondUserId: definingRelationship.targetId });
-      if (relationship) {
-         return { _id: relationship._id.toString(), type: "friend", ...definingRelationship };
-      }
-      relationship = await this.repository.getFriendRequest({ senderId: definingRelationship.ownerId, receiverId: definingRelationship.targetId });
-      if (relationship) {
-         return { _id: relationship._id.toString(), type: "requestSent", ...definingRelationship };
-      }
-      relationship = await this.repository.getFriendRequest({ senderId: definingRelationship.targetId, receiverId: definingRelationship.ownerId });
-      if (relationship) {
-         return { _id: relationship._id.toString(), type: "requestReceived", ...definingRelationship }
-      }
-
-      //? relationship must not exist if nothing has been returned
-      return { _id: "0", type: "none", ...definingRelationship };
+      return await this.repository.findRelationship({ ownerId: authId, targetId });
    }
 
-   async getFriendIdList(userId: string) {
-      const friendshipList = await this.repository.getFriendshipList(userId);
+   async getFriendIdList(userId: Types.ObjectId): Promise<Types.ObjectId[]> {
+      const friendshipList = await this.repository.searchFriendship(userId);
       
       // filter out the userId from each friendship and return an array of Ids
-      return friendshipList.map((friendship) => {
-         const firstFriendId = friendship.friendIds[0]!.toString();
-         if (firstFriendId !== userId) { return firstFriendId; }
-         else { return friendship.friendIds[1]!.toString(); }
-      });
+      return friendshipList.flatMap((friendship) => { return friendship.friendIds.filter((id) => !id.equals(userId)) });
    }
 }

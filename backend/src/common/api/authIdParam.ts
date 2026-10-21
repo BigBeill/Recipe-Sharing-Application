@@ -1,3 +1,5 @@
+import type { Types } from "mongoose"
+
 export type AuthIdParam = {
-   authId?: string
+   authId?: Types.ObjectId
 }

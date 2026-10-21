@@ -1,20 +1,26 @@
 import { Elysia, t } from 'elysia';
 import { RegisterValidator } from './validators/register.validator';
 import { LoginValidator } from './validators/login.validator';
-import { authenticateMiddleware, authorizeMiddleware } from './auth.middleware';
+import { authenticateMiddleware, authorizeMiddleware } from '../auth.middleware';
 import { requestPasswordResetValidator } from './validators/requestPasswordReset.validator';
 import { resetPasswordValidator } from './validators/resetPassword.validator';
 import { changePasswordValidator } from './validators/changePassword.validator';
-import { authService } from '../../container';
-import { NotFoundError } from '../../global/departingData/error.types';
+import { authService } from '../../../container';
+import { NotFoundError } from '../../../global/departingData/error.types';
 
 const service = authService;
 
 export const authController = new Elysia({ prefix: '/auth' })
+
+
+
    .post( '/login',
       async ({ body, set, cookie: { accessToken, refreshToken } }) => {
          const { name, password, rememberMe } = body;
+
          const result = await service.login({ name, password });
+
+         // * set cookies for the client
          accessToken.set({
             value: result.tokens.accessToken,
             maxAge: 60 * 15 // 15 minutes in seconds
@@ -23,6 +29,7 @@ export const authController = new Elysia({ prefix: '/auth' })
             value: result.tokens.refreshToken,
             ...(rememberMe && { maxAge: 60 * 60 * 24 * 30 }) // 30 days in seconds if rememberMe is true
          });
+
          set.status = 200;
          return {
             data: { _id: result.userId }
@@ -36,9 +43,15 @@ export const authController = new Elysia({ prefix: '/auth' })
          })
       }
    )
+
+
+
    .post( '/refresh',
       async ({ set, cookie: { accessToken, refreshToken } }) => {
+
          const result = await service.refresh(refreshToken.value);
+
+         // * set cookies
          accessToken.set({
             value: result.tokens.accessToken,
             maxAge: 60 * 15 // 15 minutes in seconds
@@ -47,6 +60,7 @@ export const authController = new Elysia({ prefix: '/auth' })
             value: result.tokens.refreshToken,
             maxAge: 60 * 60 * 24 * 30 // 30 days in seconds
          });
+
          set.status = 200;
          return {
             data: { 
@@ -62,10 +76,16 @@ export const authController = new Elysia({ prefix: '/auth' })
          })
       }
    )
+
+
+
    .post( '/register',
       async ({ body, set, cookie: { accessToken, refreshToken } }) => {
          const { name, email, password } = body;
+
          const result = await service.register({ name, email, password });
+
+         // * set cookies
          accessToken.set({
             value: result.tokens.accessToken,
             maxAge: 60 * 15 // 15 minutes in seconds
@@ -73,11 +93,10 @@ export const authController = new Elysia({ prefix: '/auth' })
          refreshToken.set({
             value: result.tokens.refreshToken,
          });
+
          set.status = 200;
          return {
-            data: {
-               _id: result.userId
-            },
+            data: { _id: result.userId },
          };
       },
       {
@@ -88,12 +107,17 @@ export const authController = new Elysia({ prefix: '/auth' })
          })
       }
    )
+
+
+
    .post('/requestPasswordReset',
       async ({ set, body }) => {
          const { email } = body;
+
+         // ? catch any not found errors and return as if the request was a success (prevents an enumeration attack)
          try { await service.requestPasswordReset(email); }
-         // catch not found errors and return as if it was a success (prevents an enumeration attack)
          catch (error) { if (!(error instanceof NotFoundError)) { throw error; } }
+
          set.status = 204;
          return;
       },
@@ -101,6 +125,9 @@ export const authController = new Elysia({ prefix: '/auth' })
          body: requestPasswordResetValidator,
       }
    )
+
+
+
    .post('/resetPassword',
       async ({ set, body }) => {
          const { password, token } = body;
@@ -113,9 +140,13 @@ export const authController = new Elysia({ prefix: '/auth' })
       }
    )
 
+
+
    .use(authenticateMiddleware)
-   //* Routes past this point require a valid accessToken to use
-   .use(authorizeMiddleware)
+   .use(authorizeMiddleware) // * Routes past this point require a valid accessToken to use
+
+
+
    .post( '/changePassword',
       async ({ set, body, authId }) => {
          const { oldPassword, newPassword } = body;
@@ -127,6 +158,9 @@ export const authController = new Elysia({ prefix: '/auth' })
          body: changePasswordValidator,
       }
    )
+
+
+
    .get( '/status', 
       ({ authId }) => {
          return {
@@ -135,11 +169,17 @@ export const authController = new Elysia({ prefix: '/auth' })
          }
       }
    )
+
+
+
    .post( '/logout',
       async ({ set, cookie: { accessToken, refreshToken } }) => {
-         await service.removeRefreshToken(refreshToken.value);
+         await service.deleteRefreshToken(refreshToken.value);
+
+         // * set cookies
          accessToken.remove();
          refreshToken.remove();
+         
          set.status = 204;
          return;
       },

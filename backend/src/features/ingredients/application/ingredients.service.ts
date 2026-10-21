@@ -1,5 +1,5 @@
 import { NotFoundError } from "elysia";
-import type { IngredientRecord } from "../../../externalResources/database/mongo/schemas/recipe.schema";
+import type { IngredientRecord } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
 import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import type { IngredientsRepository } from "../infrastructure/ingredients.repository";
 import type { TypeIngredient, TypeIngredientConversion, TypeIngredientGroup, TypeRecipeIngredient } from "../domain/ingredients.types";

@@ -1,8 +1,8 @@
 import { t } from "elysia";
 
 export const GetImageValidator = t.Object({
-   context: t.Union([
-      t.Literal('avatars'),
+   location: t.Union([
+      t.Literal('users'),
       t.Literal('recipes'),
    ]),
    fileName: t.String(),

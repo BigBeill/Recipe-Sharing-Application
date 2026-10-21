@@ -1,13 +1,15 @@
+import type { Types } from "mongoose";
+
 type TypeGraceEntry = { 
    token: string; 
-   userId: string; 
+   userId: Types.ObjectId;
    timeout: ReturnType<typeof setTimeout>;
 };
 
 class GraceCache {
    private store = new Map<string, TypeGraceEntry>();
 
-   set(oldHash: string, token: string, userId: string, ttlMs: number) {
+   set(oldHash: string, token: string, userId: Types.ObjectId, ttlMs: number) {
       
       // clear any existing timer for this key before overwriting
       this.store.get(oldHash)?.timeout && clearTimeout(this.store.get(oldHash)!.timeout);
@@ -16,7 +18,7 @@ class GraceCache {
       this.store.set(oldHash, { token, userId, timeout });
    }
 
-   get(oldHash: string): { token: string; userId: string } | undefined {
+   get(oldHash: string): { token: string; userId: Types.ObjectId } | undefined {
       const entry = this.store.get(oldHash);
       return entry ? { token: entry.token, userId: entry.userId } : undefined;
    }

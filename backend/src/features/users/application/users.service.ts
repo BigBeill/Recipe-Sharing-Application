@@ -1,20 +1,18 @@
-import type { FriendRequestRecord } from "../../../externalResources/database/mongo/schemas/friendRequest.schema";
-import type { FriendshipRecord } from "../../../externalResources/database/mongo/schemas/friendship.schema";
 import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
-import type { AuthService } from "../../auth/auth.service";
-import type { ImagesService } from "../../images/images.service";
-import type { ImageType } from "../../images/images.types";
+import type { AuthService } from "../../auth/application/auth.service";
 import type { RecipesService } from "../../recipes/application/recipes.service";
-import { buildConflictString } from "../infrastructure/users.utils";
 import type { AuthIdParam } from "../../../common/api/authIdParam";
 import type { UsersRepository } from "../infrastructure/users.repository";
-import type { RelationshipType, UserType } from "../domain/users.types";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/error.types";
+import type { ImagesService } from "../../images/application/images.service";
+import type { TypeRelationship, TypeUser } from "../domain/users.types";
+import type { Types } from "mongoose";
+import type { TypeImageReference } from "../../images/domain/images.types";
 
 interface DefinedRelationshipParams {
-   authId: string;
-   userId: string;
+   ownerId: Types.ObjectId;
+   targetId: Types.ObjectId;
 }
 
 interface GetUserParams extends AuthIdParam{
@@ -22,8 +20,8 @@ interface GetUserParams extends AuthIdParam{
 }
 
 interface SearchUsersParams {
-   authId?: string,
-   _id?: string,
+   authId?: Types.ObjectId,
+   _id?: Types.ObjectId,
    name?: string,
    includeRelationship?: boolean,
    skip?: number,
@@ -31,11 +29,11 @@ interface SearchUsersParams {
 }
 
 interface UpdateAccountParams {
-   authId: string;
+   authId: Types.ObjectId;
    name?: string;
    email?: string;
    bio?: string;
-   image?: ImageType;
+   imageReference?: TypeImageReference;
 }
 
 export class UsersService {
@@ -58,35 +56,16 @@ export class UsersService {
 
 
 
-   async defineRelationship({ authId, userId }: DefinedRelationshipParams): Promise<RelationshipType> {
-      const definingRelationship = { ownerId: userId, targetId: authId }
+   async findRelationship(params: DefinedRelationshipParams): Promise<TypeRelationship | null> {
+      const { ownerId, targetId } = params;
 
-      if (definingRelationship.ownerId = definingRelationship.targetId) { 
-         return { _id: "0", type: "self", ...definingRelationship }
-      }
-
-      let relationship: FriendshipRecord | FriendRequestRecord | null;
-      relationship = await this.repository.getFriendship({ firstUserId: definingRelationship.ownerId, secondUserId: definingRelationship.targetId });
-      if (relationship) {
-         return { _id: relationship._id.toString(), type: "friend", ...definingRelationship };
-      }
-      relationship = await this.repository.getFriendRequest({ senderId: definingRelationship.ownerId, receiverId: definingRelationship.targetId });
-      if (relationship) {
-         return { _id: relationship._id.toString(), type: "requestSent", ...definingRelationship };
-      }
-      relationship = await this.repository.getFriendRequest({ senderId: definingRelationship.targetId, receiverId: definingRelationship.ownerId });
-      if (relationship) {
-         return { _id: relationship._id.toString(), type: "requestReceived", ...definingRelationship }
-      }
-
-      //? relationship must not exist if nothing has been returned
-      return { _id: "0", type: "none", ...definingRelationship };
+      if (ownerId.equals(targetId)) { return null; }
+      return await this.repository.findRelationship({ ownerId, targetId });
    }
 
 
 
-   async deleteAccount(password: string, params: AuthIdParam): Promise<boolean> {
-      const { authId } = params;
+   async deleteAccount(password: string, { authId }: AuthIdParam): Promise<boolean> {
       if (!authId) { throw new UnauthorizedError(); }
 
       // make sure the client know the password of the signed in account
@@ -98,9 +77,7 @@ export class UsersService {
 
       // delete users avatar image
       const user = await this.repository.getUser(authId);
-      if (user?.image) {
-         await this.imagesService.deleteImage('avatars', user.image.filename)
-      }
+      if (user.imageReferenceId) { await this.imagesService.deleteImage(user.imageReferenceId); }
 
       await this.repository.deleteUser(authId);
       return true;
@@ -108,12 +85,11 @@ export class UsersService {
 
 
 
-   async deleteFriendship(_id: string, params: AuthIdParam): Promise<boolean> {
-      const { authId } = params;
+   async deleteFriendship(_id: Types.ObjectId, { authId }: AuthIdParam): Promise<boolean> {
       if (!authId) { throw new UnauthorizedError(); }
 
-      const friendship = await this.repository.getFriendship({ _id });
-      if (!friendship || !friendship.friendIds.some(_id => _id.toString() === authId)) { throw new UnauthorizedError('Invalid Credentials'); }
+      const friendship = await this.repository.getFriendship(_id);
+      if (!friendship || !friendship.friendIds.some((_id) => _id.equals(authId))) { throw new UnauthorizedError('Invalid Credentials'); }
 
       await this.repository.deleteFriendship(_id);
       return true;
@@ -121,40 +97,33 @@ export class UsersService {
 
 
 
-   async getFriendIdList(userId: string) {
-      const friendshipList = await this.repository.getFriendshipList(userId);
+   async getFriendIdList(userId: Types.ObjectId) {
+      const friendshipList = await this.repository.searchFriendship(userId);
       
       // filter out the userId from each friendship and return an array of Ids
-      return friendshipList.map((friendship) => {
-         const firstFriendId = friendship.friendIds[0]!.toString();
-         if (firstFriendId !== userId) { return firstFriendId; }
-         else { return friendship.friendIds[1]!.toString(); }
-      });
+      return friendshipList.flatMap((friendship) => { return friendship.friendIds.filter((id) => !id.equals(userId)) });
    }
 
 
 
-   async getUser(_id: string, {authId, includeRelationship}: GetUserParams): Promise<UserType | null> {
+   async getUser(_id: Types.ObjectId, {authId, includeRelationship}: GetUserParams): Promise<TypeUser> {
+      if(includeRelationship && !authId) { throw new UnauthorizedError(); }
+
       const [user, relationship] = await Promise.all([
          this.repository.getUser(_id),
-         (() => {
-            if (!includeRelationship || !authId) { return undefined; }
-            else { return this.defineRelationship({ authId, userId: _id }); }
-         })(),
+         (includeRelationship ? this.findRelationship({ ownerId: _id, targetId: authId! }) : null),
       ]);
-      if (!user) { throw new NotFoundError(`User with id: ${_id}, not found`); }
-      return { ...removeMongooseNoise(user), relationship };
+      return { ...removeMongooseNoise(user), ...(relationship != null && { relationship }) };
    }
 
 
 
-   async sendFriendRequest(targetId: string, params: AuthIdParam): Promise<RelationshipType> {
-      const { authId } = params;
+   async sendFriendRequest(targetId: Types.ObjectId, { authId }: AuthIdParam): Promise<TypeRelationship> {
       if(!authId) { throw new UnauthorizedError(); }
 
       const friendRequest = await this.repository.createFriendRequest(authId, targetId)
       return {
-         _id: friendRequest._id.toString(),
+         _id: friendRequest._id,
          ownerId: targetId,
          targetId: authId,
          type: 'requestReceived',
@@ -163,86 +132,77 @@ export class UsersService {
 
 
 
-   async processFriendRequest(_id: string, response: boolean, params: AuthIdParam): Promise<RelationshipType> {
-      const { authId } = params;
+   async processFriendRequest(_id: Types.ObjectId, approve: boolean, { authId }: AuthIdParam): Promise<TypeRelationship | null> {
       if(!authId) { throw new UnauthorizedError(); }
 
       // get friendship from the database
-      const friendRequest = await this.repository.getFriendRequest({ _id });
-      if (!friendRequest) { throw new NotFoundError("Friend request not found"); }
+      const friendRequest = await this.repository.getFriendRequest(_id);
 
       // check if friendship can be approved
-      if (response && friendRequest.receiverId.toString() === authId) {
+      if (approve && friendRequest.receiverId.equals(authId)) {
          await this.repository.deleteFriendRequest(_id);
          const friendship = await this.repository.createFriendship([ friendRequest.senderId.toString(), friendRequest.receiverId.toString() ]);
          return {
-            _id: friendship._id.toString(),
-            ownerId: friendRequest.senderId.toString(),
+            _id: friendship._id,
+            ownerId: friendRequest.senderId,
             targetId: authId,
             type: "friend",
          }
       }
 
       // check if friendship can be declined
-      else if (!response && (friendRequest.receiverId.toString() === authId || friendRequest.senderId.toString() === authId)) {
+      else if (!approve && (friendRequest.receiverId.equals(authId) || friendRequest.senderId.equals(authId))) {
          await this.repository.deleteFriendRequest(_id);
-         return {
-            _id: '0',
-            ownerId: friendRequest.senderId.toString(),
-            targetId: authId,
-            type: 'none',
-         }
+         return null;
       }
 
-      // whatever the client is attempting to do got rejected
+      // whatever the client is attempting to do was not executable
       else { throw new UnauthorizedError('Invalid credentials'); }
    }
 
 
 
-   async searchUsers(params: SearchUsersParams): Promise<PaginatedListType<UserType>> {
+   async searchUsers(params: SearchUsersParams): Promise<PaginatedListType<TypeUser>> {
       const { authId, _id, name, skip, limit, includeRelationship } = params;
-      const userRecords = await this.repository.searchUsers({ _id, name, skip, limit });
-      let users: PaginatedListType<UserType> = removeMongooseNoise(userRecords);
-      if (includeRelationship) {
-         if (!authId) { throw new UnauthorizedError('Include relationship flag cannot be set to true if user is not signed in'); }
-         users.list.map((user) => {
-            const relationship = this.defineRelationship({ authId, userId: user._id });
-            return { ...user, relationship };
-         });
-      }
+      if (includeRelationship && !authId) { throw new UnauthorizedError('Include relationship flag cannot be set to true without a valid session'); }
 
-      return users;
+      const users = removeMongooseNoise(await this.repository.searchUser({ _id, name, skip, limit }));
+      if (!includeRelationship) { return users; }
+      else {
+         const list = await Promise.all(users.list.map(async (user) => {
+            const relationship = await this.findRelationship({ ownerId: user._id, targetId: authId! });
+            return {
+               ...user,
+               relationship
+            }
+         }));
+         return {
+            ...users,
+            list,
+         }
+      }
    }
 
 
 
-   async updateAccount(params: UpdateAccountParams): Promise<UserType> {
-      const { authId, name, email, bio, image } = params;
-      let savedImage: ImageType | undefined;
+   async updateAccount(params: UpdateAccountParams): Promise<TypeUser> {
+      const { authId, name, email, bio, imageReference } = params;
 
-      const conflictUserList = await this.repository.getExactUserList({ name, email });
-      conflictUserList.filter((conflictUser) => !(conflictUser._id.toString() === authId))
+      const potentiallyConflictingUsers = await this.repository.searchUser({ name, email, searchExact: true });
+      const conflictingUsersList = potentiallyConflictingUsers.list.filter((user) => { return user._id.equals(authId); })
 
-      if(conflictUserList.length > 0) {
-         const conflictingUser = {
-            _id: "0",
-            name: name || "",
-            email: email || "",
-         }
-         throw new ConflictError(buildConflictString(conflictingUser, conflictUserList)!) 
-      }
+      if(conflictingUsersList.length > 0) { throw new ConflictError("cant update users account"); }
 
       // replace the image if one has been provided
-      if (image){
-         const oldUser = await this.repository.getUser(authId);
-         if (oldUser?.image) {
-            await this.imagesService.deleteImage('avatars', oldUser.image.filename)
+      if (imageReference) {
+         const outdatedUserRecord = await this.repository.getUser(authId);
+         if (!outdatedUserRecord.imageReferenceId?.equals(imageReference._id)) {
+            if (outdatedUserRecord.imageReferenceId) { await this.imagesService.deleteImage(outdatedUserRecord.imageReferenceId); }
+            await this.imagesService.claimImage(imageReference._id, { authId });
          }
-         savedImage = await this.imagesService.saveImage('avatars', image.filename, authId)
       }
 
-      const updatedUser = await this.repository.updateUser(authId, { name, email, bio, image: savedImage });
+      const updatedUser = await this.repository.updateUser(authId, { name, email, bio, image: imageReference?._id });
       if (!updatedUser) { throw new NotFoundError("user not updated"); }
       return removeMongooseNoise(updatedUser);
    }
