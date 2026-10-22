@@ -47,11 +47,11 @@ export default async function middleware(request: NextRequest) {
    // keep cookies if http failure isn't related to 
    if (!upstream.ok) { return NextResponse.next(); }
 
-   const { data } = await upstream.json();
-   if (!data?.accessToken) { return NextResponse.next(); }
+   const updatedAccessToken = await upstream.json();
+   if (!updatedAccessToken) { return NextResponse.next(); }
 
    // so this render's cookies() sees the fresh token
-   request.cookies.set('accessToken', data.accessToken);
+   request.cookies.set('accessToken', updatedAccessToken);
    const response = NextResponse.next({ request });
 
    // so the browser gets both — forward Elysia's Set-Cookie verbatim
