@@ -20,5 +20,5 @@ export default async function parseResponse<T>(response: Response): Promise<T> {
    }
 
    const payload = await response.json();
-   return payload.data;
+   return payload;
 }
