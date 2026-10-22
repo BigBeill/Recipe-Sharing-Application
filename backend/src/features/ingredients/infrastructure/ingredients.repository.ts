@@ -3,7 +3,7 @@ import postgresConnection from "../../../externalResources/database/postgres/con
 import { postgresQueryBuilder } from "../../../externalResources/database/postgres/queryBuilder.postgreDatabase";
 import { NotFoundError } from "../../../global/departingData/error.types";
 import type { TypeNutrition } from "../../recipes/domain/recipes.types";
-import type { TypeIngredient, TypeIngredientConversion, TypeIngredientGroup } from "../domain/ingredients.types";
+import type { TypeIngredientDraft, TypeIngredientConversion, TypeIngredientGroup } from "../domain/ingredients.types";
 import { breakupMeasureDescription, calculateTrueConversionFactorValue } from "./ingredients.mapper";
 
 interface SearchGroupParams {
@@ -87,7 +87,7 @@ export class IngredientsRepository {
 
 
 
-   async getIngredient (_id: number): Promise<TypeIngredient> {
+   async getIngredient (_id: number): Promise<TypeIngredientDraft> {
       const { rows } = await postgresConnection.query('SELECT description FROM food WHERE _id = $1 LIMIT 1', [ _id ]);
       if (!rows[0]) { throw new NotFoundError("ingredients.repository.getIngredient could not find _id: " + _id) }
       return { _id, description: rows[0].description }
@@ -110,11 +110,11 @@ export class IngredientsRepository {
 
 
 
-   async  searchIngredient ({ description, food_group_id, skip = 0, limit }: SearchIngredientParams): Promise<PaginatedListType<TypeIngredient>> {
+   async  searchIngredient ({ description, food_group_id, skip = 0, limit }: SearchIngredientParams): Promise<PaginatedListType<TypeIngredientDraft>> {
       const descriptionConditionList = (description?.trim().split(/\s+/) ?? []).filter(Boolean).map((entry) => {
          return { column: 'description', operation: 'ILIKE', value: `%${ entry }%` };
       });
-      const { list, count } = await postgresQueryBuilder<TypeIngredient>('SELECT _id, description FROM food', { 
+      const { list, count } = await postgresQueryBuilder<TypeIngredientDraft>('SELECT _id, description FROM food', { 
          where: [
             ...descriptionConditionList,
             ...(food_group_id ? [{ column: 'food_group_id', operation: '=', value: `${food_group_id}` }] : []),

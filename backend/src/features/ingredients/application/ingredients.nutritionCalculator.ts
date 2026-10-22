@@ -1,5 +1,5 @@
 import type { TypeNutrition } from "../../recipes/domain/recipes.types";
-import type { TypeRecipeIngredient } from "../domain/ingredients.types";
+import type { TypeIngredient } from "../domain/ingredients.types";
 import type { IngredientsRepository } from "../infrastructure/ingredients.repository";
 
 export class NutritionCalculator {
@@ -9,7 +9,7 @@ export class NutritionCalculator {
       this.repository = ingredientsRepository;
    }
 
-   async calculate(ingredient: TypeRecipeIngredient): Promise<TypeNutrition> {
+   async calculate(ingredient: TypeIngredient): Promise<TypeNutrition> {
 
       const [baseNutrition, conversion] = await Promise.all([
          this.repository.getBaseNutrition(ingredient._id),

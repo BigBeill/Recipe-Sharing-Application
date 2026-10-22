@@ -2,7 +2,7 @@ import { NotFoundError } from "elysia";
 import type { IngredientRecord } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
 import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import type { IngredientsRepository } from "../infrastructure/ingredients.repository";
-import type { TypeIngredient, TypeIngredientConversion, TypeIngredientGroup, TypeRecipeIngredient } from "../domain/ingredients.types";
+import type { TypeIngredient, TypeIngredientConversion, TypeIngredientDraft, TypeIngredientGroup } from "../domain/ingredients.types";
 import { NutritionCalculator } from "./ingredients.nutritionCalculator";
 import type { TypeNutrition } from "../../recipes/domain/recipes.types";
 
@@ -30,7 +30,7 @@ export class IngredientsService {
 
 
 
-   async getIngredient (_id: number): Promise<TypeIngredient> {
+   async getIngredient (_id: number): Promise<TypeIngredientDraft> {
       const ingredient = await this.repository.getIngredient(_id);
       if (!ingredient) { throw new NotFoundError(); }
       return ingredient;
@@ -38,13 +38,13 @@ export class IngredientsService {
 
 
 
-   async getNutrition (ingredient: TypeRecipeIngredient): Promise<TypeNutrition> {
+   async getNutrition (ingredient: TypeIngredient): Promise<TypeNutrition> {
       return this.nutrition.calculate(ingredient);
    }
 
 
 
-   async hydrateIngredient(record: IngredientRecord): Promise<TypeRecipeIngredient> {
+   async hydrateIngredient(record: IngredientRecord): Promise<TypeIngredient> {
       const [ingredient, measureDescription] = await Promise.all([
          this.repository.getIngredient(record._id),
          this.repository.getMeasureDescription(record.portion._id)
@@ -77,7 +77,7 @@ export class IngredientsService {
 
 
 
-   async searchIngredient (params: SearchIngredientParams): Promise<PaginatedListType<TypeIngredient>> {
+   async searchIngredient (params: SearchIngredientParams): Promise<PaginatedListType<TypeIngredientDraft>> {
       const { description, food_group_id, skip, limit } = params;
       const ingredientList = await this.repository.searchIngredient({ description, food_group_id, skip, limit });
       return ingredientList;

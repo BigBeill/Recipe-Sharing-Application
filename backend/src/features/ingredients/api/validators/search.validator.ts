@@ -4,6 +4,6 @@ import { PostgresIdValidator } from "../../../../common/api/validators/postgresI
 
 export const SearchValidator = t.Object({
    description: t.Optional(t.String()),
-   foodGroupId: t.Optional(PostgresIdValidator),
+   food_group_id: t.Optional(PostgresIdValidator),
    ...PaginationValidator.properties,
 });

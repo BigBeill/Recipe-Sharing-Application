@@ -1,32 +1,37 @@
-import Elysia from "elysia"
+import Elysia, { status } from "elysia"
 import { imagesService } from "../../../container";
-import { UploadImageValidator } from "./validators/uploadImage.validator";
-import { GetImageValidator } from "./validators/getImage.validator";
+import { UploadValidator } from "./validators/upload.validator";
+import { GetValidator } from "./validators/get.validator";
 import { authorizeMiddleware } from "../../auth/auth.middleware";
+import { DepartingStringValidator } from "../../../global/departingData/validators/primitives/departingString.validator";
+import { ImageReferenceValidator } from "./validators/imageReference.validator";
 
 const service = imagesService;
 
 export const imagesController = new Elysia({ prefix: '/image' })
 
-   .get(
-      '/:location/:fileName',
+   .get('/:location/:fileName', 
       async ({ params }) => {
          const key = `${params.location}/${params.fileName}`;
-         return await service.getPresignedURL(key);
+         const imageURL = await service.getPresignedURL(key);
+         return status(200, imageURL);
       },
       {
-         params: GetImageValidator,
+         params: GetValidator,
+         response: DepartingStringValidator,
       }
    )
 
    .use(authorizeMiddleware)
 
-   .post( '/upload',
+   .post('/upload',
       async ({ body, authId }) => {
          const { file, location } = body;
-         return await service.pushImage(location, file, { authId });
+         const imageReference = await service.pushImage(location, file, { authId });
+         return status(201, imageReference)
       },
       {
-         body: UploadImageValidator
+         body: UploadValidator,
+         response: { 201: ImageReferenceValidator },
       }
    )

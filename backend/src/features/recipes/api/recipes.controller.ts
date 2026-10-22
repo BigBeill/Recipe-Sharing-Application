@@ -1,9 +1,11 @@
-import Elysia from "elysia";
+import Elysia, { status } from "elysia";
 import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
 import { IdValidator } from "../../../common/api/validators/id.validator";
 import { recipesService } from "../../../container";
 import { SearchValidator } from "./validators/search.validator";
-import { ValidatorRecipeDraft } from "./validators/recipeDraft.Validator";
+import { DepartingRecipeValidator } from "../../../global/departingData/validators/departingRecipe.validator";
+import { DepartingPaginatedList } from "../../../global/departingData/validators/departingPaginatedList";
+import { RecipeDraftValidator } from "./validators/recipeDraft.Validator";
 
 const service = recipesService;
 
@@ -20,10 +22,11 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
       async ({ authId, params }) => {
          const { _id } = params;
          const recipe = await service.getRecipe(_id, { authId });
-         return { data: recipe };
+         return status(200, recipe);
       },
       {
-         params: IdValidator
+         params: IdValidator,
+         response: DepartingRecipeValidator,
       }
    )
 
@@ -33,10 +36,11 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
       async ({ authId, query }) => {
          const { title, ownerIdList, ingredientIdList, visibilityList, limit, skip } = query;
          const recipes = await service.searchRecipes({ authId, title, ownerIdList, ingredientIdList, visibilityList, skip, limit });
-         return { data: recipes };
+         return status(200, recipes)
       },
       {
-         query: SearchValidator
+         query: SearchValidator,
+         response: DepartingPaginatedList(DepartingRecipeValidator),
       }
    )
 
@@ -49,11 +53,12 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
 
    .post( '/create',
       async ({ authId, body }) => {
-         const newRecipe = await service.createRecipe(body, { authId })
-         return { data: newRecipe }
+         const recipe = await service.createRecipe(body, { authId })
+         return status(201, recipe);
       },
       {
-         body: ValidatorRecipeDraft
+         body: RecipeDraftValidator,
+         response: { 201: DepartingRecipeValidator }
       }
    )
 
@@ -62,11 +67,12 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
    .put( '/update/:_id',
       async ({ authId, body, params }) => {
          const { _id } = params;
-         const updatedRecipe = await service.updateRecipe(_id, body, { authId })
-         return { data: updatedRecipe }
+         const updatedRecipe = await service.updateRecipe(_id, body, { authId });
+         return status(201, updatedRecipe);
       },
       {
          params: IdValidator,
-         body: ValidatorRecipeDraft
+         body: RecipeDraftValidator,
+         response: { 201: DepartingRecipeValidator }
       }
    )

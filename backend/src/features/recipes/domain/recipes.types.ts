@@ -1,6 +1,6 @@
 import type { Types } from "mongoose";
 import type { TypeImageReference } from "../../images/domain/images.types";
-import type { TypeRecipeIngredient } from "../../ingredients/domain/ingredients.types";
+import type { TypeIngredient } from "../../ingredients/domain/ingredients.types";
 
 export interface TypeRecipe extends TypeRecipeDraft {
    _id: Types.ObjectId;
@@ -12,7 +12,7 @@ export interface TypeRecipeDraft {
    title: string;
    description: string;
    imageReference?: TypeImageReference;
-   ingredientList: TypeRecipeIngredient[];
+   ingredientList: TypeIngredient[];
    instructionList: string[];
    visibility: 'public' | 'private' | 'personal';
 }

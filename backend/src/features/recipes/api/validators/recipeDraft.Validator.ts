@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import { IngredientValidator } from "../../../ingredients/api/validators/ingredient.validator";
 
-export const ValidatorRecipeDraft = t.Object({
+export const RecipeDraftValidator = t.Object({
    title: t.String(),
    description: t.String(),
    ingredientList: t.Array(IngredientValidator),

@@ -4,7 +4,7 @@ import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import type { RecipesRepository } from "../infrastructure/recipes.repository";
 import type { IngredientsService } from "../../ingredients/application/ingredients.service";
 import type { TypeNutrition, TypeRecipe, TypeRecipeDraft } from "../domain/recipes.types";
-import type { TypeRecipeIngredient } from "../../ingredients/domain/ingredients.types";
+import type { TypeIngredient } from "../../ingredients/domain/ingredients.types";
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
 import type { AuthIdParam } from "../../../common/api/authIdParam";
 import { NotFoundError, UnauthorizedError } from "../../../global/departingData/error.types";
@@ -86,7 +86,7 @@ export class RecipesService {
 
 
 
-   async getNutrition(ingredientList: TypeRecipeIngredient[]): Promise<TypeNutrition> {
+   async getNutrition(ingredientList: TypeIngredient[]): Promise<TypeNutrition> {
       const nutritionList = await Promise.all(ingredientList.map((ingredient) => this.ingredientsService.getNutrition(ingredient)));
 
       // combine each ingredients nutritional value
@@ -120,7 +120,7 @@ export class RecipesService {
 
 
 
-   async hydrateRecipe(recipeRecord: RecipeRecord, knownFields?: { imageReference?: TypeImageReference, ingredientList?: TypeRecipeIngredient[] }): Promise<TypeRecipe> {
+   async hydrateRecipe(recipeRecord: RecipeRecord, knownFields?: { imageReference?: TypeImageReference, ingredientList?: TypeIngredient[] }): Promise<TypeRecipe> {
       const { imageReferenceId, ...normalizedRecipe } = removeMongooseNoise(recipeRecord);
 
       const fetchImageReference = async (): Promise<TypeImageReference | undefined> => {
@@ -129,7 +129,7 @@ export class RecipesService {
          else { return await this.imagesService.getImageReference(imageReferenceId); }
       }
 
-      const fetchIngredientList = async (): Promise<TypeRecipeIngredient[]> => {
+      const fetchIngredientList = async (): Promise<TypeIngredient[]> => {
          if (knownFields?.ingredientList) { return knownFields.ingredientList; }
          else { return await Promise.all(normalizedRecipe.ingredientList.map(async (ingredient) => { return await this.ingredientsService.hydrateIngredient(ingredient); }) ); }
       }

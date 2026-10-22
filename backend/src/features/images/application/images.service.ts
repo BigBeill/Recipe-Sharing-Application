@@ -83,7 +83,7 @@ export class ImagesService {
 
 
 
-   async pushImage(location: ('recipes' | 'users'), file: File, { authId }: AuthIdParam): Promise<string> {
+   async pushImage(location: ('recipes' | 'users'), file: File, { authId }: AuthIdParam): Promise<TypeImageReference> {
       if (!authId){ throw new UnauthorizedError(); }
       if (file.size > MAX_BYTES) { throw new Error("Image too large"); }
 
@@ -93,9 +93,9 @@ export class ImagesService {
 
       const key = `${location}/${randomUUID()}`;
       await bucketClient.file(`temp/${key}`).write(file, { type: "image/webp" });
-      await this.repository.createImageReference({ key, owner: authId, status: 'pending' })
+      const imageReference = await this.repository.createImageReference({ key, owner: authId, status: 'pending' })
 
-      return key;
+      return imageReference;
    }
 
 

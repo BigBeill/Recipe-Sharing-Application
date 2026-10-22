@@ -13,7 +13,7 @@ import { errorHandler } from './global/departingData/errorHandler.root';
 import { corsConfig } from './global/config/cors.config';
 import { logger } from './global/departingData/logger.root';
 
-export const app = new Elysia({ normalize: false, cookie: cookieConfig })
+export const app = new Elysia({ cookie: cookieConfig })
    .use(circuitBreaker({ limit: 2000, windowMs: 10_000, cooldownMs: 30_000 }))
    .use(ipRateLimit({ limit: 100, windowMs: 10_000 }))
    .use(errorHandler)

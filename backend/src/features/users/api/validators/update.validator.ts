@@ -1,9 +1,7 @@
 import { t } from "elysia";
-import { ImageReferenceValidator } from "../../../images/api/validators/imageReference.validator";
+import { UserValidator } from "./user.validator";
 
-export const UpdateValidator = t.Object({
-   name: t.Optional(t.String()),
-   email: t.Optional(t.String()),
-   bio: t.Optional(t.String()),
-   image: t.Optional(ImageReferenceValidator),
-});
+export const UpdateValidator = t.Composite([
+   t.Pick(UserValidator, ["_id"]),
+   t.Partial(t.Omit(UserValidator, ["_id"])),
+]);

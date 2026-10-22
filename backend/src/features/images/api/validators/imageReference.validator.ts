@@ -2,9 +2,9 @@ import { t } from "elysia";
 import { IdValidator } from "../../../../common/api/validators/id.validator";
 
 export const ImageReferenceValidator = t.Object({
-   _id: IdValidator.properties._id,
+   _id: IdValidator,
    key: t.String(),
-   owner: IdValidator.properties._id,
+   owner: IdValidator,
    status: t.Union([
       t.Literal('pending'),
       t.Literal('active'),

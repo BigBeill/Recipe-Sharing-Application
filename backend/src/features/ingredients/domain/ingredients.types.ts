@@ -1,7 +1,6 @@
-export interface TypeIngredient {
+export interface TypeIngredientDraft {
    _id: number;
    description: string;
-   label?: string;
    commonName?: string;
 }
 
@@ -17,7 +16,8 @@ export interface TypeIngredientGroup {
    description: string;
 }
 
-export type TypeRecipeIngredient = TypeIngredient & {
+export type TypeIngredient = TypeIngredientDraft & {
+   label?: string;
    portion: {
       _id: number;
       description: string;

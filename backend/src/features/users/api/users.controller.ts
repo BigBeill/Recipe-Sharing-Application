@@ -1,4 +1,4 @@
-import Elysia from "elysia";
+import Elysia, { status, t } from "elysia";
 import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
 import { GetValidator } from "./validators/get.validator";
 import { SearchValidator } from "./validators/search.validator";
@@ -6,6 +6,9 @@ import { usersService } from "../../../container";
 import { UpdateValidator } from "./validators/update.validator";
 import { ProcessFriendRequestValidator } from "./validators/processFriendRequest.validator";
 import { IdValidator } from "../../../common/api/validators/id.validator";
+import { DepartingUserValidator } from "../../../global/departingData/validators/departingUserValidator";
+import { DepartingPaginatedList } from "../../../global/departingData/validators/departingPaginatedList";
+import { DepartingRelationshipValidator } from "../../../global/departingData/validators/departingRelationshipValidator";
 
 const service = usersService
 
@@ -23,11 +26,12 @@ export const usersController = new Elysia({ prefix: '/users' })
          const { _id } = params;
          const { includeRelationship = false } = query;
          const user = await service.getUser(_id, { authId, includeRelationship });
-         return { data: user }
+         return status(200, user);
       },
       {
          params: IdValidator,
-         query: GetValidator
+         query: GetValidator,
+         response: DepartingUserValidator,
       }
    )
 
@@ -37,10 +41,11 @@ export const usersController = new Elysia({ prefix: '/users' })
       async ({ authId, query }) => {
          const { _id, name, skip = 0, limit = 32, includeRelationship } = query;
          const users = await service.searchUsers({ authId, _id, name, skip, limit, includeRelationship });
-         return { data: users }
+         return status(200, users);
       },
       {
-         query: SearchValidator
+         query: SearchValidator,
+         response: DepartingPaginatedList(DepartingUserValidator)
       }
 
    )
@@ -55,39 +60,43 @@ export const usersController = new Elysia({ prefix: '/users' })
    .get( '/defineRelationship/:_id',
       async ({ params, authId }) => {
          const { _id } = params
-         const definedRelationship = await service.defineRelationship({ authId, userId: _id });
-         return { data: definedRelationship };
+         const definedRelationship = await service.findRelationship({ ownerId: authId, targetId: _id });
+         if (definedRelationship) { return status(200, definedRelationship); }
+         else { return status(204, undefined); }
       },
       {
-         params: IdValidator
+         params: IdValidator,
+         response: { 
+            200: DepartingRelationshipValidator,
+            204: t.Void()
+         }
       }
    )
 
 
 
    .post( '/deleteFriendship/:_id',
-      async ({ set, authId, params }) => {
+      async ({ authId, params }) => {
          const { _id } = params;
          await service.deleteFriendship(_id, { authId });
-         set.status = 201;
-         return;
+         return status(201);
       },
       {
-         params: IdValidator
+         params: IdValidator,
       }
    )
 
 
 
    .post( '/processFriendRequest/:_id/:response',
-      async ({ set, authId, params }) => {
+      async ({ authId, params }) => {
          const{ _id, response } = params;
-         await service.processFriendRequest(_id, response, { authId });
-         set.status = 201;
-         return;
+         const relationship = await service.processFriendRequest(_id, response, { authId });
+         return status(201, relationship);
       },
       {
-         params: ProcessFriendRequestValidator
+         params: ProcessFriendRequestValidator,
+         response: { 201: t.Union([DepartingRelationshipValidator, t.Void()]) }
       }
    )
 
@@ -97,10 +106,11 @@ export const usersController = new Elysia({ prefix: '/users' })
       async ({ authId, params }) => {
          const { _id } = params;
          const friendRequest = await service.sendFriendRequest(_id, { authId });
-         return { data: friendRequest }
+         return status(200, friendRequest);
       },
       {
-         params: IdValidator
+         params: IdValidator,
+         response: DepartingRelationshipValidator,
       }
    )
 
@@ -108,8 +118,8 @@ export const usersController = new Elysia({ prefix: '/users' })
 
    .put( '/update',
       async ({ authId, body }) => {
-         const { name, email, bio, image } = body;
-         const updatedUser = await service.updateAccount({ authId, name, email, bio, image});
+         const { name, email, bio, imageReference } = body;
+         const updatedUser = await service.updateAccount({ authId, name, email, bio, imageReference });
          return { data: updatedUser }
       },
       {

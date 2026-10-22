@@ -1,9 +1,13 @@
-import Elysia from "elysia";
+import Elysia, { status, t } from "elysia";
 import { ingredientsService } from "../../../container";
 import { SearchValidator } from "./validators/search.validator";
 import { PostgresIdValidator } from "../../../common/api/validators/postgresId.validator";
 import { GetValidator } from "./validators/get.validator";
 import { PaginationValidator } from "../../../common/api/validators/pagination.validator";
+import { DepartingIngredientValidator } from "../../../global/departingData/validators/departingIngredient.validator";
+import { DepartingPaginatedList } from "../../../global/departingData/validators/departingPaginatedList";
+import { DepartingIngredientConversionValidator } from "../../../global/departingData/validators/departingIngredientConversion.validator";
+import { DepartingFoodGroupValidator } from "../../../global/departingData/validators/departingFoodGroup.validator";
 
 const service = ingredientsService;
 
@@ -15,12 +19,10 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
       async ({ params, query }) => {
          const { _id } = params;
          const ingredient = await service.getIngredient(_id);
-         return {
-            data: ingredient
-         };
+         return status(200, ingredient);
       },
       {
-         params: PostgresIdValidator,
+         params: t.Object({ _id: PostgresIdValidator }),
          query: GetValidator,
       }
    )
@@ -30,13 +32,12 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
    .get( '/search',
       async ({ query }) => {
          const { description, food_group_id, skip = 0, limit = 32 } = query;
-         const ingredientList = await service.searchIngredient({ description, food_group_id, skip, limit });
-         return {
-            data: ingredientList 
-         };
+         const ingredients = await service.searchIngredient({ description, food_group_id, skip, limit });
+         return status(200, ingredients);
       },
       {
-         query: SearchValidator
+         query: SearchValidator,
+         response: DepartingPaginatedList(t.Omit(DepartingIngredientValidator, ['portion'])),
       }
    )
 
@@ -46,14 +47,13 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
       async ({ params, query }) => {
          const { _id: food_id } = params;
          const { skip = 0, limit = 32  } = query;
-         const conversionList = await service.searchConversion(food_id, { skip, limit });
-         return { 
-            data: conversionList 
-         };
+         const conversions = await service.searchConversion(food_id, { skip, limit });
+         return status(200, conversions);
       },
       {
-         params: PostgresIdValidator,
+         params: t.Object({ _id: PostgresIdValidator }),
          query: PaginationValidator,
+         response: DepartingPaginatedList(DepartingIngredientConversionValidator)
       }
    )
 
@@ -61,9 +61,10 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
 
    .get( '/searchGroup', 
       async () => {
-         const groupList = await service.searchGroup({});
-         return {
-            data: groupList 
-         };
+         const foodGroups = await service.searchGroup({});
+         return status(200, foodGroups);
+      },
+      {
+         response: DepartingPaginatedList(DepartingFoodGroupValidator),
       }
    )
