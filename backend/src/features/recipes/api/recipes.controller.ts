@@ -1,6 +1,6 @@
 import Elysia, { status } from "elysia";
 import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
-import { IdValidator } from "../../../common/api/validators/id.validator";
+import { IdParamsValidator } from "../../../common/api/validators/id.validator";
 import { recipesService } from "../../../container";
 import { SearchValidator } from "./validators/search.validator";
 import { DepartingRecipeValidator } from "../../../global/departingData/validators/departingRecipe.validator";
@@ -25,7 +25,7 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
          return status(200, recipe);
       },
       {
-         params: IdValidator,
+         params: IdParamsValidator,
          response: DepartingRecipeValidator,
       }
    )
@@ -71,7 +71,7 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
          return status(201, updatedRecipe);
       },
       {
-         params: IdValidator,
+         params: IdParamsValidator,
          body: RecipeDraftValidator,
          response: { 201: DepartingRecipeValidator }
       }

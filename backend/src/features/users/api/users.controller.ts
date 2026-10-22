@@ -5,7 +5,7 @@ import { SearchValidator } from "./validators/search.validator";
 import { usersService } from "../../../container";
 import { UpdateValidator } from "./validators/update.validator";
 import { ProcessFriendRequestValidator } from "./validators/processFriendRequest.validator";
-import { IdValidator } from "../../../common/api/validators/id.validator";
+import { IdParamsValidator } from "../../../common/api/validators/id.validator";
 import { DepartingUserValidator } from "../../../global/departingData/validators/departingUserValidator";
 import { DepartingPaginatedList } from "../../../global/departingData/validators/departingPaginatedList";
 import { DepartingRelationshipValidator } from "../../../global/departingData/validators/departingRelationshipValidator";
@@ -29,7 +29,7 @@ export const usersController = new Elysia({ prefix: '/users' })
          return status(200, user);
       },
       {
-         params: IdValidator,
+         params: IdParamsValidator,
          query: GetValidator,
          response: DepartingUserValidator,
       }
@@ -65,7 +65,7 @@ export const usersController = new Elysia({ prefix: '/users' })
          else { return status(204, undefined); }
       },
       {
-         params: IdValidator,
+         params: IdParamsValidator,
          response: { 
             200: DepartingRelationshipValidator,
             204: t.Void()
@@ -82,7 +82,7 @@ export const usersController = new Elysia({ prefix: '/users' })
          return status(201);
       },
       {
-         params: IdValidator,
+         params: IdParamsValidator,
       }
    )
 
@@ -109,7 +109,7 @@ export const usersController = new Elysia({ prefix: '/users' })
          return status(200, friendRequest);
       },
       {
-         params: IdValidator,
+         params: IdParamsValidator,
          response: DepartingRelationshipValidator,
       }
    )

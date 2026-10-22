@@ -9,3 +9,5 @@ export const IdValidator = t.Transform(
 )
   .Decode((value) => new Types.ObjectId(value))
   .Encode((value) => value.toString());
+
+export const IdParamsValidator = t.Object({ _id: IdValidator });

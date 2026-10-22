@@ -1,7 +1,7 @@
 import Elysia, { status, t } from "elysia";
 import { ingredientsService } from "../../../container";
 import { SearchValidator } from "./validators/search.validator";
-import { PostgresIdValidator } from "../../../common/api/validators/postgresId.validator";
+import { PostgresIdParamsValidator } from "../../../common/api/validators/postgresId.validator";
 import { GetValidator } from "./validators/get.validator";
 import { PaginationValidator } from "../../../common/api/validators/pagination.validator";
 import { DepartingIngredientValidator } from "../../../global/departingData/validators/departingIngredient.validator";
@@ -22,7 +22,7 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
          return status(200, ingredient);
       },
       {
-         params: t.Object({ _id: PostgresIdValidator }),
+         params: PostgresIdParamsValidator,
          query: GetValidator,
       }
    )
@@ -51,7 +51,7 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
          return status(200, conversions);
       },
       {
-         params: t.Object({ _id: PostgresIdValidator }),
+         params: PostgresIdParamsValidator,
          query: PaginationValidator,
          response: DepartingPaginatedList(DepartingIngredientConversionValidator)
       }
