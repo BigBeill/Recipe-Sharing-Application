@@ -2,62 +2,67 @@
 
 import styles from './input.module.scss';
 
-import { useRef, useState, useEffect, Ref, useImperativeHandle } from "react"
+import { useState, useEffect, Ref, useImperativeHandle, useReducer, useRef } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
-import { unpackImage } from "../services/image.services";
 import { DataHandle } from '@/shared/domain/shared.types';
-import { PackagedImageType } from '../domain/image.types';
+import { TypeImageReference } from '../domain/image.types';
+import { imageService } from '../services/image.service.client';
+import useServiceState from '@/shared/lib/hooks/useServiceState';
 
 
-/*
-Image Uploader Component
-Props:
-   - imageBuffer: The current image file buffer
-   - setImageBuffer: Function to update the image buffer
-   - oldImageUrl: The URL of the old image (if any)
-   - fallbackImageUrl: The URL of the fallback image to use if no image is provided
+const RECIPE_IMAGE_FALLBACK = "/recipe-image-fallback.png";
+const USER_IMAGE_FALLBACK = "/recipe-image-fallback.png";
 
-This component will attempt to display an image source, it chooses what to display with following order of priority:
-   1. imageBuffer
-   2. oldImageUrl
-   3. fallbackImageUrl (should exist inside the project already)
-
-It will give the user the option to upload a new image file, which will be sent to setImageBuffer provided by the parent component.
-*/
 interface ImageUploaderProps {
-   ref: Ref<DataHandle<File | null>>;
-   initial?: PackagedImageType;
-   category: string;
+   ref: Ref<DataHandle<TypeImageReference | undefined>>;
+   initial?: TypeImageReference;
+   category: 'recipes' | 'users';
 }
 
 export default function ImageUploader({ ref, initial, category }: ImageUploaderProps) {
    const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-   const [imageBuffer, setImageBuffer] = useState<File | null>(null);
-
-   useImperativeHandle(ref, () => ({
-      getData: () => imageBuffer,
-      setData: setImageBuffer,
-   }),[]);
-
    const fileInputRef = useRef<HTMLInputElement | null>(null);
-   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+   const [imageUrl, setImageUrl] = useState<string | null>(null);
+   const [imageBuffer, setImageBuffer] = useReducer((previous: File | null, newFile: File | null) => (newFile && (newFile.size <= maxFileSize) ? newFile : previous), null);
    const [isDragging, setIsDragging] = useState<boolean>(false);
 
-   useEffect(() => {
-      if (!(imageBuffer instanceof File)) {
-         setPreviewUrl(null);
-         return;
-      }
-      const objectUrl = URL.createObjectURL(imageBuffer);
-      setPreviewUrl(objectUrl);
-      return () => URL.revokeObjectURL(objectUrl);
-   }, [imageBuffer]);
+   useImperativeHandle(ref, () => ({
+      getData: async () => {
+         if (imageBuffer) { return await imageService.upload(category, imageBuffer); }
+         else { return undefined; }
+      },
+      setData: async (imageReference: TypeImageReference | undefined) => {
+         if (imageReference) { setImageUrl(await imageService.get(imageReference.key)); }
+         else { setImageUrl(null); }
+      },
+   }), []);
 
-   function updateBuffer(file: File) {
-      if (file.size <= maxFileSize) { setImageBuffer(file); }
-   }
+   const initialImageState = useServiceState(async () => { 
+      if (initial) { 
+         const returnedImageUrl = await imageService.get(initial._id);
+         setImageUrl(returnedImageUrl);
+         return returnedImageUrl; 
+      }
+      else { 
+         return null; 
+      }
+   }, [initial]);
+
+   // ? update ImageUrl to keep up with imageBuffer()
+   useEffect(() => {
+      if (!imageBuffer) { 
+         if (initialImageState.status === 'ready') { setImageUrl(initialImageState.data); }
+         else { setImageUrl(null); }
+      }
+      else {
+         const uploadUrl = URL.createObjectURL(imageBuffer);
+         setImageUrl(uploadUrl);
+         return () => URL.revokeObjectURL(uploadUrl);
+      }
+   }, [imageBuffer]);
 
    function uploadFile() {
       fileInputRef.current?.click();
@@ -85,7 +90,7 @@ export default function ImageUploader({ ref, initial, category }: ImageUploaderP
          const uploadedFile = files[0];
          const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
          if (validTypes.includes(uploadedFile.type) && uploadedFile.size <= maxFileSize) {
-            updateBuffer(uploadedFile);
+            setImageBuffer(uploadedFile);
             event.dataTransfer.clearData();
          }
       }
@@ -107,17 +112,15 @@ export default function ImageUploader({ ref, initial, category }: ImageUploaderP
             aria-label="Choose an image for uploading"
             onChange={(event) => { 
                const userFile = event.target.files?.[0];
-               if (userFile) { (updateBuffer(userFile)); }
+               if (userFile) { (setImageBuffer(userFile)); }
             }}
          />
 
-         { previewUrl ? (
-            <img className="consumeSpace" alt="preview of uploaded file" src={previewUrl}/>
-         ) : ( 
-            <img 
-               className="consumeSpace" 
-               { ...unpackImage(initial) }
-            />
+         { imageUrl ? (
+            <img className="consumeSpace" alt="preview of uploaded file" src={imageUrl}/>
+         ) : ( category === 'recipes'
+            ? <img className="consumeSpace" alt="preview of uploaded file" src={ RECIPE_IMAGE_FALLBACK }/>
+            : <img className="consumeSpace" alt="preview of uploaded file" src={ USER_IMAGE_FALLBACK }/>
          ) }
          <FontAwesomeIcon icon={faCamera} className={isDragging ? 'makeVisible' : ''}/>
       </div>

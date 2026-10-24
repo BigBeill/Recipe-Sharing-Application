@@ -13,7 +13,7 @@ export interface RelationshipType {
    _id: string;
    owner: string;
    target: string;
-   type: "none" | "friend" | "requestReceived" | "requestSent" | "self";
+   type: "friend" | "requestReceived" | "requestSent";
 }
 
 export interface FolderType {

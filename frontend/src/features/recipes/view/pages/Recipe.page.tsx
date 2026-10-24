@@ -1,7 +1,7 @@
 "use client"
 
 import styles from './styles/recipe.module.scss';
-import { RecipeType } from "../../domain/recipes.types";
+import { TypeRecipe } from "../../domain/recipes.types";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { ComponentPropsWithoutRef, Ref, useRef } from "react";
 import { DataHandle } from '@/shared/domain/shared.types';
@@ -17,7 +17,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/providers/AuthProvider';
 
 interface Props {
-   recipe: RecipeType;
+   recipe: TypeRecipe;
 }
 
 export default function RecipePage ({ recipe }: Props) {
@@ -58,7 +58,7 @@ function TitleShard({ recipe }: Props) {
          <h2 className={ styles.heading2 }>{ recipe.title }</h2>
 
          <div className={ styles.imageWrapper }>
-            <ImageDisplay packagedImage={ recipe.image } className={ styles.photo } />
+            <ImageDisplay imageReference={ recipe.imageReference } category="recipes" className={ styles.photo } />
             <NutritionList nutrition={ recipe.nutrition } />
          </div>
 

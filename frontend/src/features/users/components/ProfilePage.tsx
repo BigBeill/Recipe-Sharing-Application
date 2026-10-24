@@ -5,7 +5,6 @@ import GrowingText from '@/shared/view/components/GrowingText.component';
 import { RelationshipType, UserType } from '../domain/user.types';
 import ImageUploader from '@/features/images/components/ImageUploader';
 import { useRouter } from 'next/navigation';
-import { unpackImage } from '@/features/images/services/image.services';
 import styles from './profilePage.module.scss';
 import { DataHandle } from '@/shared/domain/shared.types';
 import { userService } from '../services/user.service.client';
@@ -14,27 +13,32 @@ import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
 import { LoadingProvider } from '@/shared/lib/hooks/loadingContext';
 import { ButtonOval, ButtonShielded } from '@/shared/view/components/Button.components';
 import { InputString } from '@/shared/view/components/Input.components';
+import { TypeImageReference } from '@/features/images/domain/image.types';
 
 interface Props {
    initial: UserType
 }
 
+
+// TODO: Fix this page
 export default function ProfilePage({ initial }: Props) {
 
-   const [user, setUser] = useState<UserType>(initial);
-   const [modifiedUser, setModifiedUser] = useState<UserType | null>(null);
-
    const router = useRouter();
-   const { logoutSession } = useAuth();
+   const { session, sessionStatus, logoutSession } = useAuth();
 
-   const bioRef = useRef<DataHandle<string>>(null);
-   const imageRef = useRef<DataHandle<File | null>>(null);
+   const [user, setUser] = useState<UserType>(initial);
 
-   // mutator for updating the user (when coming out of edit mode)
-   const userMutator = useServiceMutation((updatedUser: UserType): Promise<UserType> => { return userService.update(updatedUser); })
+   const refs = {
+      bio: useRef<DataHandle<string>>(null),
+      imageReference: useRef<DataHandle<TypeImageReference | undefined>>(null),
+   }
+
+   // ? functions and variables for editing the current user
+   const [editMode, setEditMode] = useState<boolean>(false);
+   const userMutator = useServiceMutation((updatedUser: UserType): Promise<UserType> => { return userService.update(updatedUser); });
 
    async function saveChanges() {
-      if (!modifiedUser) { return; }
+      if (!editMode) { return; }
 
       const mutatedUser = await userMutator.send(modifiedUser);
       setUser((previous) => { return { ...mutatedUser, relationship: previous.relationship } });

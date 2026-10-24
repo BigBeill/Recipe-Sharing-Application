@@ -36,8 +36,8 @@ export function useInteractableList<T>({ initial, ref, renderItemContent, render
    }
 
    useImperativeHandle(ref, () => ({
-      getData: () => list.map((item) => item.content),
-      setData: (newList) => {
+      getData: async () => (await list).map((item) => item.content),
+      setData: async (newList) => {
          nextId.current = 0;
          setList(assignIds(newList));
       }

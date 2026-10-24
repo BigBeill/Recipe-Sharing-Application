@@ -1,23 +1,17 @@
-import { PackagedImageType } from '@/features/images/domain/image.types';
+import { TypeImageReference } from '@/features/images/domain/image.types';
 import { IngredientType, TypeNutrition } from '../../ingredients/domain/ingredient.types';
 
-export interface RecipeDraft {
+export interface TypeRecipeDraft {
    title: string;
    description: string;
-   image?: File;
+   imageReference?: TypeImageReference;
    ingredientList: IngredientType[];
    instructionList: string[];
    visibility: 'public' | 'private' | 'personal';
 }
 
-export interface RecipeType{
+export interface TypeRecipe extends TypeRecipeDraft{
    _id: string;
    ownerId: string;
-   title: string;
-   description: string;
-   image?: PackagedImageType;
-   ingredientList: IngredientType[];
-   instructionList: string[];
-   visibility: 'public' | 'private' | 'personal';
    nutrition?: TypeNutrition
 }

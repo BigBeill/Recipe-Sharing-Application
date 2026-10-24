@@ -102,8 +102,8 @@ export function InputNumber({ label, initial, ref, className, readOnlyOptions, .
    const [value, setValue] = useState<number>(initial || 0);
 
    useImperativeHandle(ref, () => ({
-      getData: () => value,
-      setData: setValue,
+      getData: async () => value,
+      setData: async (value) => { setValue(value) },
    }),[value]);
 
    return (
@@ -150,8 +150,8 @@ export function InputString({ className, label, initial, ref, readOnlyOptions, .
    const [string, setString] = useState<string>(initial ?? '');
 
    useImperativeHandle(ref, () => ({
-      getData: () => string,
-      setData: setString
+      getData: async () => string,
+      setData: async (value) => { setString(value) }
    }), [string]);
 
    // * grab the actual input component
@@ -226,8 +226,8 @@ function InputRadio<T>({ className, label, ref, optionList, initial, ...rest }: 
    const [choice, setChoice] = useState<{ label: string, value: T }>(initial || optionList[0]);
 
    useImperativeHandle(ref, () => ({
-      getData: () => choice.value,
-      setData: () => undefined,
+      getData: async () => choice.value,
+      setData: async () => undefined,
    }),[choice]);
    
    return (
@@ -248,8 +248,8 @@ function InputSelect<T>({ className, label, ref, optionList, initial, ...rest }:
    const [choice, setChoice] = useState<{ label: string, value: T }>(initial || optionList[0])
 
    useImperativeHandle(ref, () => ({
-      getData: () => choice?.value,
-      setData: () => undefined,
+      getData: async () => choice?.value,
+      setData: async () => undefined,
    }), [choice]);
 
    return (

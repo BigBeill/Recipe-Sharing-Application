@@ -16,8 +16,8 @@ export function FullscreenPage({ ref, children, className, ...rest }: ComponentP
    const [fullscreen, setFullscreen] = useState<boolean>(false);
 
    useImperativeHandle(ref, () => ({
-      getData: () => fullscreen,
-      setData: setFullscreen
+      getData: async () => fullscreen,
+      setData: async (value) => { setFullscreen(value); }
    }), [fullscreen]);
 
    useEffect(() => {

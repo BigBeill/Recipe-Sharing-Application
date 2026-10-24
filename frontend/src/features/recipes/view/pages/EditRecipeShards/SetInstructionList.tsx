@@ -41,8 +41,8 @@ export default function EditRecipeShardSetInstructionList ({ refs, initial }: Co
       ),
    });
 
-   function addInstruction() {
-      const newInstruction = newInstructionRef.current!.getData();
+   async function addInstruction() {
+      const newInstruction = await newInstructionRef.current!.getData();
       if(newInstruction.length < 3) { return; }
       instructionList.addItem(newInstruction);
       newInstructionRef.current!.setData('');

@@ -70,7 +70,7 @@ export default function IngredientSearch({ extendedRequirements = false, onSubmi
    async function handleSubmit() {
       if (!extendedRequirements) { forceSubmit(); }
       else if (ingredient !== null) { 
-         const harvestedData = harvestRefsObject(refs);
+         const harvestedData = await harvestRefsObject(refs);
          if(!harvestedData.amount || !harvestedData.unit) { return; }
          onSubmit({ 
             ...ingredient,

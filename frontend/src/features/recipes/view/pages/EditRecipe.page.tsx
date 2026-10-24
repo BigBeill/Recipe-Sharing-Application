@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from 'react';
-import { RecipeType } from '../../domain/recipes.types';
+import { TypeRecipe } from '../../domain/recipes.types';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { DataHandle } from '@/shared/domain/shared.types';
 import harvestRefsObject from '@/shared/lib/harvestRefsObject';
@@ -14,9 +14,10 @@ import EditRecipeShardSetImage from './EditRecipeShards/SetImage';
 import EditRecipeShardSetIngredientList from './EditRecipeShards/SetIngredientList';
 import EditRecipeShardSetInstructionList from './EditRecipeShards/SetInstructionList';
 import EditRecipeShardSubmit from './EditRecipeShards/Submit';
+import { TypeImageReference } from '@/features/images/domain/image.types';
 
 interface ComponentParams {
-	recipe: RecipeType
+	recipe: TypeRecipe
 }
 
 export default function EditRecipePage({ recipe }: ComponentParams ) {
@@ -27,7 +28,7 @@ export default function EditRecipePage({ recipe }: ComponentParams ) {
 	const refs = {
 		title: useRef<DataHandle<string>>(null),
 		description: useRef<DataHandle<string>>(null),
-		image: useRef<DataHandle<File | null>>(null),
+		image: useRef<DataHandle<TypeImageReference | undefined>>(null),
 		visibility: useRef<DataHandle<'public' | 'private' | 'personal'>>(null),
 		ingredientList: useRef<DataHandle<IngredientType[]>>(null),
 		instructionList: useRef<DataHandle<string[]>>(null),
@@ -35,7 +36,7 @@ export default function EditRecipePage({ recipe }: ComponentParams ) {
 
 	const saveMutator = useServiceMutation(async () => {
 		await recipeService.update(recipe._id, {
-			...harvestRefsObject(refs),
+			...await harvestRefsObject(refs),
 		});
 		router.push('/recipes');
 	});
@@ -50,7 +51,7 @@ export default function EditRecipePage({ recipe }: ComponentParams ) {
 		<NotebookPage components={ {
 			list: [
 				<EditRecipeShardSetTitle newRecipe={ !('_id' in recipe) } refs={ { title: refs.title, description: refs.description } } initial={ { title: recipe.title, description: recipe.description } } />,
-				<EditRecipeShardSetImage refs={ { image: refs.image, visibility: refs.visibility } } initial={ { image: recipe.image || undefined, visibility: recipe.visibility } } />,
+				<EditRecipeShardSetImage refs={ { image: refs.image, visibility: refs.visibility } } initial={ { imageReference: recipe.imageReference || undefined, visibility: recipe.visibility } } />,
 				<EditRecipeShardSetIngredientList refs={ { ingredientList: refs.ingredientList } } initial={ { ingredientList: recipe.ingredientList } } />,
 				<EditRecipeShardSetInstructionList refs={ { instructionList: refs.instructionList } } initial={ { instructionList: recipe.instructionList } } />,
 				<EditRecipeShardSubmit saveMutator={ saveMutator } deleteMutator={ deleteMutator } />,
