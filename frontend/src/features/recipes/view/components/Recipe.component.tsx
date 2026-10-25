@@ -1,7 +1,7 @@
 import styles from './styles/recipe.module.scss';
-import { RecipeType } from '../../domain/recipes.types';
 import GrowingText from "@/shared/view/components/GrowingText.component";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
+import { TypeRecipe } from '../../domain/recipes.types';
 
 
 
@@ -10,13 +10,13 @@ This is very similar to Recipe.page.tsx except it puts everything on a single wh
 Used for displaying recipe as a plugin component, instead of the entire page dedicated to one recipe
 */
 
-export default function RecipeComponent({ recipe }: { recipe: RecipeType }) {
+export default function RecipeComponent({ recipe }: { recipe: TypeRecipe }) {
 
    return (
       <div className={ styles.preview }>
          <GrowingText text={recipe.title}/>
 
-         <ImageDisplay packagedImage={recipe.image} />
+         <ImageDisplay category="recipes" imageReference={ recipe.imageReference } />
 
          <div className="description">
             <h3>Description</h3>
