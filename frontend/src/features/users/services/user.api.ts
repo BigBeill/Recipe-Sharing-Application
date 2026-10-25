@@ -1,57 +1,64 @@
 import type { TypeApiCaller } from "@/shared/lib/api/types";
-import { RelationshipType, UserType } from "../domain/user.types"
 import { PaginatedListType } from "@/shared/domain/shared.types";
+import { TypeImageReference } from "@/features/images/domain/image.types";
+import { TypeRelationship, TypeUser } from "../domain/user.types";
 
-export type TypeUserServiceGetParam = { includeRelationship: boolean };
-export type TypeUserServiceProcessFriendRequestParams = { accept: boolean; }
-export type TypeUserServiceSearchParams = {
+export type PayloadUserApiGet = { includeRelationship: boolean };
+export type PayloadUserApiProcessFriendRequest = { accept: boolean; }
+export type PayloadUserApiSearch = {
    _id?: string
    name?: string
    category?: 'friends' | 'incomingRequests' | 'outgoingRequests' | 'none';
    skip?: number;
    limit?: number;
 }
+export type PayloadUserApiUpdate = {
+   name?: string;
+   email?: string;
+   bio?: string;
+   imageReference?: TypeImageReference;
+}
 
 export function createUserApi(call: TypeApiCaller) {
    return {
       defineRelationship: (userId: string) =>
-         call<RelationshipType>({
+         call<TypeRelationship>({
             url: `/users/defineRelationship/${userId}`,
             method: 'get'
          }),
-      get: (userId: string, params?: TypeUserServiceGetParam) =>
-         call<UserType>({
+      get: (userId: string, body?: PayloadUserApiGet) =>
+         call<TypeUser>({
             url: `/users/get/${userId}`,
             method: 'get',
-            body: params,
+            body: body,
          }),
-      processFriendRequest: (relationshipId: string, params: TypeUserServiceProcessFriendRequestParams) =>
-         call<RelationshipType>({
+      processFriendRequest: (relationshipId: string, params: PayloadUserApiProcessFriendRequest) =>
+         call<TypeRelationship>({
             url:`/users/processFriendRequest/${relationshipId}`,
             method: 'post',
             body: params,
          }),
       removeFriend: (relationshipId: string) => 
-         call<RelationshipType>({
+         call<TypeRelationship>({
             url: `/users/removeFriend/${relationshipId}`,
             method: 'post',
          }),
-      search: (params: TypeUserServiceSearchParams) =>
-         call<PaginatedListType<UserType>>({
+      search: (body: PayloadUserApiSearch) =>
+         call<PaginatedListType<TypeUser>>({
             url: `/users/search`,
             method: 'get',
-            body: params
+            body: body,
          }),
       sendFriendRequest: (userId: string) =>
-         call<RelationshipType>({
+         call<TypeRelationship>({
             url: `/users/sendFriendRequest/${userId}`,
             method: 'post',
          }),
-      update: (user: FormData) =>
-         call<UserType>({
+      update: (userId: string, body: PayloadUserApiUpdate) =>
+         call<TypeUser>({
             url: `/users/update`,
             method: 'put',
-            body: { user },
+            body: body,
          }),
    }
 }

@@ -1,25 +1,25 @@
 import { PaginatedListType } from "@/shared/domain/shared.types";
-import { RelationshipType, UserType } from "../domain/user.types";
-import { createUserFormData } from "./user.utils";
 import type {
    TypeUserApi,
-   TypeUserServiceGetParam,
-   TypeUserServiceProcessFriendRequestParams,
-   TypeUserServiceSearchParams
+   PayloadUserApiGet,
+   PayloadUserApiProcessFriendRequest,
+   PayloadUserApiSearch,
+   PayloadUserApiUpdate,
 } from "./user.api";
+import { TypeRelationship, TypeUser } from "../domain/user.types";
 
 export function createUserService(api: TypeUserApi) {
    return {
 
-      defineRelationship: (userId: string): Promise<RelationshipType> => {
+      defineRelationship: (userId: string): Promise<TypeRelationship> => {
          return api.defineRelationship(userId);
       },
 
-      get: (userId: string, params?: TypeUserServiceGetParam) => {
-         return api.get(userId, params);
+      get: (userId: string, payload?: PayloadUserApiGet) => {
+         return api.get(userId, payload);
       },
 
-      processFriendRequest: (relationshipId: string, params: TypeUserServiceProcessFriendRequestParams) => {
+      processFriendRequest: (relationshipId: string, params: PayloadUserApiProcessFriendRequest) => {
          return api.processFriendRequest(relationshipId, params);
       },
 
@@ -27,16 +27,16 @@ export function createUserService(api: TypeUserApi) {
          return api.removeFriend(relationshipId);
       },
 
-      search: (params: TypeUserServiceSearchParams): Promise<PaginatedListType<UserType>> => {
-         return api.search(params);
+      search: (payload: PayloadUserApiSearch): Promise<PaginatedListType<TypeUser>> => {
+         return api.search(payload);
       },
 
       sendFriendRequest: (userId: string) => {
          return api.sendFriendRequest(userId);
       },
 
-      update: (user: UserType, image?: File): Promise<UserType> => {
-         return api.update(createUserFormData(user, image));
+      update: (userId: string, payload: PayloadUserApiUpdate): Promise<TypeUser> => {
+         return api.update(userId, payload);
       },
    }
 }

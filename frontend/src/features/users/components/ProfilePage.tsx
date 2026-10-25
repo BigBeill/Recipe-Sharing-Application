@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react'
 import GrowingText from '@/shared/view/components/GrowingText.component';
-import { RelationshipType, UserType } from '../domain/user.types';
 import ImageUploader from '@/features/images/components/ImageUploader';
 import { useRouter } from 'next/navigation';
 import styles from './profilePage.module.scss';
@@ -14,51 +13,49 @@ import { LoadingProvider } from '@/shared/lib/hooks/loadingContext';
 import { ButtonOval, ButtonShielded } from '@/shared/view/components/Button.components';
 import { InputString } from '@/shared/view/components/Input.components';
 import { TypeImageReference } from '@/features/images/domain/image.types';
+import { TypeRelationship, TypeUser } from '../domain/user.types';
+import harvestRefsObject from '@/shared/lib/harvestRefsObject';
 
 interface Props {
-   initial: UserType
+   initial: TypeUser
 }
 
-
-// TODO: Fix this page
 export default function ProfilePage({ initial }: Props) {
-
    const router = useRouter();
    const { session, sessionStatus, logoutSession } = useAuth();
+   if (sessionStatus === 'pending') { throw new Error("Attempting to call ProfilePage with a sessionStatus of pending") }
+   if (sessionStatus === 'guest') { return router.replace('/login'); }
 
-   const [user, setUser] = useState<UserType>(initial);
+   const [user, setUser] = useState<TypeUser>(initial);
 
    const refs = {
+      name: useRef<DataHandle<string>>(null),
       bio: useRef<DataHandle<string>>(null),
       imageReference: useRef<DataHandle<TypeImageReference | undefined>>(null),
    }
 
    // ? functions and variables for editing the current user
    const [editMode, setEditMode] = useState<boolean>(false);
-   const userMutator = useServiceMutation((updatedUser: UserType): Promise<UserType> => { return userService.update(updatedUser); });
+   const userMutator = useServiceMutation(async (): Promise<TypeUser> => { return await userService.update(user._id, (await harvestRefsObject(refs))) });
 
    async function saveChanges() {
       if (!editMode) { return; }
 
-      const mutatedUser = await userMutator.send(modifiedUser);
-      setUser((previous) => { return { ...mutatedUser, relationship: previous.relationship } });
-      setModifiedUser(null);
+      setUser(await userMutator.send());
    }
 
    // mutator for setting the relationship.type field of another user
-   const relationshipMutator = useServiceMutation((newRelationship: 'none' | 'requestReceived' | 'friend'): Promise<RelationshipType> => {
-      const relationship: RelationshipType = user.relationship!;
-      if (newRelationship === 'none') { 
-         if (relationship.type === 'friend') { return userService.removeFriend(relationship._id); }
-         else if (relationship.type === 'requestReceived' || relationship.type === 'requestSent') { return userService.processFriendRequest(relationship._id, { accept: false}); }
+   const relationshipMutator = useServiceMutation(session?.userId === user._id ? async () => { return null; } 
+      : async (newRelationship: 'none' | 'requestReceived' | 'friend'): Promise<TypeRelationship | null> => {
+         if (newRelationship === 'none') {
+            if (user.relationship?.type === 'friend') { return userService.removeFriend(user.relationship._id); }
+            else if (user.relationship?.type === 'requestReceived' || user.relationship?.type === 'requestSent') { return userService.processFriendRequest(user.relationship._id, { accept: false}); }
+         }
+         if (newRelationship === 'requestReceived' && user.relationship?.type !== null) { return userService.sendFriendRequest(user._id); }
+         if (newRelationship === 'friend' && user.relationship?.type === 'requestSent') { return userService.processFriendRequest(user.relationship._id, { accept: true }); }
+         return null;
       }
-      if (newRelationship === 'requestReceived' && relationship.type === 'none') { return userService.sendFriendRequest(relationship.owner); }
-      if (newRelationship === 'friend' && relationship.type === 'requestSent') { return userService.processFriendRequest(relationship._id, { accept: true }); }
-
-      // If the request does not match any of the above conditions and trigger a return then send an error
-      console.error('Unable to set the targets relationship with this user to: ' + newRelationship + ' their current relationship with this user is: ' + relationship.type);
-      throw new Error('relationship cannot be set to ' + newRelationship);
-   });
+   );
 
    async function updateRelationship(newRelationship: 'none' | 'requestReceived' | 'friend') {
       const mutatedRelationship = await relationshipMutator.send(newRelationship);
@@ -74,33 +71,27 @@ export default function ProfilePage({ initial }: Props) {
    return (
       <div className={ styles.userProfile }>
          <GrowingText text={ user.name }/>
-         <div>
-            { !modifiedUser ? (
-               <img className='consumeSpace' { ...unpackImage(user.image) }/>
-            ) : (
-               <ImageUploader
-                  ref={ imageRef }
-                  initial={ user.image }
-                  category={ 'user' }
-               />
-            ) }
-         </div>
+         <ImageUploader
+            ref={ refs.imageReference }
+            initial={ user.imageReference }
+            category={ 'users' }
+         />
 
          <div> {/* styleDiv, should not contain anything */} </div>
 
          <div>
             <p>id: { String(user._id) }</p>
-            <p>username: { user.name }</p>
+            <InputString type='text' label='Username' initial={ user.name } ref={ refs.name } readOnlyOptions={ { condition: editMode, placeholder: 'Issue loading username' } } />
          </div>
 
          <InputString 
             type='textarea'
             label='Personal Bio' 
             placeholder='Talk about yourself' 
-            ref={ bioRef }
+            ref={ refs.bio }
             initial={ user.bio }
             readOnlyOptions={ {
-               condition: !modifiedUser,
+               condition: editMode,
                placeholder: "No bio created yet"
             } }
          />
@@ -110,12 +101,17 @@ export default function ProfilePage({ initial }: Props) {
          {/* display the appropriate set of two buttons */}
          <LoadingProvider value={ relationshipMutator.status === 'loading' || userMutator.status === 'loading' }>
             <div className="splitSpace">
-               { modifiedUser ? (
+               { editMode ? (
                   <>
                      <ButtonShielded key='save' message='Save Changes' showLoading={ true } onClick={ saveChanges } />
-                     <ButtonShielded key='delete' message='Delete Changes' onClick={ () => { setModifiedUser(null); } }/>
+                     <ButtonShielded key='delete' message='Delete Changes' onClick={ () => { setEditMode(false); } }/>
                   </>
-               ) : user.relationship?.type == "none" ? (
+               ) : session?.userId === user._id ? (
+                  <>
+                     <ButtonOval onClick={ () => { setEditMode(true); } }> edit account </ButtonOval>
+                     <ButtonShielded key='logout' message="logout" onClick={ () => { handleLogout(); } }/>
+                  </>
+               ) : user.relationship === null ? (
                   <>
                      <ButtonOval showLoading={ true } onClick={ () => { updateRelationship('requestReceived'); } }>Send friend request</ButtonOval>
                   </>
@@ -134,7 +130,7 @@ export default function ProfilePage({ initial }: Props) {
                   </>
                ) : user.relationship?.type == "self" ? (
                   <>
-                     <ButtonOval onClick={ () => { setModifiedUser(user); } }> edit account </ButtonOval>
+                     <ButtonOval onClick={ () => { setEditMode(true); } }> edit account </ButtonOval>
                      <ButtonShielded key='logout' message="logout" onClick={ () => { handleLogout(); } }/>
                   </>
                ) : null }

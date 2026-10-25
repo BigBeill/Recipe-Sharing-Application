@@ -1,23 +1,19 @@
-import { PackagedImageType } from "@/features/images/domain/image.types";
+import { TypeImageReference } from "@/features/images/domain/image.types";
 
-export interface UserType {
-   _id: string;
+export interface TypeUserDraft {
    name: string;
    email?: string;
    bio?: string;
-   image?: PackagedImageType;
-   relationship?: RelationshipType;
+   imageReference?: TypeImageReference;
+}
+export interface TypeUser extends TypeUserDraft{
+   _id: string;
+   relationship?: TypeRelationship | null;
 }
 
-export interface RelationshipType {
+export interface TypeRelationship {
    _id: string;
    owner: string;
    target: string;
    type: "friend" | "requestReceived" | "requestSent";
-}
-
-export interface FolderType {
-   _id: string;
-   title: string;
-   content?: UserType[];
 }
