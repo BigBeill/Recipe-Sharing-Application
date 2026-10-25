@@ -148,7 +148,6 @@ type InputStringProps = ( InputTextProps & { type: 'text' } ) | ( InputTextAreaP
 export function InputString({ className, label, initial, ref, readOnlyOptions, ...props }: InputStringProps) {
    const id = useId();
    const [string, setString] = useState<string>(initial ?? '');
-
    useImperativeHandle(ref, () => ({
       getData: async () => string,
       setData: async (value) => { setString(value) }

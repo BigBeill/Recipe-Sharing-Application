@@ -23,8 +23,7 @@ interface Props {
 export default function ProfilePage({ initial }: Props) {
    const router = useRouter();
    const { session, sessionStatus, logoutSession } = useAuth();
-   if (sessionStatus === 'pending') { throw new Error("Attempting to call ProfilePage with a sessionStatus of pending") }
-   if (sessionStatus === 'guest') { return router.replace('/login'); }
+   if (sessionStatus !== 'authenticated') { throw new Error("Attempting to call ProfilePage without a sessionState of authenticated") }
 
    const [user, setUser] = useState<TypeUser>(initial);
 
@@ -81,7 +80,7 @@ export default function ProfilePage({ initial }: Props) {
 
          <div>
             <p>id: { String(user._id) }</p>
-            <InputString type='text' label='Username' initial={ user.name } ref={ refs.name } readOnlyOptions={ { condition: editMode, placeholder: 'Issue loading username' } } />
+            <InputString type='text' label='Username' initial={ user.name } ref={ refs.name } readOnlyOptions={ { condition: !editMode, placeholder: 'Issue loading username' } } />
          </div>
 
          <InputString 
@@ -91,7 +90,7 @@ export default function ProfilePage({ initial }: Props) {
             ref={ refs.bio }
             initial={ user.bio }
             readOnlyOptions={ {
-               condition: editMode,
+               condition: !editMode,
                placeholder: "No bio created yet"
             } }
          />
@@ -101,7 +100,7 @@ export default function ProfilePage({ initial }: Props) {
          {/* display the appropriate set of two buttons */}
          <LoadingProvider value={ relationshipMutator.status === 'loading' || userMutator.status === 'loading' }>
             <div className="splitSpace">
-               { editMode ? (
+               { !editMode ? (
                   <>
                      <ButtonShielded key='save' message='Save Changes' showLoading={ true } onClick={ saveChanges } />
                      <ButtonShielded key='delete' message='Delete Changes' onClick={ () => { setEditMode(false); } }/>
