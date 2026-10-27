@@ -19,12 +19,10 @@ export const app = new Elysia({ cookie: cookieConfig })
    .use(errorHandler)
    .use(jwksPlugin)
    .mapResponse({ as: 'global' }, ({ responseValue }) => {
-      if (responseValue && typeof responseValue === 'object' && 'data' in responseValue) {
-         return new Response(
-            JSON.stringify({ data: removeMongooseNoise((responseValue as any).data) }),
-            { headers: { 'Content-Type': 'application/json' } }
-         );
-      }
+      return new Response(
+         JSON.stringify(removeMongooseNoise(responseValue)),
+         { headers: { 'Content-Type': 'application/json' } }
+      );
    })
    .use(corsConfig)
    .use(logger)

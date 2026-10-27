@@ -1,20 +1,20 @@
 // features/auth/services/authService.ts
 import { TypeApiCaller } from "@/shared/lib/api/types";
 
-export type TypeAuthServiceLoginParams = {
+export type PayloadAuthApiLogin = {
   name: string;
   password: string;
   rememberMe: boolean;
 }
-export type TypeAuthServiceRegisterParams = {
+export type PayloadAuthApiRegister = {
   name: string;
   email: string;
   password: string;
 }
-export type TypeAuthServiceRequestPasswordResetParams = {
+export type PayloadAuthApiRequestPasswordReset = {
    email: string;
 }
-export type TypeAuthServiceResetPasswordParams = {
+export type PayloadAuthApiResetPassword = {
   token: string;
   password: string;
 }
@@ -28,11 +28,11 @@ export function createAuthApi(call: TypeApiCaller) {
             method: 'GET'
          }),
 
-      login: (params: TypeAuthServiceLoginParams): Promise<{ _id: string }> =>
+      login: (body: PayloadAuthApiLogin): Promise<string> =>
          call({
             url: "/auth/login",
             method: "POST",
-            body: params,
+            body,
          }),
 
       logout: (): Promise<void> => 
@@ -41,25 +41,25 @@ export function createAuthApi(call: TypeApiCaller) {
             method: 'POST',
          }),
 
-      register: (params: TypeAuthServiceRegisterParams): Promise<{ _id: string }> =>
+      register: (body: PayloadAuthApiRegister): Promise<string> =>
          call({
             url: "/auth/register",
             method: "POST",
-            body: params,
+            body,
          }),
 
-      requestPasswordReset: (params: TypeAuthServiceRequestPasswordResetParams): Promise<void> =>
+      requestPasswordReset: (body: PayloadAuthApiRequestPasswordReset): Promise<void> =>
          call({
             url: "/auth/requestPasswordReset",
             method: "POST",
-            body: params,
+            body,
          }),
 
-      resetPassword: (params: TypeAuthServiceResetPasswordParams): Promise<void> =>
+      resetPassword: (body: PayloadAuthApiResetPassword): Promise<void> =>
          call({
             url: "/auth/resetPassword",
             method: "POST",
-            body: params,
+            body,
          }),
    }
 };

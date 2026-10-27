@@ -44,10 +44,10 @@ export default async function middleware(request: NextRequest) {
       return response;
    }
 
-   // keep cookies if http failure isn't related to 
+   // keep cookies if http failure isn't related to failed authentication
    if (!upstream.ok) { return NextResponse.next(); }
 
-   const updatedAccessToken = await upstream.json();
+   const updatedAccessToken = (await upstream.text()).trim();
    if (!updatedAccessToken) { return NextResponse.next(); }
 
    // so this render's cookies() sees the fresh token

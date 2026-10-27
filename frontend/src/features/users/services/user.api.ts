@@ -30,13 +30,13 @@ export function createUserApi(call: TypeApiCaller) {
          call<TypeUser>({
             url: `/users/get/${userId}`,
             method: 'get',
-            body: body,
+            body,
          }),
-      processFriendRequest: (relationshipId: string, params: PayloadUserApiProcessFriendRequest) =>
+      processFriendRequest: (relationshipId: string, body: PayloadUserApiProcessFriendRequest) =>
          call<TypeRelationship>({
             url:`/users/processFriendRequest/${relationshipId}`,
             method: 'post',
-            body: params,
+            body,
          }),
       removeFriend: (relationshipId: string) => 
          call<TypeRelationship>({
@@ -47,7 +47,7 @@ export function createUserApi(call: TypeApiCaller) {
          call<PaginatedListType<TypeUser>>({
             url: `/users/search`,
             method: 'get',
-            body: body,
+            body,
          }),
       sendFriendRequest: (userId: string) =>
          call<TypeRelationship>({
@@ -58,7 +58,7 @@ export function createUserApi(call: TypeApiCaller) {
          call<TypeUser>({
             url: `/users/update`,
             method: 'put',
-            body: body,
+            body,
          }),
    }
 }

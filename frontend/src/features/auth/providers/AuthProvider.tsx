@@ -30,7 +30,7 @@ export default function AuthProvider({ sessionPromise, children }: props) {
 	useEffect(() => {
 		let cancelled = false;
 		sessionPromise.then((resolved) => {
-         if (cancelled) return;
+         if (cancelled) { return; }
 			setState({ session: resolved, sessionStatus:(resolved ? 'authenticated' : 'guest') } as AuthState)
       });
 		return () => { cancelled = true; };

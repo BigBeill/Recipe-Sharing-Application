@@ -64,7 +64,7 @@ export default function ProfilePage({ initial }: Props) {
    // handle logout function
    function handleLogout() {
       logoutSession()
-         .then(() => router.push('/login'));
+         .then(() => router.push('/auth/login'));
    }
 
    return (
@@ -100,7 +100,7 @@ export default function ProfilePage({ initial }: Props) {
          {/* display the appropriate set of two buttons */}
          <LoadingProvider value={ relationshipMutator.status === 'loading' || userMutator.status === 'loading' }>
             <div className="splitSpace">
-               { !editMode ? (
+               { editMode ? (
                   <>
                      <ButtonShielded key='save' message='Save Changes' showLoading={ true } onClick={ saveChanges } />
                      <ButtonShielded key='delete' message='Delete Changes' onClick={ () => { setEditMode(false); } }/>
