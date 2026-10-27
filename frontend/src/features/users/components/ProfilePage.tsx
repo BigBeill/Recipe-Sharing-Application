@@ -23,7 +23,9 @@ interface Props {
 export default function ProfilePage({ initial }: Props) {
    const router = useRouter();
    const { session, sessionStatus, logoutSession } = useAuth();
-   if (sessionStatus !== 'authenticated') { throw new Error("Attempting to call ProfilePage without a sessionState of authenticated") }
+
+   const [sessionStatusOnMount] = useState(sessionStatus);
+   if (sessionStatusOnMount !== 'authenticated') { throw new Error("Attempting to call ProfilePage without a sessionState of authenticated") }
 
    const [user, setUser] = useState<TypeUser>(initial);
 

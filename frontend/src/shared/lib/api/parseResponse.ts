@@ -8,7 +8,6 @@ export default async function parseResponse<T>(response: Response): Promise<T> {
    else if (response.status === 204) { return undefined as T; }
 
    else if (!response.ok) {
-      console.log("logging bad response");
       const content = await response.json().catch(() => null);
 
       const badResponse = {

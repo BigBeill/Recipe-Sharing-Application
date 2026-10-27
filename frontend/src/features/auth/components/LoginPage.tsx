@@ -28,9 +28,7 @@ export default function LoginPage() {
    const [loginData, setLoginData] = useState<TypeLoginData>({ name: "", password: "", rememberMe: false });
    
    const loginMutator = useServiceMutation(async () => { 
-      console.log("loginData:", loginData);
       const response = await authService.login(loginData);
-      console.log("response", response);
       overrideSession({ userId: response, roles: [] });
       router.replace('/');
    });

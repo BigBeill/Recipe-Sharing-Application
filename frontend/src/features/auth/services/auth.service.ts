@@ -16,11 +16,8 @@ export function createAuthService(api: TypeAuthApi) {
       },
 
       login: async (payload: PayloadAuthApiLogin): Promise<string> => {
-         console.log('checkpoint 1')
          checkValidPassword(payload.password);
-         console.log('checkpoint 2');
          const response = await api.login(payload);
-         console.log('checkpoint 3:', response);
          return response;
       },
 
