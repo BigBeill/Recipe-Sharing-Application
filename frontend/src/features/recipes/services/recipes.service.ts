@@ -1,30 +1,30 @@
 import { PaginatedListType } from "@/shared/domain/shared.types";
-import { RecipeDraft, RecipeType } from "../domain/recipes.types";
-import { checkValidRecipeDraft, createRecipeFormData } from "./recipes.utils";
+import { checkValidRecipeDraft } from "./recipes.utils";
 import {
    TypeRecipeApi,
-   TypeRecipeServiceGetParams,
-   TypeRecipeServiceSearchParams,
+   PayloadRecipeApiGet,
+   PayloadRecipeApiSearch,
+   PayloadRecipeApiUpdate,
 } from './recipes.api'
+import { TypeRecipe, TypeRecipeDraft } from "../domain/recipes.types";
 
 export function createRecipeService(api: TypeRecipeApi) {
    return {
 
-      create: (recipe: RecipeDraft): Promise<void> => {
+      create: async (recipe: TypeRecipeDraft): Promise<void> => {
          checkValidRecipeDraft(recipe);
-         const recipeFormData = createRecipeFormData(recipe);
-         return api.create(recipeFormData);
+         await api.create(recipe);
       },
 
       delete: (recipeId: string): Promise<void> => {
          return api.delete(recipeId);
       },
 
-      get: (recipeId: string, params?: TypeRecipeServiceGetParams): Promise<RecipeType> => {
+      get: (recipeId: string, params?: PayloadRecipeApiGet): Promise<TypeRecipe> => {
          return api.get(recipeId, params);
       },
 
-      search: (params: TypeRecipeServiceSearchParams): Promise<PaginatedListType<RecipeType>> => {
+      search: (params: PayloadRecipeApiSearch): Promise<PaginatedListType<TypeRecipe>> => {
          const { title, ingredientIdList, visibilityList, limit, skip } = params;
          return api.search({ 
             ...(title ? { title } : undefined),
@@ -35,11 +35,8 @@ export function createRecipeService(api: TypeRecipeApi) {
          });
       },
 
-      update: (recipeId: string, recipe: RecipeDraft): Promise<void> => {
-         checkValidRecipeDraft(recipe);
-         const recipeFormData = createRecipeFormData(recipe);
-         return api.update(recipeId, recipeFormData);
-      }
-
+      update: async (recipeId: string, body: PayloadRecipeApiUpdate): Promise<void> => {
+         await api.update(recipeId, body);
+      },
    }
 }

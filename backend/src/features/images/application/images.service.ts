@@ -92,8 +92,11 @@ export class ImagesService {
       if (!type) { throw new Error("Unsupported image type"); }
 
       const key = `${location}/${randomUUID()}`;
-      await bucketClient.file(`temp/${key}`).write(file, { type: "image/webp" });
-      const imageReference = await this.repository.createImageReference({ key, owner: authId, status: 'pending' })
+      console.log("image key created:", key);
+      await bucketClient.file(key).write(file, { type: "image/webp" });
+      console.log("creating reference");
+      const imageReference = await this.repository.createImageReference({ key, owner: authId, status: 'pending' });
+      console.log("reference created:", imageReference);
 
       return imageReference;
    }

@@ -1,7 +1,7 @@
 import { TypeImageReference } from '@/features/images/domain/image.types';
 import { IngredientType, TypeNutrition } from '../../ingredients/domain/ingredient.types';
 
-export interface TypeRecipeDraft {
+export type TypeRecipeDraft = {
    title: string;
    description: string;
    imageReference?: TypeImageReference;

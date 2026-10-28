@@ -2,13 +2,13 @@ import Elysia, { status } from "elysia"
 import { imagesService } from "../../../container";
 import { UploadValidator } from "./validators/upload.validator";
 import { GetValidator } from "./validators/get.validator";
-import { authorizeMiddleware } from "../../auth/auth.middleware";
+import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
 import { DepartingStringValidator } from "../../../global/departingData/validators/primitives/departingString.validator";
 import { ImageReferenceValidator } from "./validators/imageReference.validator";
 
 const service = imagesService;
 
-export const imagesController = new Elysia({ prefix: '/image' })
+export const imagesController = new Elysia({ prefix: '/images' })
 
    .get('/:location/:fileName', 
       async ({ params }) => {
@@ -22,6 +22,7 @@ export const imagesController = new Elysia({ prefix: '/image' })
       }
    )
 
+   .use(authenticateMiddleware)
    .use(authorizeMiddleware)
 
    .post('/upload',

@@ -1,7 +1,6 @@
 "use client"
 
 import styles from './input.module.scss';
-
 import { useState, useEffect, Ref, useImperativeHandle, useReducer, useRef } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
@@ -38,7 +37,7 @@ export default function ImageUploader({ ref, initial, category }: ImageUploaderP
          if (imageReference) { setImageUrl(await imageService.get(imageReference.key)); }
          else { setImageUrl(null); }
       },
-   }), []);
+   }), [imageBuffer, category]);
 
    const initialImageState = useServiceState(async () => { 
       if (initial) { 
@@ -98,22 +97,22 @@ export default function ImageUploader({ ref, initial, category }: ImageUploaderP
 
    return (
       <div 
-         className={styles.inputWrapper}
-         onClick={uploadFile}
-         onDragOver={handleDragOver}
-         onDragLeave={handleDragLeave}
-         onDrop={handleDrop}
+         className={ styles.inputWrapper }
+         onClick={ uploadFile }
+         onDragOver={ handleDragOver }
+         onDragLeave={ handleDragLeave }
+         onDrop={ handleDrop }
       >
          {/* input will be hidden by css, but still included in DOM for screen readers */}
          <input 
             type="file"
-            ref={fileInputRef}
+            ref={ fileInputRef }
             accept="image/png, image/jpeg, image/jpg, image/webp"
             aria-label="Choose an image for uploading"
-            onChange={(event) => { 
+            onChange={ (event) => { 
                const userFile = event.target.files?.[0];
                if (userFile) { (setImageBuffer(userFile)); }
-            }}
+            } }
          />
 
          { imageUrl ? (
@@ -122,7 +121,7 @@ export default function ImageUploader({ ref, initial, category }: ImageUploaderP
             ? <img className="consumeSpace" alt="preview of uploaded file" src={ RECIPE_IMAGE_FALLBACK }/>
             : <img className="consumeSpace" alt="preview of uploaded file" src={ USER_IMAGE_FALLBACK }/>
          ) }
-         <FontAwesomeIcon icon={faCamera} className={isDragging ? 'makeVisible' : ''}/>
+         <FontAwesomeIcon icon={ faCamera } className={ isDragging ? 'makeVisible' : '' }/>
       </div>
    )
 }
