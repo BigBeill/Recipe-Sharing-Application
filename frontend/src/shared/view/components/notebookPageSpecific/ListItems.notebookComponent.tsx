@@ -1,8 +1,8 @@
-import { PackagedImageType } from "@/features/images/domain/image.types";
 import styles from './styles/ListItems.module.scss'
 import GrowingText from "../GrowingText.component";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { LinkBackground } from "../Link.components";
+import { TypeImageReference } from '@/features/images/domain/image.types';
 
 
 // * Default method of displaying a list of items designed to be plugged directly into @/shared/view/pages/notebook.page.tsx
@@ -10,7 +10,7 @@ import { LinkBackground } from "../Link.components";
 interface Props {
    itemList: {
       title: string;
-      image?: PackagedImageType;
+      imageReference: TypeImageReference;
       href: string;
    }[];
    defaultListSize?: number;
@@ -28,7 +28,7 @@ export default function NotebookComponentListItems({ itemList, defaultListSize =
                   <LinkBackground href={ item.href }>
                      <GrowingText text={ item.title } className={ styles.title } />
                      <div className={ styles.decretiveLine } aria-hidden="true"/>
-                     <ImageDisplay packagedImage={ item.image } />
+                     <ImageDisplay imageReference={ item.imageReference } category='recipes' />
                   </LinkBackground>
                </li>
             )) }

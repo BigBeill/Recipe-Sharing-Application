@@ -52,7 +52,6 @@ export class RecipesRepository {
 
    
    async search(params: SearchParams): Promise<PaginatedListType<RecipeRecord>> {
-      console.log("params sent to search:", params);
 
       const { title, ownerIdList, ingredientIdList, visibilityList, authId, friendIdList = [], skip, limit } = params;
 
