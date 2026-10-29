@@ -7,7 +7,7 @@ import type { TypeNutrition, TypeRecipe, TypeRecipeDraft } from "../domain/recip
 import type { TypeIngredient } from "../../ingredients/domain/ingredients.types";
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
 import type { AuthIdParam } from "../../../common/api/authIdParam";
-import { NotFoundError, UnauthorizedError } from "../../../global/departingData/error.types";
+import { NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { ImagesService } from "../../images/application/images.service";
 import type { Types } from "mongoose";
 import type { TypeImageReference } from "../../images/domain/images.types";

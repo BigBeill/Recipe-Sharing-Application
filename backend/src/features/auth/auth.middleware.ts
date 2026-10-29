@@ -2,7 +2,7 @@
 import { Elysia } from 'elysia';
 import { jwtVerify } from 'jose';
 import { publicKey } from './keys';
-import { UnauthorizedError } from '../../global/departingData/error.types';
+import { UnauthorizedError } from '../../global/departingData/errorClasses';
 import { env } from '../../global/config/env.config';
 import { Types } from 'mongoose';
 

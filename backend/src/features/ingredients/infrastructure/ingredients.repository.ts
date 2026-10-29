@@ -1,7 +1,7 @@
 import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import postgresConnection from "../../../externalResources/database/postgres/config.postgreDatabase";
 import { postgresQueryBuilder } from "../../../externalResources/database/postgres/queryBuilder.postgreDatabase";
-import { NotFoundError } from "../../../global/departingData/error.types";
+import { NotFoundError } from "../../../global/departingData/errorClasses";
 import type { TypeNutrition } from "../../recipes/domain/recipes.types";
 import type { TypeIngredientDraft, TypeIngredientConversion, TypeIngredientGroup } from "../domain/ingredients.types";
 import { breakupMeasureDescription, calculateTrueConversionFactorValue } from "./ingredients.mapper";

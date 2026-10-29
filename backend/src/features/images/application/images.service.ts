@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import bucketClient from "../infrastructure/bucket";
 import type { ImagesRepository } from "../infrastructure/images.repository";
 import type { AuthIdParam } from "../../../common/api/authIdParam";
-import { UnauthorizedError } from "../../../global/departingData/error.types";
+import { UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { Types } from "mongoose";
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
 import type { TypeImageReference } from "../domain/images.types";

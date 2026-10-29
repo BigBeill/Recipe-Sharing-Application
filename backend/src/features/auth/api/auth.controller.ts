@@ -6,7 +6,7 @@ import { requestPasswordResetValidator } from './validators/requestPasswordReset
 import { resetPasswordValidator } from './validators/resetPassword.validator';
 import { changePasswordValidator } from './validators/changePassword.validator';
 import { authService } from '../../../container';
-import { NotFoundError } from '../../../global/departingData/error.types';
+import { NotFoundError } from '../../../global/departingData/errorClasses';
 import { DepartingIdValidator } from '../../../global/departingData/validators/departingId.validator';
 import { DepartingStringValidator } from '../../../global/departingData/validators/primitives/departingString.validator';
 

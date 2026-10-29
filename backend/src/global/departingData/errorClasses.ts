@@ -23,12 +23,6 @@ export class UnauthorizedError extends AppError {
    }
 }
 
-export class ValidationError extends AppError {
-   constructor(message: string) {
-      super(message, 400, 'VALIDATION_ERROR');
-   }
-}
-
 export class ConflictError extends AppError {
    constructor(message: string) {
       super(message, 409, 'CONFLICT');

@@ -1,5 +1,5 @@
 import { Elysia, ValidationError } from 'elysia';
-import { AppError } from './error.types';
+import { AppError } from './errorClasses';
 
 export const errorHandler = new Elysia({ name: 'error-handler' })
    .onError(({ error, code, set }) => {
@@ -14,22 +14,16 @@ export const errorHandler = new Elysia({ name: 'error-handler' })
       }
 
       else if (error instanceof ValidationError) {
-         const grouped = new Map<string, string[]>();
-
-         for (const valueError of error.all) {
-            if (!('path' in valueError)) { continue; }
-            const field = valueError.path.slice(1).replaceAll('/', '.') || 'root';
-            const reasonList = grouped.get(field) ?? [];
-            reasonList.push(valueError.message);
-            grouped.set(field, reasonList);
-         }
-
-         set.status = 400;
+         const rejectedFieldList = error.all.flatMap((error) =>
+            'path' in error
+               ? [{ field: error.path.slice(1) || 'root', reasonList: [error.message] }]
+               : []
+         )
          return {
-            name: 'Validation Error',
-            code: 'ERROR_VALIDATION',
-            message: 'Some fields are missing or invalid.',
-            rejectedFieldList: [...grouped].map(([field, reasonList]) => ({ field, reasonList }))
+            name: error.name,
+            code: error.code,
+            message: `Validation rejected by { ${error.type} }`,
+            reasonList: rejectedFieldList,
          }
       }
 

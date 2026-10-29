@@ -4,7 +4,7 @@ import type { AuthService } from "../../auth/application/auth.service";
 import type { RecipesService } from "../../recipes/application/recipes.service";
 import type { AuthIdParam } from "../../../common/api/authIdParam";
 import type { UsersRepository } from "../infrastructure/users.repository";
-import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/error.types";
+import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { ImagesService } from "../../images/application/images.service";
 import type { TypeRelationship, TypeUser } from "../domain/users.types";
 import type { Types } from "mongoose";

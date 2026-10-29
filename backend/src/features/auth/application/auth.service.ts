@@ -7,7 +7,7 @@ import { generateRefreshToken, signAccessToken } from '../tokenSigner';
 import { graceCache } from "../lib/refreshTokenGraceCache";
 import type { PasswordResetTokenRecord } from "../../../externalResources/database/mongoose/schemas/passwordResetToken.schema";
 import type { AuthIdParam } from "../../../common/api/authIdParam";
-import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/error.types";
+import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { TypeAuthResult, TypeSavedRefreshToken } from "../auth.types";
 
 type TypeBuildAuthResultOptions = { oldRefreshToken: string; expiresAt?: undefined; } | { oldRefreshToken?: undefined; expiresAt: Date };

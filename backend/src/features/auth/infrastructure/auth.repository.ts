@@ -3,7 +3,7 @@ import { RefreshTokenModel, type RefreshTokenRecord } from "../../../externalRes
 import { UserModel, type UserRecord } from "../../../externalResources/database/mongoose/schemas/user.schema";
 import { PasswordResetTokenModel, type PasswordResetTokenRecord } from "../../../externalResources/database/mongoose/schemas/passwordResetToken.schema";
 import type { TypeUserDraft } from "../auth.types";
-import { NotFoundError } from "../../../global/departingData/error.types";
+import { NotFoundError } from "../../../global/departingData/errorClasses";
 
 type UserWithPassword = UserRecord & { passwordHash: string; };
 

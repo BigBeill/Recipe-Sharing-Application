@@ -1,5 +1,5 @@
 import type { Types } from "mongoose";
-import { NotFoundError } from "../../../global/departingData/error.types";
+import { NotFoundError } from "../../../global/departingData/errorClasses";
 import type { TypeImageReferenceDraft } from "../domain/images.types";
 import { ImageReferenceModel, type ImageReferenceRecord } from "../../../externalResources/database/mongoose/schemas/image.schema";
 
