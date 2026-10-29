@@ -104,13 +104,13 @@ export class RecipesService {
    async get(_id: Types.ObjectId, { authId }: AuthIdParam): Promise<TypeRecipe> {
       const recipeRecord = await this.repository.get(_id);
 
-      // check for any reason a person should not be allowed to view this recipe
+      // ? check for any reason a person should not be allowed to view this recipe
       if (recipeRecord.visibility !== 'public'){
-         if (!authId) { throw new UnauthorizedError(); }
-         if (recipeRecord.visibility === 'personal' && !recipeRecord.ownerId.equals(authId)) { throw new UnauthorizedError(); }
-         if (recipeRecord.visibility === 'private' ) {
+         if (!authId) { throw new UnauthorizedError("Unauthenticated users do not have access to recipes that are not marked as public"); }
+         if (!recipeRecord.ownerId.equals(authId)){
+            if (recipeRecord.visibility === 'personal') { throw new UnauthorizedError("Authenticated user does not have read access for this recipe"); }
             const relationship = await this.permissionsService.defineRelationship({ authId, targetId: recipeRecord.ownerId });
-            if (!(relationship?.type === 'friend')) { throw new UnauthorizedError(); }
+            if (!relationship || relationship.type !== 'friend') { throw new UnauthorizedError("Authenticated user does not have read access for this recipe"); }
          }
       }
 
