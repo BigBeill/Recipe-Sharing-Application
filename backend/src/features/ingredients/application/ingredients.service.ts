@@ -1,10 +1,10 @@
 import { NotFoundError } from "elysia";
-import type { IngredientRecord } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
 import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import type { IngredientsRepository } from "../infrastructure/ingredients.repository";
 import type { TypeIngredient, TypeIngredientConversion, TypeIngredientDraft, TypeIngredientGroup } from "../domain/ingredients.types";
 import { NutritionCalculator } from "./ingredients.nutritionCalculator";
 import type { TypeNutrition } from "../../recipes/domain/recipes.types";
+import type { RecordIngredient, RecordIngredientDraft } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
 
 interface SearchGroupParams {
    description?: string,
@@ -30,7 +30,23 @@ export class IngredientsService {
 
 
 
-   async getIngredient (_id: number): Promise<TypeIngredientDraft> {
+   async calculateNutrition(ingredient: TypeIngredient | RecordIngredient): Promise<TypeNutrition> {
+      return this.nutrition.calculate(ingredient);
+   }
+
+
+
+   async depopulate({ _id, label, portion }: TypeIngredient): Promise<RecordIngredientDraft> {
+      return {
+         _id,
+         label,
+         portion: { _id: portion._id, amount: portion.amount },
+      };
+   }
+
+
+
+   async get(_id: number): Promise<TypeIngredientDraft> {
       const ingredient = await this.repository.getIngredient(_id);
       if (!ingredient) { throw new NotFoundError(); }
       return ingredient;
@@ -38,19 +54,14 @@ export class IngredientsService {
 
 
 
-   async getNutrition (ingredient: TypeIngredient): Promise<TypeNutrition> {
-      return this.nutrition.calculate(ingredient);
-   }
-
-
-
-   async hydrateIngredient(record: IngredientRecord): Promise<TypeIngredient> {
+   async populate(record: RecordIngredient): Promise<TypeIngredient> {
       const [ingredient, measureDescription] = await Promise.all([
          this.repository.getIngredient(record._id),
          this.repository.getMeasureDescription(record.portion._id)
       ]);
       return {
          ...record,
+         label: record.label ?? undefined,
          description: ingredient?.description,
          portion: {
             ...record.portion,
@@ -61,7 +72,7 @@ export class IngredientsService {
 
 
 
-   async searchConversion (food_id: number, params: { skip?: number, limit?: number }): Promise<PaginatedListType<TypeIngredientConversion>> {
+   async searchConversion(food_id: number, params: { skip?: number, limit?: number }): Promise<PaginatedListType<TypeIngredientConversion>> {
       const { skip, limit } = params;
       const conversionList = await this.repository.searchConversionOption(food_id, { skip, limit });
       return conversionList;
@@ -69,7 +80,7 @@ export class IngredientsService {
 
 
 
-   async searchGroup (params: SearchGroupParams): Promise<PaginatedListType<TypeIngredientGroup>> {
+   async searchGroup(params: SearchGroupParams): Promise<PaginatedListType<TypeIngredientGroup>> {
       const { description, skip, limit } = params;
       const groupList = await this.repository.searchGroup({ description, skip, limit });
       return groupList;
@@ -77,7 +88,7 @@ export class IngredientsService {
 
 
 
-   async searchIngredient (params: SearchIngredientParams): Promise<PaginatedListType<TypeIngredientDraft>> {
+   async searchIngredient(params: SearchIngredientParams): Promise<PaginatedListType<TypeIngredientDraft>> {
       const { description, food_group_id, skip, limit } = params;
       const ingredientList = await this.repository.searchIngredient({ description, food_group_id, skip, limit });
       return ingredientList;

@@ -1,9 +1,7 @@
 import { t } from "elysia";
-import { IdValidator } from "../../../../common/api/validators/id.validator";
 import { IngredientValidator } from "../../../ingredients/api/validators/ingredient.validator";
 
-export const ValidatorRecipeDraft = t.Object({
-   _id: IdValidator,
+export const ValidatorRecipesUpdate = t.Object({
    title: t.Optional(t.String()),
    description: t.Optional(t.String()),
    ingredientList: t.Optional(t.Array(IngredientValidator)),

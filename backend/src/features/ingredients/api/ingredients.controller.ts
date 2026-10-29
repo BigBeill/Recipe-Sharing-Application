@@ -18,7 +18,7 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
    .get( '/get/:_id',
       async ({ params, query }) => {
          const { _id } = params;
-         const ingredient = await service.getIngredient(_id);
+         const ingredient = await service.get(_id);
          return status(200, ingredient);
       },
       {

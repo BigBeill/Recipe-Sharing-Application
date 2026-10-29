@@ -1,3 +1,4 @@
+import type { RecordIngredient } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
 import type { TypeNutrition } from "../../recipes/domain/recipes.types";
 import type { TypeIngredient } from "../domain/ingredients.types";
 import type { IngredientsRepository } from "../infrastructure/ingredients.repository";
@@ -9,7 +10,7 @@ export class NutritionCalculator {
       this.repository = ingredientsRepository;
    }
 
-   async calculate(ingredient: TypeIngredient): Promise<TypeNutrition> {
+   async calculate(ingredient: TypeIngredient | RecordIngredient): Promise<TypeNutrition> {
 
       const [baseNutrition, conversion] = await Promise.all([
          this.repository.getBaseNutrition(ingredient._id),

@@ -1,49 +1,48 @@
-import { Schema, Types, model, type HydratedDocument, type InferSchemaType } from 'mongoose';
-import type { TypeNutrition } from '../../../../features/recipes/domain/recipes.types';
+import { Schema, Types, model, type HydratedDocument, type InferSchemaType, type Require_id, type SchemaDefinitionProperty } from 'mongoose';
+import type { TypeNutrition, TypeRecipeDraft } from '../../../../features/recipes/domain/recipes.types';
+import type { TypeIngredient } from '../../../../features/ingredients/domain/ingredients.types';
 
-interface TypeTimestamps {
-   createdAt: Date;
-   updatedAt: Date;
+
+
+export type RecordPortionDraft = Omit<TypeIngredient['portion'], 'description'>;
+
+export type RecordIngredientDraft = Omit<TypeIngredient, 'description' | 'commonName' | 'portion'> & {
+    portion: RecordPortionDraft;
 }
 
-interface TypeDatabaseIngredient {
-    _id: number;
-    label: string;
-    portion: { _id: number, amount: number }
-}
+export type RecordNutritionDraft = TypeNutrition;
 
-interface TypeDatabaseRecipe {
+export type RecordRecipeDraft = Omit<TypeRecipeDraft, 'imageReference' | 'ingredientList'> & {
     ownerId: Types.ObjectId;
-    title: string;
-    description: string;
     imageReferenceId?: Types.ObjectId;
-    ingredientList: TypeDatabaseIngredient[];
-    instructionList: string[];
-    nutrition: TypeNutrition;
-    visibility: 'public' | 'private' | 'personal';
+    ingredientList: RecordIngredientDraft[];
+    nutrition: RecordNutritionDraft;
 }
 
 
 
-const portionSchema = new Schema({
+const portionDefinition = {
     _id: { type: Number, required: true },
     amount: { type: Number, required: true },
-});
+} as const satisfies Record<keyof RecordPortionDraft, SchemaDefinitionProperty>;
+
+const portionSchema = new Schema(portionDefinition, { _id: false });
+export type RecordPortion = InferSchemaType<typeof portionSchema>
 
 
 
-const ingredientSchema = new Schema({
+const ingredientDefinition = {
     _id: { type: Number, required: true },
-    label: { type: String, allowNull: false },
+    label: { type: String, validate: { validator: (v: unknown) => v !== null, message: 'label cannot be null' } },
     portion: { type: portionSchema, required: true }
-});
+} as const satisfies Record<keyof RecordIngredientDraft, SchemaDefinitionProperty>;
 
-type IngredientSchemaType = InferSchemaType<typeof ingredientSchema>;
-export type IngredientRecord = IngredientSchemaType;
+const ingredientSchema = new Schema(ingredientDefinition, { _id: false });
+export type RecordIngredient = InferSchemaType<typeof ingredientSchema>;
 
 
 
-const nutritionSchema = new Schema({
+const nutritionDefinition = {
     calories: { type: Number, required: true },
     fat: { type: Number, required: true },
     cholesterol: { type: Number, required: true },
@@ -53,22 +52,26 @@ const nutritionSchema = new Schema({
     fibre: { type: Number, required: true },
     sugar: { type: Number, required: true },
     protein: { type: Number, required: true },
-});
+} as const satisfies Record<keyof RecordNutritionDraft, SchemaDefinitionProperty>;
+
+const nutritionSchema = new Schema(nutritionDefinition, { _id: false });
+export type RecordNutrition = InferSchemaType<typeof nutritionSchema>;
 
 
 
-const recipeSchema = new Schema<TypeDatabaseRecipe & TypeTimestamps>({
+const recipeDefinition = {
     ownerId: { type: Schema.Types.ObjectId, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
     imageReferenceId: { type: Schema.Types.ObjectId },
-    ingredientList: { type: [ingredientSchema], required: true },
-    instructionList: { type: [String], required: true },
+    ingredientList: { type: [ingredientSchema], required: true, validate: { validator: (v: unknown[]) => v.length > 0, message: 'ingredientList cannot be empty' } },
+    instructionList: { type: [String], required: true, validate: { validator: (v: unknown[]) => v.length > 0, message: 'instructionList cannot be empty' } },
     nutrition: { type: nutritionSchema, required: true },
     visibility: { type: String, enum: ['public', 'private', 'personal'], default: 'public' },
-}, { timestamps: true });
+} as const satisfies Record<keyof RecordRecipeDraft, SchemaDefinitionProperty>;
 
-export type RecipeDocument = HydratedDocument<TypeDatabaseRecipe & TypeTimestamps>;
-export type RecipeRecord = TypeDatabaseRecipe & TypeTimestamps & { _id: Types.ObjectId };
+const recipeSchema = new Schema(recipeDefinition, { timestamps: true });
+export type RecordRecipe = Require_id<InferSchemaType<typeof recipeSchema>>;
+export type DocumentRecipe = HydratedDocument<RecordRecipe>;
 
-export const RecipeModel = model<TypeDatabaseRecipe & TypeTimestamps>('Recipe', recipeSchema);
+export const ModelRecipe = model<RecordRecipe>('Recipe', recipeSchema);

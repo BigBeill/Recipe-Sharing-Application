@@ -6,6 +6,7 @@ import { SearchValidator } from "./validators/search.validator";
 import { DepartingRecipeValidator } from "../../../global/departingData/validators/departingRecipe.validator";
 import { DepartingPaginatedList } from "../../../global/departingData/validators/departingPaginatedList";
 import { RecipeDraftValidator } from "./validators/recipeDraft.Validator";
+import { ValidatorRecipesUpdate } from "./validators/update.validator";
 
 const service = recipesService;
 
@@ -21,7 +22,7 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
    .get( '/get/:_id',
       async ({ authId, params }) => {
          const { _id } = params;
-         const recipe = await service.getRecipe(_id, { authId });
+         const recipe = await service.get(_id, { authId });
          return status(200, recipe);
       },
       {
@@ -35,7 +36,7 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
    .get( '/search', 
       async ({ authId, query }) => {
          const { title, ownerIdList, ingredientIdList, visibilityList, limit, skip } = query;
-         const recipes = await service.searchRecipes({ authId, title, ownerIdList, ingredientIdList, visibilityList, skip, limit });
+         const recipes = await service.search({ authId, title, ownerIdList, ingredientIdList, visibilityList, skip, limit });
          return status(200, recipes)
       },
       {
@@ -53,7 +54,7 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
 
    .post( '/create',
       async ({ authId, body }) => {
-         const recipe = await service.createRecipe(body, { authId })
+         const recipe = await service.create(body, { authId })
          return status(201, recipe);
       },
       {
@@ -67,12 +68,12 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
    .put( '/update/:_id',
       async ({ authId, body, params }) => {
          const { _id } = params;
-         const updatedRecipe = await service.updateRecipe(_id, body, { authId });
+         const updatedRecipe = await service.update(_id, body, { authId });
          return status(201, updatedRecipe);
       },
       {
          params: IdParamsValidator,
-         body: RecipeDraftValidator,
+         body: ValidatorRecipesUpdate,
          response: { 201: DepartingRecipeValidator }
       }
    )

@@ -7,6 +7,8 @@ type SerializedBuffer = { type: 'Buffer'; data: number[] };
 type PassThrough = 'clientSafeMetadata';
 type Primitive = string | number | boolean | bigint | symbol | null | undefined;
 
+type DocumentMemberKeys = Exclude<keyof Types.ArraySubdocument, '_id'>;
+
 export type Serialized<T> =
    T extends Primitive ? T :
    T extends (...args: never[]) => unknown ? T :
@@ -15,7 +17,7 @@ export type Serialized<T> =
    T extends Date ? Date :
    T extends Map<infer K, infer V> ? Record<K & PropertyKey, Serialized<V>> :
    T extends readonly (infer E)[] ? Serialized<E>[] :
-   T extends { toObject(): infer O } ? SerializedObject<O> :
+   T extends { toObject(): unknown } ? SerializedObject<Omit<T, DocumentMemberKeys>> :
    T extends object ? SerializedObject<T> :
    T;
 
