@@ -190,10 +190,7 @@ export function InputString({ className, label, initial, ref, readOnlyOptions, .
 type InputChooseValueBaseProps<T> = {
    label: string;
    ref?: Ref<DataHandle<T>>;
-   initial?: {
-      label: string;
-      value: T;
-   };
+   initial?: T;
    optionList: {
       label: string;
       value: T;
@@ -209,6 +206,7 @@ type InputChooseValueProps<T> = ( InputRadioProps<T> & { type: 'radio' } ) | ( I
 
 export function InputChooseValue<T>({ ...props }: InputChooseValueProps<T>) {
    if (props.optionList.length === 0) { throw new Error("@/shared/view/components/input.components.tsx --> InputChooseValue.  { optionList } was empty, at least one list item is required."); }
+
    if (props.type === 'radio') {
       const { type, ...rest } = props;
       return <InputRadio { ...rest } />;
@@ -222,7 +220,7 @@ export function InputChooseValue<T>({ ...props }: InputChooseValueProps<T>) {
 
 function InputRadio<T>({ className, label, ref, optionList, initial, ...rest }: InputRadioProps<T>) {
    const id = useId();
-   const [choice, setChoice] = useState<{ label: string, value: T }>(initial || optionList[0]);
+   const [choice, setChoice] = useState<{ label: string, value: T }>(optionList.find((option) => { return option.value === initial }) || optionList[0]);
 
    useImperativeHandle(ref, () => ({
       getData: async () => choice.value,
@@ -244,7 +242,7 @@ function InputRadio<T>({ className, label, ref, optionList, initial, ...rest }: 
 
 function InputSelect<T>({ className, label, ref, optionList, initial, ...rest }: InputSelectProps<T>) {
    const id = useId();
-   const [choice, setChoice] = useState<{ label: string, value: T }>(initial || optionList[0])
+   const [choice, setChoice] = useState<{ label: string, value: T }>(optionList.find((option) => { return option.value === initial }) || optionList[0])
 
    useImperativeHandle(ref, () => ({
       getData: async () => choice?.value,
