@@ -47,23 +47,24 @@ export class ImagesService {
 
       const candidates = await this.repository.searchImageReference({ statusList: ["deleting", "pending"], cutoff })
 
-      for (const image of candidates) {
+      for (const imageReference of candidates) {
          try {
-            if (image.status === "pending") {
-               await this.repository.updateImageReferenceStatus(image._id, 'deleting');
+            if (imageReference.status === "pending") {
+               await this.repository.updateImageReferenceStatus(imageReference._id, 'deleting');
             }
 
-            await bucketClient.file(image.key).delete();
+            await bucketClient.file(imageReference.key).delete();
+            await this.repository.deleteImageReference(imageReference._id);
          }
          catch (error) {
-            console.error(`Failed to clean up image ${image.key}`, error);
+            console.error(`Failed to clean up image ${imageReference.key}`, error);
          }
       }
    }
 
 
 
-   async deleteImage(_id: Types.ObjectId): Promise<void> {
+   async delete(_id: Types.ObjectId): Promise<void> {
       const imageRecord = await this.repository.getImageReference(_id);
       await bucketClient.file(imageRecord.key).delete();
       await this.repository.deleteImageReference(_id);
@@ -92,13 +93,27 @@ export class ImagesService {
       if (!type) { throw new Error("Unsupported image type"); }
 
       const key = `${location}/${randomUUID()}`;
-      console.log("image key created:", key);
       await bucketClient.file(key).write(file, { type: "image/webp" });
-      console.log("creating reference");
       const imageReference = await this.repository.createImageReference({ key, owner: authId, status: 'pending' });
-      console.log("reference created:", imageReference);
 
       return imageReference;
+   }
+
+
+
+   async update(oldImageReferenceId: Types.ObjectId | undefined, newImageReference: TypeImageReference): Promise<TypeImageReference> {
+      if (!oldImageReferenceId) { return newImageReference; }
+      else {
+         const oldImageReference = await this.getImageReference(oldImageReferenceId);
+         if (oldImageReference.key === newImageReference.key) {
+            this.repository.deleteImageReference(oldImageReference._id);
+            return newImageReference;
+         }
+         else {
+            await this.delete(oldImageReferenceId);
+            return newImageReference;
+         }
+      }
    }
 
 
