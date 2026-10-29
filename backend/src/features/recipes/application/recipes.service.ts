@@ -177,13 +177,14 @@ export class RecipesService {
    async update(_id: Types.ObjectId, updateFields: Partial<TypeRecipeDraft>, params: AuthIdParam): Promise<TypeRecipe> {
       const { authId } = params;
       if(!authId) { throw new UnauthorizedError("AuthId was not provided to recipeService.update"); }
+      console.log(updateFields);
 
       const oldRecipeRecord = await this.repository.get(_id);
       if (!oldRecipeRecord.ownerId.equals(authId)) { throw new UnauthorizedError(`Authenticated user does not have write access to recipe: ${ _id }`); }
 
       const [nutrition, imageReference] = await Promise.all([
          (updateFields.ingredientList ? this.calculateNutrition({ ingredientList: updateFields.ingredientList }) : oldRecipeRecord.nutrition), // get the updated nutrition field
-         (updateFields.imageReference ? this.imagesService.update(oldRecipeRecord.imageReferenceId ?? undefined, updateFields.imageReference) : undefined) // replace the image saved in the bucket
+         (updateFields.imageReference ? this.imagesService.update(oldRecipeRecord.imageReferenceId ?? undefined, updateFields.imageReference, { authId }) : undefined) // replace the image saved in the bucket
       ]);
 
       const returnedRecord = await this.repository.update(_id, { ...updateFields, nutrition, imageReferenceId: imageReference?._id });

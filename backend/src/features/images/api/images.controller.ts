@@ -1,10 +1,11 @@
 import Elysia, { status } from "elysia"
 import { imagesService } from "../../../container";
-import { UploadValidator } from "./validators/upload.validator";
-import { GetValidator } from "./validators/get.validator";
 import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
 import { DepartingStringValidator } from "../../../global/departingData/validators/primitives/departingString.validator";
-import { ImageReferenceValidator } from "./validators/imageReference.validator";
+import { ValidatorGet } from "./validators/get.validator";
+import { ValidatorImageReference } from "./validators/imageReference.validator";
+import { ValidatorUpload } from "./validators/upload.validator";
+import { DepartingValidatorImageReference } from "../../../global/departingData/validators/departingImageReference.validator";
 
 const service = imagesService;
 
@@ -17,7 +18,7 @@ export const imagesController = new Elysia({ prefix: '/images' })
          return status(200, imageURL);
       },
       {
-         params: GetValidator,
+         params: ValidatorGet,
          response: DepartingStringValidator,
       }
    )
@@ -32,7 +33,7 @@ export const imagesController = new Elysia({ prefix: '/images' })
          return status(201, imageReference)
       },
       {
-         body: UploadValidator,
-         response: { 201: ImageReferenceValidator },
+         body: ValidatorUpload,
+         response: { 201: DepartingValidatorImageReference},
       }
    )

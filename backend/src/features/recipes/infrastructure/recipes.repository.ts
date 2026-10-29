@@ -89,6 +89,7 @@ export class RecipesRepository {
 
 
    async update(_id: Types.ObjectId, updateFields: Partial<Omit<RecordRecipeDraft, 'ownerId'>>): Promise<RecordRecipe> {
+      console.log(updateFields);
       const updatedRecipe = await ModelRecipe.findByIdAndUpdate(_id, updateFields, { runValidators: true } );
       if (!updatedRecipe) { throw new NotFoundError(`Recipe with _id: ${ _id } was unable to be updated`); }
       return updatedRecipe;

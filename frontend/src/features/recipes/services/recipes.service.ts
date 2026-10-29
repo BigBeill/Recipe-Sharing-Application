@@ -35,8 +35,8 @@ export function createRecipeService(api: TypeRecipeApi) {
          });
       },
 
-      update: async (recipeId: string, body: PayloadRecipeApiUpdate): Promise<void> => {
-         await api.update(recipeId, body);
+      update: async (recipeId: string, payload: PayloadRecipeApiUpdate): Promise<void> => {
+         await api.update(recipeId, payload);
       },
    }
 }

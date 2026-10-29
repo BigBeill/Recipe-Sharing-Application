@@ -1,6 +1,6 @@
 import { t } from "elysia";
 
-export const UploadValidator = t.Object({
+export const ValidatorUpload = t.Object({
    location: t.Union([
       t.Literal('users'),
       t.Literal('recipes'),

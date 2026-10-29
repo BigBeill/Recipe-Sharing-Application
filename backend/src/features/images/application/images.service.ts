@@ -101,7 +101,8 @@ export class ImagesService {
 
 
 
-   async update(oldImageReferenceId: Types.ObjectId | undefined, newImageReference: TypeImageReference): Promise<TypeImageReference> {
+   async update(oldImageReferenceId: Types.ObjectId | undefined, newImageReference: TypeImageReference, { authId }: AuthIdParam): Promise<TypeImageReference> {
+      this.claimImage(newImageReference._id, { authId });
       if (!oldImageReferenceId) { return newImageReference; }
       else {
          const oldImageReference = await this.getImageReference(oldImageReferenceId);

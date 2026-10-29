@@ -1,7 +1,7 @@
 import { t } from "elysia";
 import { IdValidator } from "../../../../common/api/validators/id.validator";
 
-export const ImageReferenceValidator = t.Object({
+export const ValidatorImageReference = t.Object({
    _id: IdValidator,
    key: t.String(),
    owner: IdValidator,
