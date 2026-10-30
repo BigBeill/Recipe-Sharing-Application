@@ -3,7 +3,6 @@ import { imagesService } from "../../../container";
 import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
 import { DepartingStringValidator } from "../../../global/departingData/validators/primitives/departingString.validator";
 import { ValidatorGet } from "./validators/get.validator";
-import { ValidatorImageReference } from "./validators/imageReference.validator";
 import { ValidatorUpload } from "./validators/upload.validator";
 import { DepartingValidatorImageReference } from "../../../global/departingData/validators/departingImageReference.validator";
 
