@@ -93,7 +93,7 @@ export default function RecipeFilterComponent() {
 
          <InputString type='text' className={ styles.titleInput } label='Name' initial={ title } ref={ refs.title } placeholder='Search for a recipe by name' />
          { ingredientList.htmlView }
-         <InputChooseValue<'public' | 'friends' | 'personal'> type="radio" label="Recipe type" className={ styles.categoryInput } ref={ refs.category } optionList={ categoryOptionList } initial={ { label: (category.charAt(0).toUpperCase() + category.slice(1)), value: category } } />
+         <InputChooseValue<'public' | 'friends' | 'personal'> type="radio" label="Recipe type" className={ styles.categoryInput } ref={ refs.category } optionList={ categoryOptionList } initial={ category } />
          <IngredientSearch className={ styles.ingredientInput } placeholder='Describe an ingredient you would like to be include in your recipe' onSubmit={ ingredientList.addItem } />
 
          <ButtonOval className={ styles.searchButton } showLoading={ true } onClick={ handleFormSubmit }>search</ButtonOval>

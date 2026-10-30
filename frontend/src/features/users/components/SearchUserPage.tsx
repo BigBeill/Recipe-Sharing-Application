@@ -39,7 +39,7 @@ export default function SearchUserPage() {
       
       for (let i = 0; i < response.list.length; i += groupSize) {
          const userList = response.list.slice(i, i + groupSize);
-         const itemList = userList.map((user) => { return { title: user.name, image: user.image, href: `/recipes/${ user._id }` } });
+         const itemList = userList.map((user) => { return { title: user.name, image: user.imageReference, href: `/recipes/${ user._id }` } });
          newComponents.push(<NotebookPageListItems itemList={ itemList } defaultListSize={ groupSize } />);
       }
 

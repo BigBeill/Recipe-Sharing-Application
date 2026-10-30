@@ -10,7 +10,7 @@ import { TypeImageReference } from '@/features/images/domain/image.types';
 interface Props {
    itemList: {
       title: string;
-      imageReference: TypeImageReference;
+      imageReference?: TypeImageReference;
       href: string;
    }[];
    defaultListSize?: number;
