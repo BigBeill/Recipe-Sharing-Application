@@ -18,10 +18,10 @@ export default function UserFilterPage() {
    const userIdRef = useRef<DataHandle<string>>(null);
    const nameRef = useRef<DataHandle<string>>(null);
 
-   function handleFormSubmit() {
+   async function handleFormSubmit() {
       const updatedParams = new URLSearchParams();
-      const userId = userIdRef.current!.getData();
-      const name = nameRef.current!.getData();
+      const userId = await userIdRef.current!.getData();
+      const name = await nameRef.current!.getData();
       if(userId) { updatedParams.set('userId', userId); }
       if(name) { updatedParams.set('name', name); }
       router.push(`${ pathname }?${ updatedParams }`);
