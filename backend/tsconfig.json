@@ -9,6 +9,9 @@
     "allowJs": true,
     "types": ["bun"],
 
+    // debugging stuff
+    // "noErrorTruncation": true
+
     // Bundler mode
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

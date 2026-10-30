@@ -10,7 +10,7 @@ const service = imagesService;
 
 export const imagesController = new Elysia({ prefix: '/images' })
 
-   .get('/:location/:fileName', 
+   .get('/get/:location/:fileName', 
       async ({ params }) => {
          const key = `${params.location}/${params.fileName}`;
          const imageURL = await service.getPresignedURL(key);
