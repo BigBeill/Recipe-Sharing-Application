@@ -57,15 +57,6 @@ export class UsersService {
 
 
 
-   async findRelationship(params: DefinedRelationshipParams): Promise<TypeRelationship | null> {
-      const { ownerId, targetId } = params;
-
-      if (ownerId.equals(targetId)) { return null; }
-      return await this.repository.findRelationship({ ownerId, targetId });
-   }
-
-
-
    async deleteAccount(password: string, { authId }: AuthIdParam): Promise<boolean> {
       if (!authId) { throw new UnauthorizedError(); }
 
@@ -94,6 +85,15 @@ export class UsersService {
 
       await this.repository.deleteFriendship(_id);
       return true;
+   }
+
+
+
+   async findRelationship(params: DefinedRelationshipParams): Promise<TypeRelationship | null> {
+      const { ownerId, targetId } = params;
+
+      if (ownerId.equals(targetId)) { return null; }
+      return await this.repository.findRelationship({ ownerId, targetId });
    }
 
 
@@ -192,7 +192,7 @@ export class UsersService {
       if (!_id.equals(authId)) { throw new UnauthorizedError("Authenticated user does not have write access to this user"); }
 
       const potentiallyConflictingUsers = await this.repository.searchUser({ name, email, searchExact: true });
-      const conflictingUsersList = potentiallyConflictingUsers.list.filter((user) => { return user._id.equals(authId); })
+      const conflictingUsersList = potentiallyConflictingUsers.list.filter((user) => { return !user._id.equals(_id); })
 
       if(conflictingUsersList.length > 0) { throw new ConflictError("cant update users account"); }
 

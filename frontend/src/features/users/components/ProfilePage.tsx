@@ -41,7 +41,7 @@ export default function ProfilePage({ initial }: Props) {
 
    async function saveChanges() {
       if (!editMode) { return; }
-
+      setEditMode(false);
       setUser(await userMutator.send());
    }
 

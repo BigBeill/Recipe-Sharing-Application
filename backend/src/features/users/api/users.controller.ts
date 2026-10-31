@@ -120,12 +120,12 @@ export const usersController = new Elysia({ prefix: '/users' })
       async ({ authId, body, params }) => {
          const { _id } = params;
          const { name, email, bio, imageReference } = body;
-         await service.updateAccount({ _id, name, email, bio, imageReference, authId });
-         return status(204)
+         const response = await service.update({ _id, name, email, bio, imageReference, authId });
+         return status(201, response);
       },
       {
          params: IdParamsValidator,
          body: UpdateValidator,
-         response: { 204: t.Void() }
+         response: { 201: DepartingUserValidator }
       }
    )
