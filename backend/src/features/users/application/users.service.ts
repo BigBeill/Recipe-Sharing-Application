@@ -29,11 +29,12 @@ interface SearchUsersParams {
 }
 
 interface UpdateAccountParams {
-   authId: Types.ObjectId;
+   _id: Types.ObjectId;
    name?: string;
    email?: string;
    bio?: string;
    imageReference?: TypeImageReference;
+   authId: Types.ObjectId;
 }
 
 export class UsersService {
@@ -73,11 +74,11 @@ export class UsersService {
       if (!validPassword) { throw new UnauthorizedError('Invalid Credentials'); }
 
       // delete any recipes associated with the account
-      await this.recipesService.deleteManyRecipes(authId, { authId });
+      await this.recipesService.deleteMany(authId, { authId });
 
       // delete users avatar image
       const user = await this.repository.getUser(authId);
-      if (user.imageReferenceId) { await this.imagesService.deleteImage(user.imageReferenceId); }
+      if (user.imageReferenceId) { await this.imagesService.delete(user.imageReferenceId); }
 
       await this.repository.deleteUser(authId);
       return true;
@@ -185,8 +186,10 @@ export class UsersService {
 
 
 
-   async updateAccount(params: UpdateAccountParams): Promise<TypeUser> {
-      const { authId, name, email, bio, imageReference } = params;
+   async update(params: UpdateAccountParams): Promise<TypeUser> {
+      const { _id, name, email, bio, imageReference, authId } = params;
+
+      if (!_id.equals(authId)) { throw new UnauthorizedError("Authenticated user does not have write access to this user"); }
 
       const potentiallyConflictingUsers = await this.repository.searchUser({ name, email, searchExact: true });
       const conflictingUsersList = potentiallyConflictingUsers.list.filter((user) => { return user._id.equals(authId); })
@@ -197,12 +200,12 @@ export class UsersService {
       if (imageReference) {
          const outdatedUserRecord = await this.repository.getUser(authId);
          if (!outdatedUserRecord.imageReferenceId?.equals(imageReference._id)) {
-            if (outdatedUserRecord.imageReferenceId) { await this.imagesService.deleteImage(outdatedUserRecord.imageReferenceId); }
+            if (outdatedUserRecord.imageReferenceId) { await this.imagesService.delete(outdatedUserRecord.imageReferenceId); }
             await this.imagesService.claimImage(imageReference._id, { authId });
          }
       }
 
-      const updatedUser = await this.repository.updateUser(authId, { name, email, bio, image: imageReference?._id });
+      const updatedUser = await this.repository.updateUser(authId, { name, email, bio, imageReferenceId: imageReference?._id });
       if (!updatedUser) { throw new NotFoundError("user not updated"); }
       return removeMongooseNoise(updatedUser);
    }

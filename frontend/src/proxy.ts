@@ -55,7 +55,7 @@ export default async function proxy(request: NextRequest) {
    const response = NextResponse.next({ request });
 
    // so the browser gets both — forward Elysia's Set-Cookie verbatim
-   for (const cookie of response.headers.getSetCookie()) {
+   for (const cookie of refreshResponse.headers.getSetCookie()) {
       response.headers.append('set-cookie', cookie);
    }
 

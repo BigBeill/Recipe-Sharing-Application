@@ -10,7 +10,7 @@ import type { AuthIdParam } from "../../../common/api/authIdParam";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { TypeAuthResult, TypeSavedRefreshToken } from "../auth.types";
 
-type TypeBuildAuthResultOptions = { oldRefreshToken: string; expiresAt?: undefined; } | { oldRefreshToken?: undefined; expiresAt: Date };
+type TypeBuildAuthResultOptions = { cachedRefreshToken: string; expiresAt?: undefined; } | { cachedRefreshToken?: undefined; expiresAt: Date };
 
 interface LoginParams {
    name: string, 
@@ -69,7 +69,7 @@ export class AuthService {
 
       const oneDay = 60 * 60 * 24 * 1000 // 1 day in milliseconds
 
-      const expiresAt = new Date(Date.now() + (rememberMe ? oneDay : oneDay * 30 ));
+      const expiresAt = new Date(Date.now() + (rememberMe ? oneDay * 30 : oneDay ));
       return this.buildAuthResult(user._id, { expiresAt });
    }
 
@@ -105,7 +105,7 @@ export class AuthService {
       }
       else {
          const withinGrace = graceCache.get(hashedToken);
-         if (withinGrace) { return this.buildAuthResult(withinGrace.userId, { oldRefreshToken: withinGrace.token }); }
+         if (withinGrace) { return this.buildAuthResult(withinGrace.userId, { cachedRefreshToken: withinGrace.token }); }
          else { throw new UnauthorizedError('invalid refresh token'); }
       }
    }
@@ -174,19 +174,21 @@ export class AuthService {
 
    private async buildAuthResult(userId: Types.ObjectId, options: TypeBuildAuthResultOptions): Promise<TypeAuthResult> {
 
+      // * create access token
       const accessToken = await signAccessToken(userId);
 
-      let refreshToken: string;
-      // check if a new refresh token has been provided, create one if it has not
-      if (options.oldRefreshToken) { refreshToken = options.oldRefreshToken }
-      else {
-         // generate a new refresh token
-         refreshToken = generateRefreshToken();
-         const hash = new Bun.CryptoHasher("sha256").update(refreshToken).digest("hex");
-         await this.repository.createRefreshToken({ userId, hash, expiresAt: options.expiresAt ?? new Date(Date.now()) }); //Logically expiresAt should never be new Date(Date.now()), but if somehow the function gets sent no expiration time and no token then just get the token to kill itself now.
+      // * if a refreshToken from cache was provided, then just return it as is
+      if (options.cachedRefreshToken) {
+         return { userId, tokens: { accessToken, refreshToken: options.cachedRefreshToken } }
       }
-
-      return { userId, tokens: { accessToken, refreshToken } }
+      // * otherwise generate a new refresh token
+      else {
+         const refreshToken = generateRefreshToken();
+         const refreshTokenHash = new Bun.CryptoHasher("sha256").update(refreshToken).digest("hex");
+         await this.repository.createRefreshToken({ userId, hash: refreshTokenHash, expiresAt: options.expiresAt ?? new Date(Date.now()) });
+         
+         return { userId, tokens: { accessToken, refreshToken } }
+      }
    }
 
 

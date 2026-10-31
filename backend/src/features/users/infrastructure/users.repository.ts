@@ -4,7 +4,6 @@ import { escapeRegex } from "../../../common/utils/filter";
 import { FriendRequestModel, type FriendRequestRecord } from "../../../externalResources/database/mongoose/schemas/friendRequest.schema";
 import { FriendshipModel, type FriendshipRecord } from "../../../externalResources/database/mongoose/schemas/friendship.schema";
 import { UserModel, type UserRecord } from "../../../externalResources/database/mongoose/schemas/user.schema";
-import type { TypeImage } from "../../images/domain/images.types";
 import type { TypeRelationship } from "../domain/users.types";
 import { NotFoundError } from "elysia";
 
@@ -21,7 +20,7 @@ interface UpdateUserParams {
    name?: string,
    email?: string,
    bio?: string,
-   image?: TypeImage
+   imageReferenceId?: Types.ObjectId,
 }
 
 export class UsersRepository {
@@ -152,14 +151,14 @@ export class UsersRepository {
 
 
 
-   async updateUser(_id: Types.ObjectId, { name, email, bio, image }: UpdateUserParams): Promise<UserRecord | null> {
+   async updateUser(_id: Types.ObjectId, { name, email, bio, imageReferenceId }: UpdateUserParams): Promise<UserRecord | null> {
       return UserModel.findByIdAndUpdate(
          _id,
          { $set: { 
             ...(name && { name }), 
             ...(email && { email }), 
             ...(bio !== undefined && { bio }), 
-            ...(image && {image}) } 
+            ...(imageReferenceId && { imageReferenceId }) } 
          },
          { new: true }
       ).lean<UserRecord>()

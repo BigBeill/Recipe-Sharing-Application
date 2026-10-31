@@ -116,13 +116,16 @@ export const usersController = new Elysia({ prefix: '/users' })
 
 
 
-   .put( '/update',
-      async ({ authId, body }) => {
+   .put( '/update/:_id',
+      async ({ authId, body, params }) => {
+         const { _id } = params;
          const { name, email, bio, imageReference } = body;
-         const updatedUser = await service.updateAccount({ authId, name, email, bio, imageReference });
-         return { data: updatedUser }
+         await service.updateAccount({ _id, name, email, bio, imageReference, authId });
+         return status(204)
       },
       {
+         params: IdParamsValidator,
          body: UpdateValidator,
+         response: { 204: t.Void() }
       }
    )

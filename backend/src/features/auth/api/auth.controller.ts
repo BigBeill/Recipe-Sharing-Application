@@ -20,19 +20,19 @@ export const authController = new Elysia({ prefix: '/auth' })
       async ({ body, cookie: { accessToken, refreshToken } }) => {
          const { name, password, rememberMe } = body;
 
-         const result = await service.login({ name, password });
+         const authResult = await service.login({ name, password, rememberMe });
 
          // * set cookies for the client
          accessToken.set({
-            value: result.tokens.accessToken,
+            value: authResult.tokens.accessToken,
             maxAge: 60 * 15 // 15 minutes in seconds
          });
          refreshToken.set({
-            value: result.tokens.refreshToken,
+            value: authResult.tokens.refreshToken,
             ...(rememberMe && { maxAge: 60 * 60 * 24 * 30 }) // 30 days in seconds if rememberMe is true
          });
 
-         return status(200, result.userId);
+         return status(200, authResult.userId);
       },
       {
          body: LoginValidator,
@@ -49,19 +49,19 @@ export const authController = new Elysia({ prefix: '/auth' })
    .post( '/refresh',
       async ({ cookie: { accessToken, refreshToken } }) => {
 
-         const result = await service.refresh(refreshToken.value);
+         const authResult = await service.refresh(refreshToken.value);
 
          // * set cookies
          accessToken.set({
-            value: result.tokens.accessToken,
+            value: authResult.tokens.accessToken,
             maxAge: 60 * 15 // 15 minutes in seconds
          });
          refreshToken.set({
-            value: result.tokens.refreshToken,
+            value: authResult.tokens.refreshToken,
             maxAge: 60 * 60 * 24 * 30 // 30 days in seconds
          });
 
-         return status(200, result.tokens.accessToken);
+         return status(200, authResult.tokens.accessToken);
       },
       {
          cookie: t.Object({
@@ -78,18 +78,18 @@ export const authController = new Elysia({ prefix: '/auth' })
       async ({ body, cookie: { accessToken, refreshToken } }) => {
          const { name, email, password } = body;
 
-         const result = await service.register({ name, email, password });
+         const authResult = await service.register({ name, email, password });
 
          // * set cookies
          accessToken.set({
-            value: result.tokens.accessToken,
+            value: authResult.tokens.accessToken,
             maxAge: 60 * 15 // 15 minutes in seconds
          });
          refreshToken.set({
-            value: result.tokens.refreshToken,
+            value: authResult.tokens.refreshToken,
          });
 
-         return status(200, result.userId);
+         return status(200, authResult.userId);
       },
       {
          body: RegisterValidator,

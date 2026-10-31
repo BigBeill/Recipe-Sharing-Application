@@ -56,7 +56,7 @@ export function createUserApi(call: TypeApiCaller) {
          }),
       update: (userId: string, body: PayloadUserApiUpdate) =>
          call<TypeUser>({
-            url: `/users/update`,
+            url: `/users/update/${ userId }`,
             method: 'put',
             body,
          }),

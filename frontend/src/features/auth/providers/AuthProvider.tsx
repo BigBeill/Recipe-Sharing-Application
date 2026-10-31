@@ -1,16 +1,11 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, use, useContext, useState } from 'react';
 import { TypeSession } from '../server/session';
 import { logout } from '../server/logout';
 
-type AuthState = { 
-	session: TypeSession; 
-	sessionStatus: 'authenticated'; 
-} | { 
-	session: null; 
-	sessionStatus: 'pending' | 'guest' 
-}
+type AuthState = { session: TypeSession; sessionStatus: 'authenticated'; } 
+	| { session: null; sessionStatus: 'pending' | 'guest'; }
 
 type AuthContextValue = AuthState & { 
 	overrideSession: (session: TypeSession | null) => void;
@@ -25,19 +20,21 @@ interface props {
 }
 
 export default function AuthProvider({ sessionPromise, children }: props) {
-	const [state, setState] = useState<AuthState>({ session: null, sessionStatus: 'pending' })
+	const resolved = use(sessionPromise);
 
-	useEffect(() => {
-		let cancelled = false;
-		sessionPromise.then((resolved) => {
-         if (cancelled) { return; }
-			setState({ session: resolved, sessionStatus:(resolved ? 'authenticated' : 'guest') } as AuthState)
-      });
-		return () => { cancelled = true; };
-	},[sessionPromise]);
+	const [override, setOverride] = useState<{
+		source: Promise<TypeSession | null>;
+		session: TypeSession | null;
+	} | null>(null);
+
+	const session = override?.source === sessionPromise ? override.session : resolved;
+
+	const state: AuthState = session
+		? { session, sessionStatus: 'authenticated' }
+		: { session: null, sessionStatus: 'guest' };
 
 	function overrideSession(newSession: TypeSession | null) {
-      setState({ session: newSession, sessionStatus: (newSession ? 'authenticated' : 'guest') } as AuthState);
+      setOverride({ source: sessionPromise, session: newSession });
    }
 
 	async function logoutSession() {
