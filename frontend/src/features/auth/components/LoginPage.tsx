@@ -29,7 +29,7 @@ export default function LoginPage() {
    
    const loginMutator = useServiceMutation(async () => { 
       const response = await authService.login(loginData);
-      overrideSession({ userId: response._id, roles: [] });
+      overrideSession({ userId: response, roles: [] });
       router.replace('/');
    });
 

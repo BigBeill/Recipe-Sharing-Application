@@ -1,17 +1,19 @@
-import type { ImageType } from "../images/images.types";
+import type { Types } from "mongoose";
+import type { TypeImageReference } from "../../images/domain/images.types";
 
-export interface UserType {
-   _id: string;
+
+export interface TypeUser {
+   _id: Types.ObjectId;
    name: string;
    email?: string;
    bio?: string;
-   image?: ImageType;
-   relationship?: RelationshipType;
+   imageReference?: TypeImageReference;
+   relationship?: TypeRelationship | null;
 }
 
-export interface RelationshipType {
-   _id: string;
-   ownerId: string;
-   targetId: string;
-   type: "none" | "friend" | "requestReceived" | "requestSent" | "self";
+export interface TypeRelationship {
+   _id: Types.ObjectId;
+   ownerId: Types.ObjectId;
+   targetId: Types.ObjectId;
+   type: "friend" | "requestReceived" | "requestSent";
 }

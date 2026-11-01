@@ -1,56 +1,54 @@
 import { Types } from "mongoose";
 import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import { escapeRegex } from "../../../common/utils/filter";
-import { RecipeModel, type RecipeRecord } from "../../../externalResources/database/mongo/schemas/recipe.schema";
-import { dehydrateRecipe } from "../application/recipes.dehydrate";
-import type { TypeRecipe } from "../domain/recipes.types";
-import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
-import { NotFoundError } from "elysia";
+import { ModelRecipe, type RecordRecipe, type RecordRecipeDraft } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
+import { NotFoundError } from "../../../global/departingData/errorClasses";
 
 
-interface GetRecipeListParams {
+
+interface SearchParams {
    // ? main constraints
    title?: string;
-   ownerIdList?: string[];
+   ownerIdList?: Types.ObjectId[];
    ingredientIdList?: number[];
    visibilityList: ('public' | 'private' | 'personal')[];
 
    // ? supporting data
-   authId?: string; // Required if { visibilityList } contains 'private' or 'personal'
-   friendIdList?: string[]; // ? for filtering when looking for 'private recipes
+   authId?: Types.ObjectId; // Required if { visibilityList } contains 'private' or 'personal'
+   friendIdList?: Types.ObjectId[]; // ? for filtering when looking for 'private' recipes
 
    // ? operationalConstraints
    skip?: number;
    limit?: number;
 }
 
+
+
 export class RecipesRepository {
 
 
 
-   async create(recipe: Omit<TypeRecipe, '_id'>): Promise<RecipeRecord> {
-      const savedRecipe = await RecipeModel.create(dehydrateRecipe(recipe));
-      return savedRecipe.toObject();
+   async create(recipe: RecordRecipeDraft): Promise<RecordRecipe> {
+      return await ModelRecipe.create(recipe);
    }
 
 
 
-   async delete(_id: string): Promise<void> {
-      await RecipeModel.deleteOne({ _id });
+   async delete(_id: Types.ObjectId): Promise<void> {
+      await ModelRecipe.deleteOne({ _id });
    }
 
 
    
-   async get(_id: string): Promise<RecipeRecord> {
-      const record = await RecipeModel.findOne({ _id }).lean<RecipeRecord | null>();
+   async get(_id: Types.ObjectId): Promise<RecordRecipe> {
+      const record = await ModelRecipe.findOne({ _id }).lean<RecordRecipe | null>();
       if (!record) { throw new NotFoundError(`Database could no find recipe with id: ${ _id }`); }
       return record;
    }
 
 
    
-   async search(params: GetRecipeListParams): Promise<PaginatedListType<RecipeRecord>> {
-      console.log("params sent to search:", params);
+   async search(params: SearchParams): Promise<PaginatedListType<RecordRecipe>> {
 
       const { title, ownerIdList, ingredientIdList, visibilityList, authId, friendIdList = [], skip, limit } = params;
 
@@ -65,9 +63,7 @@ export class RecipesRepository {
          ...(visibilityList.includes('personal') ? [{ $or: [{ visibility: 'public'}, { visibility: 'private' }, {visibility: 'personal'}], ownerId: new Types.ObjectId(authId) }] : []),
       ]
 
-      console.log("allowedConditions", recipeAccessConditionList)
-
-      const [result] = await RecipeModel.aggregate([
+      const [result] = await ModelRecipe.aggregate([
          {
             $match: {
                $or: recipeAccessConditionList,
@@ -92,12 +88,13 @@ export class RecipesRepository {
 
 
 
-   async update(recipe: TypeRecipe): Promise<RecipeRecord | null> {
-      const updatedRecipe = await RecipeModel.findByIdAndUpdate(
-         recipe._id,
-         dehydrateRecipe(recipe),
-         { runValidators: true }
-      );
-      return updatedRecipe?.toObject() ?? null;
+   async update(_id: Types.ObjectId, updateFields: Partial<Omit<RecordRecipeDraft, 'ownerId'>>): Promise<RecordRecipe> {
+      console.log(updateFields);
+      const updatedRecipe = await ModelRecipe.findByIdAndUpdate(_id, updateFields, { runValidators: true } );
+      if (!updatedRecipe) { throw new NotFoundError(`Recipe with _id: ${ _id } was unable to be updated`); }
+      return updatedRecipe;
    }
+
+
+
 }

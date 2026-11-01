@@ -1,14 +1,15 @@
 import { createContainer, asClass } from "awilix";
-import { AuthRepository } from "./features/auth/auth.repository";
+import { AuthRepository } from "./features/auth/infrastructure/auth.repository";
 import { RecipesRepository } from "./features/recipes/infrastructure/recipes.repository";
-import { AuthService } from "./features/auth/auth.service";
-import { ImagesService } from "./features/images/images.service";
+import { AuthService } from "./features/auth/application/auth.service";
+import { ImagesService } from "./features/images/application/images.service";
 import { RecipesService } from "./features/recipes/application/recipes.service";
 import { UsersService } from "./features/users/application/users.service";
 import { IngredientsRepository } from "./features/ingredients/infrastructure/ingredients.repository";
 import { IngredientsService } from "./features/ingredients/application/ingredients.service";
 import { PermissionsService } from "./features/permissions/permissions.service";
 import { UsersRepository } from "./features/users/infrastructure/users.repository";
+import { ImagesRepository } from "./features/images/infrastructure/images.repository";
 
 const container = createContainer();
 
@@ -16,6 +17,7 @@ container.register({
   authRepository: asClass(AuthRepository).singleton(),
   recipesRepository: asClass(RecipesRepository).singleton(),
   usersRepository: asClass(UsersRepository).singleton(),
+  imagesRepository: asClass(ImagesRepository).singleton(),
   ingredientsRepository: asClass(IngredientsRepository).singleton(),
   authService: asClass(AuthService).singleton(),
   imagesService: asClass(ImagesService).singleton(),

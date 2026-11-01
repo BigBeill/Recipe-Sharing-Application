@@ -64,7 +64,7 @@ export default function SearchRecipePage() {
 
       for (let i = 0; i < response.list.length; i += groupSize) {
          const recipeList = response.list.slice(i, i + groupSize);
-         const itemList = recipeList.map((recipe) => { return { title: recipe.title, image: recipe.image, href: `/recipes/${ recipe._id }` } });
+         const itemList = recipeList.map((recipe) => { return { title: recipe.title, image: recipe.imageReference, href: `/recipes/${ recipe._id }` } });
          newComponents.push(<NotebookPageListItems itemList={ itemList } defaultListSize={ groupSize } />);
       }
 

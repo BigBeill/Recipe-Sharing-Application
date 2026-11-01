@@ -1,7 +1,7 @@
-import { RecipeDraft, RecipeType } from "../domain/recipes.types";
 import { ErrorValidation } from "@/shared/domain/errorClasses";
+import { TypeRecipe, TypeRecipeDraft } from "../domain/recipes.types";
 
-export function checkValidRecipeDraft(recipe: RecipeDraft) {
+export function checkValidRecipeDraft(recipe: TypeRecipeDraft | TypeRecipe) {
    const reasonList: string[] = [];
 
    if (recipe.title.length < 3) { reasonList.push('title must be at least 3 characters long'); }
@@ -30,18 +30,4 @@ export function checkValidRecipeDraft(recipe: RecipeDraft) {
 
    if (reasonList. length != 0) { throw new ErrorValidation('Recipe validation failed', [{ field: 'recipe', reasonList }]); }
    else { return null; }
-}
-
-export function createRecipeFormData(recipe: RecipeDraft | RecipeType, imageBuffer?: File): FormData {
-   const formData = new FormData();
-
-   if ("_id" in recipe) { formData.append("_id", recipe._id); }
-	formData.append("title", recipe.title);
-	formData.append("description", recipe.description);
-	formData.append("ingredientList", JSON.stringify(recipe.ingredientList));
-	formData.append("instructionList", JSON.stringify(recipe.instructionList));
-	formData.append("visibility", recipe.visibility);
-	if (imageBuffer instanceof File) { formData.append("image", imageBuffer); }
-
-   return formData;
 }

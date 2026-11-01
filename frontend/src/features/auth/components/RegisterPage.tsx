@@ -30,7 +30,7 @@ export default function RegisterPage() {
    const [registerData, setRegisterData] = useState<TypeRegisterData>({ name: "", email: "", passwordOne: "", passwordTwo: "" });
    const registerMutator = useServiceMutation(async () => {
       const response = await authService.register(registerData);
-      overrideSession({ userId: response._id, roles: [] });
+      overrideSession({ userId: response, roles: [] });
       router.replace('/');
    });
 

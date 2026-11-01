@@ -1,9 +1,9 @@
 import { Elysia } from 'elysia';
-import { authController } from './features/auth/auth.controller';
+import { authController } from './features/auth/api/auth.controller';
 import { usersController } from './features/users/api/users.controller';
 import removeMongooseNoise from './common/utils/removeMongooseNoise';
 import { ingredientsController } from './features/ingredients/api/ingredients.controller';
-import { imagesController } from './features/images/images.controller';
+import { imagesController } from './features/images/api/images.controller';
 import { recipesController } from './features/recipes/api/recipes.controller';
 import { jwksPlugin } from './features/auth/jwk.plugin';
 import { circuitBreaker } from './global/security/circuitBreaker.root';
@@ -13,18 +13,16 @@ import { errorHandler } from './global/departingData/errorHandler.root';
 import { corsConfig } from './global/config/cors.config';
 import { logger } from './global/departingData/logger.root';
 
-export const app = new Elysia({ normalize: false, cookie: cookieConfig })
+export const app = new Elysia({ cookie: cookieConfig })
    .use(circuitBreaker({ limit: 2000, windowMs: 10_000, cooldownMs: 30_000 }))
    .use(ipRateLimit({ limit: 100, windowMs: 10_000 }))
    .use(errorHandler)
    .use(jwksPlugin)
    .mapResponse({ as: 'global' }, ({ responseValue }) => {
-      if (responseValue && typeof responseValue === 'object' && 'data' in responseValue) {
-         return new Response(
-            JSON.stringify({ data: removeMongooseNoise((responseValue as any).data) }),
-            { headers: { 'Content-Type': 'application/json' } }
-         );
-      }
+      return new Response(
+         JSON.stringify(removeMongooseNoise(responseValue)),
+         { headers: { 'Content-Type': 'application/json' } }
+      );
    })
    .use(corsConfig)
    .use(logger)

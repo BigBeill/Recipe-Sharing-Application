@@ -15,7 +15,7 @@ function isStale(token: string | undefined): boolean {
    catch { return true; }
 }
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
 
    // check for an access token and pass the request along if it is valid
    const accessToken = request.cookies.get('accessToken')?.value;
@@ -25,9 +25,9 @@ export default async function middleware(request: NextRequest) {
    const refreshToken = request.cookies.get('refreshToken')?.value;
    if (!refreshToken) { return NextResponse.next(); }
 
-   let upstream: Response;
+   let refreshResponse: Response;
    try {
-      upstream = await fetch(`${process.env.ELYSIA_URL}/api/v1/auth/refresh`, {
+      refreshResponse = await fetch(`${process.env.ELYSIA_URL}/api/v1/auth/refresh`, {
          method: 'POST',
          headers: { cookie: `refreshToken=${refreshToken}` },
          cache: 'no-store',
@@ -37,25 +37,25 @@ export default async function middleware(request: NextRequest) {
    }
 
    // remove tokens if refresh fails
-   if (upstream.status === 401) {
+   if (refreshResponse.status === 401) {
       const response = NextResponse.next();
       response.cookies.delete('accessToken');
       response.cookies.delete('refreshToken');
       return response;
    }
 
-   // keep cookies if http failure isn't related to 
-   if (!upstream.ok) { return NextResponse.next(); }
+   // keep cookies if http failure isn't related to failed authentication
+   if (!refreshResponse.ok) { return NextResponse.next(); }
 
-   const { data } = await upstream.json();
-   if (!data?.accessToken) { return NextResponse.next(); }
+   const updatedAccessToken = await refreshResponse.json();
+   if (!updatedAccessToken) { return NextResponse.next(); }
 
    // so this render's cookies() sees the fresh token
-   request.cookies.set('accessToken', data.accessToken);
+   request.cookies.set('accessToken', updatedAccessToken);
    const response = NextResponse.next({ request });
 
    // so the browser gets both — forward Elysia's Set-Cookie verbatim
-   for (const cookie of upstream.headers.getSetCookie()) {
+   for (const cookie of refreshResponse.headers.getSetCookie()) {
       response.headers.append('set-cookie', cookie);
    }
 

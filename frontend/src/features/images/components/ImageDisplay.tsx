@@ -1,18 +1,30 @@
 "use client"
 
-import { PackagedImageType } from "../domain/image.types";
-import { unpackImage } from "../services/image.services";
+import useServiceState from "@/shared/lib/hooks/useServiceState";
+import { TypeImageReference } from "../domain/image.types";
+import { imageService } from "../services/image.service.client";
+
+const RECIPE_IMAGE_FALLBACK = "/recipe-image-fallback.png";
+const USER_IMAGE_FALLBACK = "/recipe-image-fallback.png";
 
 type Props = React.ComponentPropsWithoutRef<'div'> & {
-   packagedImage: PackagedImageType | undefined;
+   category: 'recipes' | 'users';
+   imageReference?: TypeImageReference;
 }
 
-export default function ImageDisplay ({ packagedImage, ...rest }: Props) {
+export default function ImageDisplay ({ imageReference, category, ...rest }: Props) {
 
-   const image = unpackImage(packagedImage);
+   const fallback = category === 'recipes' ? RECIPE_IMAGE_FALLBACK : USER_IMAGE_FALLBACK;
+
+   const imageUrlState = useServiceState(async () => {
+      if (imageReference) {
+         return await imageService.get(imageReference.key);
+      }
+      else { return fallback; }
+   }, [imageReference])
 
    return (
-      <img { ...image } { ...rest } />
+      <img { ...rest } src={ imageUrlState.status === 'ready' ? imageUrlState.data : fallback } />
    );
 
 }

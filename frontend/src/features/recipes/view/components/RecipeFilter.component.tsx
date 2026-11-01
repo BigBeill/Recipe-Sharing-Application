@@ -61,10 +61,10 @@ export default function RecipeFilterComponent() {
    // * get a list of all ingredients as listed by there id's in the url
    useServiceState(async () => {
       const urlIds = new Set(ingredientIdList);
-      const prunedIngredientList = refs.ingredientList.current!.getData().filter((ingredient) => urlIds.has(ingredient._id));
+      const prunedIngredientList = (await refs.ingredientList.current!.getData()).filter((ingredient) => urlIds.has(ingredient._id));
 
       // ? get ingredientIdList without any already known ingredients
-      const currentIds = new Set(refs.ingredientList.current!.getData().map((ingredient) => ingredient._id));
+      const currentIds = new Set((await refs.ingredientList.current!.getData()).map((ingredient) => ingredient._id));
       const newIdList = ingredientIdList.filter((id) => !currentIds.has(id));
 
       // ? fetch all unknown ingredients from the server
@@ -78,9 +78,9 @@ export default function RecipeFilterComponent() {
    }, [ingredientIdList]);
 
    // * grab user entered data from url and add them to { URLsearchParams }
-   function handleFormSubmit() {
+   async function handleFormSubmit() {
       const updatedParams = new URLSearchParams();
-      const data = harvestRefsObject(refs);
+      const data = await harvestRefsObject(refs);
       if(data.title) { updatedParams.set('title', data.title); }
       if(data.ingredientList.length !== 0) { updatedParams.set('ingredientIdList', data.ingredientList.map((ingredient) => ingredient._id).join(',')); }
       if(data.category !== 'public'){ updatedParams.set('category', data.category); }
@@ -93,7 +93,7 @@ export default function RecipeFilterComponent() {
 
          <InputString type='text' className={ styles.titleInput } label='Name' initial={ title } ref={ refs.title } placeholder='Search for a recipe by name' />
          { ingredientList.htmlView }
-         <InputChooseValue<'public' | 'friends' | 'personal'> type="radio" label="Recipe type" className={ styles.categoryInput } ref={ refs.category } optionList={ categoryOptionList } initial={ { label: (category.charAt(0).toUpperCase() + category.slice(1)), value: category } } />
+         <InputChooseValue<'public' | 'friends' | 'personal'> type="radio" label="Recipe type" className={ styles.categoryInput } ref={ refs.category } optionList={ categoryOptionList } initial={ category } />
          <IngredientSearch className={ styles.ingredientInput } placeholder='Describe an ingredient you would like to be include in your recipe' onSubmit={ ingredientList.addItem } />
 
          <ButtonOval className={ styles.searchButton } showLoading={ true } onClick={ handleFormSubmit }>search</ButtonOval>

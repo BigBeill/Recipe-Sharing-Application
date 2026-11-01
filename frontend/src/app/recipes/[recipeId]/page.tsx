@@ -3,7 +3,7 @@ import { recipeService } from "@/features/recipes/services/recipes.service.serve
 import RecipePage from "@/features/recipes/view/pages/Recipe.page";
 import preRenderService from "@/shared/lib/preRenderService";
 
-export default async function Page({ params }: { params: Promise<{recipeId: string}> }) {
+export default async function Page({ params }: { params: Promise<{ recipeId: string }> }) {
    const { recipeId } = await params;
 
    const recipe = await preRenderService(() => { return recipeService.get(recipeId) })

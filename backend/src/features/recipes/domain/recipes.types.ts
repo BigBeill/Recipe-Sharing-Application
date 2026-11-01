@@ -1,17 +1,18 @@
-import type { ImageType } from "../../images/images.types";
-import type { TypeRecipeIngredient } from "../../ingredients/domain/ingredients.types";
+import type { Types } from "mongoose";
+import type { TypeImageReference } from "../../images/domain/images.types";
+import type { TypeIngredient } from "../../ingredients/domain/ingredients.types";
 
 export interface TypeRecipe extends TypeRecipeDraft {
-   _id: string;
-   ownerId: string;
+   _id: Types.ObjectId;
+   ownerId: Types.ObjectId;
    nutrition: TypeNutrition;
 }
 
 export interface TypeRecipeDraft {
    title: string;
    description: string;
-   image?: ImageType;
-   ingredientList: TypeRecipeIngredient[];
+   imageReference?: TypeImageReference;
+   ingredientList: TypeIngredient[];
    instructionList: string[];
    visibility: 'public' | 'private' | 'personal';
 }

@@ -1,13 +1,14 @@
 import { SignJWT, importPKCS8 } from 'jose';
 import { env } from '../../global/config/env.config';
+import type { Types } from 'mongoose';
 
 const pem = Buffer.from(env.AUTH_PRIVATE_KEY, 'base64').toString('utf8');
 const privateKey = await importPKCS8(pem, 'ES256');
 
-export function signAccessToken(userId: string) {
+export function signAccessToken(userId: Types.ObjectId) {
    return new SignJWT({})
       .setProtectedHeader({ alg: 'ES256', kid: env.AUTH_KEY_ID })
-      .setSubject(userId)
+      .setSubject(userId.toString())
       .setIssuer(env.AUTH_ISSUER)
       .setAudience(env.AUTH_AUDIENCE)
       .setIssuedAt()

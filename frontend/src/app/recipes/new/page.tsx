@@ -1,6 +1,6 @@
 import { verifySession } from "@/features/auth/server/session";
 import CreateRecipePage from "@/features/recipes/view/pages/CreateRecipe.page";
-import { RecipeDraft } from "@/features/recipes/domain/recipes.types";
+import { TypeRecipeDraft } from "@/features/recipes/domain/recipes.types";
 import { redirect } from "next/navigation";
 
 export default async function NewRecipe() {
@@ -8,7 +8,7 @@ export default async function NewRecipe() {
    const session = await verifySession();
    if (!session) { redirect('/auth/login'); }
 
-   const defaultRecipe: RecipeDraft = {
+   const defaultRecipe: TypeRecipeDraft = {
       title: '', 
       description: '', 
       ingredientList: [], 

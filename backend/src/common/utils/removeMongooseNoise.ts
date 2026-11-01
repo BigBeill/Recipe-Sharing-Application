@@ -7,14 +7,17 @@ type SerializedBuffer = { type: 'Buffer'; data: number[] };
 type PassThrough = 'clientSafeMetadata';
 type Primitive = string | number | boolean | bigint | symbol | null | undefined;
 
+type DocumentMemberKeys = Exclude<keyof Types.ArraySubdocument, '_id'>;
+
 export type Serialized<T> =
    T extends Primitive ? T :
    T extends (...args: never[]) => unknown ? T :
-   T extends Buffer | Types.ObjectId | SerializedBuffer ? string :
+   T extends Types.ObjectId ? T :
+   T extends Buffer | SerializedBuffer ? string :
    T extends Date ? Date :
    T extends Map<infer K, infer V> ? Record<K & PropertyKey, Serialized<V>> :
    T extends readonly (infer E)[] ? Serialized<E>[] :
-   T extends { toObject(): infer O } ? SerializedObject<O> :
+   T extends { toObject(): unknown } ? SerializedObject<Omit<T, DocumentMemberKeys>> :
    T extends object ? SerializedObject<T> :
    T;
 
@@ -46,7 +49,6 @@ function isHydratedDocument(value: unknown): value is { toObject: () => PlainObj
 
 function toHexString(value: unknown): string {
    if (Buffer.isBuffer(value)) return value.toString('hex');
-   if (isObjectId(value)) return value.toString();          // already hex
    return Buffer.from((value as SerializedBuffer).data).toString('hex');
 }
 
@@ -65,7 +67,8 @@ function removeFromObject(obj: PlainObject): PlainObject {
 }
 
 function removeNoise(value: unknown): unknown {
-   if (Buffer.isBuffer(value) || isObjectId(value) || isSerializedBuffer(value)) { return toHexString(value) }
+   if (isObjectId(value)) { return value; }
+   if (Buffer.isBuffer(value) || isSerializedBuffer(value)) { return toHexString(value) }
    if (value instanceof Map) { return removeNoise(Object.fromEntries(value)) }
    if (Array.isArray(value)) { return removeFromList(value) }
    if (isHydratedDocument(value)) { return removeFromObject(value.toObject()) }
