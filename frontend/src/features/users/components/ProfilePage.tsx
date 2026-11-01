@@ -15,6 +15,7 @@ import { InputString } from '@/shared/view/components/Input.components';
 import { TypeImageReference } from '@/features/images/domain/image.types';
 import { TypeRelationship, TypeUser } from '../domain/user.types';
 import harvestRefsObject from '@/shared/lib/harvestRefsObject';
+import ImageDisplay from '@/features/images/components/ImageDisplay';
 
 interface Props {
    initial: TypeUser
@@ -72,11 +73,15 @@ export default function ProfilePage({ initial }: Props) {
    return (
       <div className={ styles.userProfile }>
          <GrowingText text={ user.name }/>
-         <ImageUploader
-            ref={ refs.imageReference }
-            initial={ user.imageReference }
-            category={ 'users' }
-         />
+         { editMode ? 
+            <ImageUploader
+               ref={ refs.imageReference }
+               initial={ user.imageReference }
+               category={ 'users' }
+            />
+         :
+            <ImageDisplay style={ { width: '12rem', height: '12rem' } } category='users' imageReference={user.imageReference} />
+         }
 
          <div> {/* styleDiv, should not contain anything */} </div>
 
