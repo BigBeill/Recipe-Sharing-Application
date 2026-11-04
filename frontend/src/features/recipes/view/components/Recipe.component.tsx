@@ -16,7 +16,7 @@ export default function RecipeComponent({ recipe }: { recipe: TypeRecipe }) {
       <div className={ styles.preview }>
          <GrowingText text={recipe.title}/>
 
-         <ImageDisplay category="recipes" imageReference={ recipe.imageReference } />
+         <ImageDisplay category="recipes" signedImageUrl={ recipe.signedImageUrl } />
 
          <div className="description">
             <h3>Description</h3>

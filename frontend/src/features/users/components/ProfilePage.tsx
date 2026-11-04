@@ -76,11 +76,11 @@ export default function ProfilePage({ initial }: Props) {
          { editMode ? 
             <ImageUploader
                ref={ refs.imageReference }
-               initial={ user.imageReference }
+               initial={ user.signedImageUrl }
                category={ 'users' }
             />
          :
-            <ImageDisplay style={ { width: '12rem', height: '12rem' } } category='users' imageReference={user.imageReference} />
+            <ImageDisplay style={ { width: '12rem', height: '12rem' } } category='users' signedImageUrl={user.signedImageUrl} />
          }
 
          <div> {/* styleDiv, should not contain anything */} </div>
