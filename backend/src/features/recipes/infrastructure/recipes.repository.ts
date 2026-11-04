@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
-import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import { escapeRegex } from "../../../common/utils/filter";
 import { ModelRecipe, type RecordRecipe, type RecordRecipeDraft } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
 import { NotFoundError } from "../../../global/departingData/errorClasses";
+import type { TypePaginatedList } from "../../../common/domain/types.common";
 
 
 
@@ -48,7 +48,7 @@ export class RecipesRepository {
 
 
    
-   async search(params: SearchParams): Promise<PaginatedListType<RecordRecipe>> {
+   async search(params: SearchParams): Promise<TypePaginatedList<RecordRecipe>> {
 
       const { title, ownerIdList, ingredientIdList, visibilityList, authId, friendIdList = [], skip, limit } = params;
 

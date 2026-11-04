@@ -1,13 +1,11 @@
 import type { Types } from "mongoose";
-import type { TypeImageReference } from "../../images/domain/images.types";
-
 
 export interface TypeUser {
    _id: Types.ObjectId;
    name: string;
    email?: string;
    bio?: string;
-   imageReference?: TypeImageReference;
+   signedImageUrl?: string;
    relationship?: TypeRelationship | null;
 }
 

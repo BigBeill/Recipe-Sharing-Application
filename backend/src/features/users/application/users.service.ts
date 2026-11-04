@@ -1,21 +1,20 @@
-import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
 import type { AuthService } from "../../auth/application/auth.service";
 import type { RecipesService } from "../../recipes/application/recipes.service";
-import type { AuthIdParam } from "../../../common/api/authIdParam";
 import type { UsersRepository } from "../infrastructure/users.repository";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { ImagesService } from "../../images/application/images.service";
 import type { TypeRelationship, TypeUser } from "../domain/users.types";
 import type { Types } from "mongoose";
 import type { TypeImageReference } from "../../images/domain/images.types";
+import type { TypeAuthId, TypePaginatedList } from "../../../common/domain/types.common";
 
 interface DefinedRelationshipParams {
    ownerId: Types.ObjectId;
    targetId: Types.ObjectId;
 }
 
-interface GetUserParams extends AuthIdParam{
+interface GetUserParams extends TypeAuthId{
    includeRelationship?: boolean;
 }
 
@@ -57,7 +56,7 @@ export class UsersService {
 
 
 
-   async deleteAccount(password: string, { authId }: AuthIdParam): Promise<boolean> {
+   async deleteAccount(password: string, { authId }: TypeAuthId): Promise<boolean> {
       if (!authId) { throw new UnauthorizedError(); }
 
       // make sure the client know the password of the signed in account
@@ -77,7 +76,7 @@ export class UsersService {
 
 
 
-   async deleteFriendship(_id: Types.ObjectId, { authId }: AuthIdParam): Promise<boolean> {
+   async deleteFriendship(_id: Types.ObjectId, { authId }: TypeAuthId): Promise<boolean> {
       if (!authId) { throw new UnauthorizedError(); }
 
       const friendship = await this.repository.getFriendship(_id);
@@ -107,7 +106,7 @@ export class UsersService {
 
 
 
-   async getUser(_id: Types.ObjectId, {authId, includeRelationship}: GetUserParams): Promise<TypeUser> {
+   async get(_id: Types.ObjectId, {authId, includeRelationship}: GetUserParams): Promise<TypeUser> {
       if(includeRelationship && !authId) { throw new UnauthorizedError(); }
 
       const [user, relationship] = await Promise.all([
@@ -119,7 +118,7 @@ export class UsersService {
 
 
 
-   async sendFriendRequest(targetId: Types.ObjectId, { authId }: AuthIdParam): Promise<TypeRelationship> {
+   async sendFriendRequest(targetId: Types.ObjectId, { authId }: TypeAuthId): Promise<TypeRelationship> {
       if(!authId) { throw new UnauthorizedError(); }
 
       const friendRequest = await this.repository.createFriendRequest(authId, targetId)
@@ -133,7 +132,7 @@ export class UsersService {
 
 
 
-   async processFriendRequest(_id: Types.ObjectId, approve: boolean, { authId }: AuthIdParam): Promise<TypeRelationship | null> {
+   async processFriendRequest(_id: Types.ObjectId, approve: boolean, { authId }: TypeAuthId): Promise<TypeRelationship | null> {
       if(!authId) { throw new UnauthorizedError(); }
 
       // get friendship from the database
@@ -163,7 +162,7 @@ export class UsersService {
 
 
 
-   async searchUsers(params: SearchUsersParams): Promise<PaginatedListType<TypeUser>> {
+   async searchUsers(params: SearchUsersParams): Promise<TypePaginatedList<TypeUser>> {
       const { authId, _id, name, skip, limit, includeRelationship } = params;
       if (includeRelationship && !authId) { throw new UnauthorizedError('Include relationship flag cannot be set to true without a valid session'); }
 

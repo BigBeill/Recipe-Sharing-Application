@@ -1,6 +1,6 @@
 import { t } from "elysia";
 
-export const resetPasswordValidator = t.Object({
+export const ValidatorIncomingAuthResetPasswordBody = t.Object({
    password: t.String(),
    token: t.String(),
 });

@@ -1,7 +1,7 @@
 import { t } from "elysia";
-import { IdValidator } from "../../../../common/api/validators/id.validator";
+import { ValidatorCommonMongooseId } from "../../../../common/domain/validators/mongooseId.validator";
 
-export const ProcessFriendRequestValidator = t.Object({
-   _id: IdValidator,
+export const ValidatorIncomingUsersProcessFriendRequestBody = t.Object({
+   _id: ValidatorCommonMongooseId,
    response: t.Boolean(),
 });

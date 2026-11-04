@@ -1,8 +1,8 @@
 import { t } from "elysia";
-import { PaginationValidator } from "../../../../common/api/validators/pagination.validator";
-import { PostgresIdValidator } from "../../../../common/api/validators/postgresId.validator";
+import { ValidatorCommonPostgresId } from "../../../../common/domain/validators/postgresId.validator";
+import { ValidatorIncomingPaginatedList } from "../../../../common/domain/validators/pagination.validator";
 
-export const SearchConversionValidator = t.Object({
-   foodId: PostgresIdValidator,
-   ...PaginationValidator.properties,
+export const ValidatorIncomingIngredientsSearchConversionBody = t.Object({
+   foodId: ValidatorCommonPostgresId,
+   ...ValidatorIncomingPaginatedList.properties,
 });

@@ -1,6 +1,6 @@
 import { t } from "elysia";
 
-export const ValidatorUpload = t.Object({
+export const ValidatorIncomingImagesUploadBody = t.Object({
    location: t.Union([
       t.Literal('users'),
       t.Literal('recipes'),
@@ -9,5 +9,4 @@ export const ValidatorUpload = t.Object({
       type: ['image/jpeg', 'image/png', 'image/webp'],
       maxSize: '5m',
    }),
-
 });

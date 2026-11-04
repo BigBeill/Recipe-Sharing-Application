@@ -58,7 +58,7 @@ function TitleShard({ recipe }: Props) {
          <h2 className={ styles.heading2 }>{ recipe.title }</h2>
 
          <div className={ styles.imageWrapper }>
-            <ImageDisplay imageReference={ recipe.imageReference } category="recipes" className={ styles.photo } />
+            <ImageDisplay signedImageUrl={ recipe.signedImageUrl } category="recipes" className={ styles.photo } />
             <NutritionList nutrition={ recipe.nutrition } />
          </div>
 

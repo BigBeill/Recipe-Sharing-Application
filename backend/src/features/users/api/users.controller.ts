@@ -1,14 +1,13 @@
 import Elysia, { status, t } from "elysia";
 import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
-import { GetValidator } from "./validators/get.validator";
-import { SearchValidator } from "./validators/search.validator";
 import { usersService } from "../../../container";
-import { UpdateValidator } from "./validators/update.validator";
-import { ProcessFriendRequestValidator } from "./validators/processFriendRequest.validator";
-import { IdParamsValidator } from "../../../common/api/validators/id.validator";
-import { DepartingUserValidator } from "../../../global/departingData/validators/departingUserValidator";
-import { DepartingPaginatedList } from "../../../global/departingData/validators/departingPaginatedList";
-import { DepartingRelationshipValidator } from "../../../global/departingData/validators/departingRelationshipValidator";
+import { ValidatorIncomingUsersGetBody } from "./validators/get.validator";
+import { ValidatorCommonMongooseId } from "../../../common/domain/validators/mongooseId.validator";
+import { ValidatorCommonUser, ValidatorCommonUserDraft } from "../domain/validators/user.validator";
+import { ValidatorIncomingUsersSearchBody } from "./validators/search.validator";
+import { ValidatorCommonPaginatedList } from "../../../common/domain/validators/pagination.validator";
+import { ValidatorCommonRelationship } from "../domain/validators/relationship.validator";
+import { ValidatorIncomingUsersProcessFriendRequestBody } from "./validators/processFriendRequest.validator";
 
 const service = usersService
 
@@ -25,13 +24,13 @@ export const usersController = new Elysia({ prefix: '/users' })
       async ({ params, query, authId }) => {
          const { _id } = params;
          const { includeRelationship = false } = query;
-         const user = await service.getUser(_id, { authId, includeRelationship });
+         const user = await service.get(_id, { authId, includeRelationship });
          return status(200, user);
       },
       {
-         params: IdParamsValidator,
-         query: GetValidator,
-         response: DepartingUserValidator,
+         params: t.Object(ValidatorCommonMongooseId),
+         query: ValidatorIncomingUsersGetBody,
+         response: { 200: ValidatorCommonUser },
       }
    )
 
@@ -44,8 +43,8 @@ export const usersController = new Elysia({ prefix: '/users' })
          return status(200, users);
       },
       {
-         query: SearchValidator,
-         response: DepartingPaginatedList(DepartingUserValidator)
+         query: ValidatorIncomingUsersSearchBody,
+         response: ValidatorCommonPaginatedList(ValidatorCommonUser),
       }
 
    )
@@ -65,9 +64,9 @@ export const usersController = new Elysia({ prefix: '/users' })
          else { return status(204, undefined); }
       },
       {
-         params: IdParamsValidator,
+         params: t.Object({ _id: ValidatorCommonMongooseId }),
          response: { 
-            200: DepartingRelationshipValidator,
+            200: ValidatorCommonRelationship,
             204: t.Void()
          }
       }
@@ -82,7 +81,7 @@ export const usersController = new Elysia({ prefix: '/users' })
          return status(201);
       },
       {
-         params: IdParamsValidator,
+         params: t.Object({ _id: ValidatorCommonMongooseId }),
       }
    )
 
@@ -95,8 +94,8 @@ export const usersController = new Elysia({ prefix: '/users' })
          return status(201, relationship);
       },
       {
-         params: ProcessFriendRequestValidator,
-         response: { 201: t.Union([DepartingRelationshipValidator, t.Void()]) }
+         params: ValidatorIncomingUsersProcessFriendRequestBody,
+         response: { 201: t.Union([ValidatorCommonRelationship, t.Void()]) }
       }
    )
 
@@ -109,8 +108,8 @@ export const usersController = new Elysia({ prefix: '/users' })
          return status(200, friendRequest);
       },
       {
-         params: IdParamsValidator,
-         response: DepartingRelationshipValidator,
+         params: t.Object({ _id: ValidatorCommonMongooseId }),
+         response: ValidatorCommonRelationship,
       }
    )
 
@@ -119,13 +118,13 @@ export const usersController = new Elysia({ prefix: '/users' })
    .put( '/update/:_id',
       async ({ authId, body, params }) => {
          const { _id } = params;
-         const { name, email, bio, imageReference } = body;
-         const response = await service.update({ _id, name, email, bio, imageReference, authId });
+         const { name, bio, imageReference } = body;
+         const response = await service.update({ _id, name, bio, imageReference, authId });
          return status(201, response);
       },
       {
-         params: IdParamsValidator,
-         body: UpdateValidator,
-         response: { 201: DepartingUserValidator }
+         params: t.Object({ _id: ValidatorCommonMongooseId }),
+         body: t.Partial(ValidatorCommonUserDraft),
+         response: { 201: ValidatorCommonUser }
       }
    )

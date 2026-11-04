@@ -1,8 +1,6 @@
 import type { TypeApiCaller } from "@/shared/lib/api/types";
 import { TypeRecipe, TypeRecipeDraft } from "../domain/recipes.types";
 import { PaginatedListType } from "@/shared/domain/shared.types";
-import { TypeImageReference } from "@/features/images/domain/image.types";
-import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
 
 export type PayloadRecipeApiGet = { includeNutrients?: boolean; }
 export type PayloadRecipeApiSearch = {
@@ -12,14 +10,6 @@ export type PayloadRecipeApiSearch = {
    visibilityList?: ('public' | 'private' | 'personal')[]
    limit?: number;
    skip?: number;
-}
-export type PayloadRecipeApiUpdate = {
-   title?: string;
-   description?: string;
-   imageReference?: TypeImageReference;
-   ingredientList?: IngredientType[];
-   instructionList?: string[];
-   visibility?: 'public' | 'private' | 'personal';
 }
 
 export function createRecipeApi(call: TypeApiCaller ) {
@@ -52,8 +42,8 @@ export function createRecipeApi(call: TypeApiCaller ) {
             body: params,
          }),
 
-      update: (recipeId: string, body: PayloadRecipeApiUpdate): Promise<void> =>
-         call({
+      update: (recipeId: string, body: Partial<TypeRecipeDraft>): Promise<TypeRecipe> =>
+         call<TypeRecipe>({
             url:`/recipes/update/${recipeId}`,
             method: 'put',
             body: body,

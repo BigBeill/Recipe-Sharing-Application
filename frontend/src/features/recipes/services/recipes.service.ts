@@ -4,9 +4,9 @@ import {
    TypeRecipeApi,
    PayloadRecipeApiGet,
    PayloadRecipeApiSearch,
-   PayloadRecipeApiUpdate,
 } from './recipes.api'
 import { TypeRecipe, TypeRecipeDraft } from "../domain/recipes.types";
+import filterUpdateDraft from "@/shared/lib/filterUpdateDraft";
 
 export function createRecipeService(api: TypeRecipeApi) {
    return {
@@ -35,8 +35,10 @@ export function createRecipeService(api: TypeRecipeApi) {
          });
       },
 
-      update: async (recipeId: string, payload: PayloadRecipeApiUpdate): Promise<void> => {
-         await api.update(recipeId, payload);
+      update: async (originalRecipe: TypeRecipe, updatedRecipe: Partial<TypeRecipeDraft>): Promise<TypeRecipe> => {
+         const uniqueFields = filterUpdateDraft(originalRecipe, updatedRecipe);
+         if (!uniqueFields) { return originalRecipe; }
+         else { return await api.update(originalRecipe._id, updatedRecipe); }
       },
    }
 }

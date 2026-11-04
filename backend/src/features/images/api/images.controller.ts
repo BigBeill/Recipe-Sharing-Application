@@ -1,26 +1,12 @@
 import Elysia, { status } from "elysia"
 import { imagesService } from "../../../container";
 import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
-import { DepartingStringValidator } from "../../../global/departingData/validators/primitives/departingString.validator";
-import { ValidatorGet } from "./validators/get.validator";
-import { ValidatorUpload } from "./validators/upload.validator";
-import { DepartingValidatorImageReference } from "../../../global/departingData/validators/departingImageReference.validator";
+import { ValidatorCommonImageReference } from "../domain/validators/imageReference.validator";
+import { ValidatorIncomingImagesUploadBody } from "./validators/upload.validator";
 
 const service = imagesService;
 
 export const imagesController = new Elysia({ prefix: '/images' })
-
-   .get('/get/:location/:fileName', 
-      async ({ params }) => {
-         const key = `${params.location}/${params.fileName}`;
-         const imageURL = await service.getPresignedURL(key);
-         return status(200, imageURL);
-      },
-      {
-         params: ValidatorGet,
-         response: DepartingStringValidator,
-      }
-   )
 
    .use(authenticateMiddleware)
    .use(authorizeMiddleware)
@@ -32,7 +18,7 @@ export const imagesController = new Elysia({ prefix: '/images' })
          return status(201, imageReference)
       },
       {
-         body: ValidatorUpload,
-         response: { 201: DepartingValidatorImageReference},
+         body: ValidatorIncomingImagesUploadBody,
+         response: { 201: ValidatorCommonImageReference },
       }
    )

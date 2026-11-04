@@ -1,17 +1,26 @@
 import { TypeImageReference } from '@/features/images/domain/image.types';
 import { IngredientType, TypeNutrition } from '../../ingredients/domain/ingredient.types';
 
-export type TypeRecipeDraft = {
-   title: string;
-   description: string;
-   imageReference?: TypeImageReference;
-   ingredientList: IngredientType[];
-   instructionList: string[];
-   visibility: 'public' | 'private' | 'personal';
-}
+export type TypeRecipeVisibilityOptions = 'public' | 'private' | 'personal';
 
-export interface TypeRecipe extends TypeRecipeDraft{
+export type TypeRecipe = {
    _id: string;
    ownerId: string;
-   nutrition?: TypeNutrition
+   title: string;
+   description: string;
+   signedImageUrl?: string;
+   ingredientList: IngredientType[];
+   instructionList: string[];
+   visibility: TypeRecipeVisibilityOptions;
+   nutrition: TypeNutrition
 }
+
+export type TypeRecipeDraft = 
+   Omit<TypeRecipe,
+      | '_id'
+      | 'ownerId'
+      | 'nutrition'
+      | 'signedImageUrl'
+   > & {
+      imageReference?: TypeImageReference
+   }

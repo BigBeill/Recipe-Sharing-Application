@@ -1,4 +1,3 @@
-// src/modules/auth/auth.middleware.ts
 import { Elysia } from 'elysia';
 import { jwtVerify } from 'jose';
 import { publicKey } from './keys';
@@ -12,7 +11,8 @@ const OBJECT_ID_HEX = /^[0-9a-fA-F]{24}$/;
 
 
 
-export const authenticateMiddleware = new Elysia({ name: 'authenticate' }).derive(
+export const authenticateMiddleware = new Elysia({ name: 'authenticate' })
+.derive(
    { as: 'scoped' },
    async ({ cookie: { accessToken } }): Promise<{ authId?: Types.ObjectId }> => {
       const token = accessToken?.value as string;

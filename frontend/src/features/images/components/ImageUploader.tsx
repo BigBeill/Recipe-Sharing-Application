@@ -5,9 +5,8 @@ import { useState, useEffect, Ref, useImperativeHandle, useReducer, useRef } fro
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { DataHandle } from '@/shared/domain/shared.types';
-import { TypeImageReference } from '../domain/image.types';
+import { TypeImageReference, TypeSignedImageUrl } from '../domain/image.types';
 import { imageService } from '../services/image.service.client';
-import useServiceState from '@/shared/lib/hooks/useServiceState';
 
 
 const RECIPE_IMAGE_FALLBACK = "/recipe-image-fallback.png";
@@ -15,7 +14,7 @@ const USER_IMAGE_FALLBACK = "/recipe-image-fallback.png";
 
 interface ImageUploaderProps {
    ref: Ref<DataHandle<TypeImageReference | undefined>>;
-   initial?: TypeImageReference;
+   initial?: TypeSignedImageUrl;
    category: 'recipes' | 'users';
 }
 
@@ -33,29 +32,12 @@ export default function ImageUploader({ ref, initial, category }: ImageUploaderP
          if (imageBuffer) { return await imageService.upload(category, imageBuffer); }
          else { return undefined; }
       },
-      setData: async (imageReference: TypeImageReference | undefined) => {
-         if (imageReference) { setImageUrl(await imageService.get(imageReference.key)); }
-         else { setImageUrl(null); }
-      },
+      setData: async () => { return; }
    }), [imageBuffer, category]);
-
-   const initialImageState = useServiceState(async () => { 
-      if (initial) { 
-         const returnedImageUrl = await imageService.get(initial._id);
-         setImageUrl(returnedImageUrl);
-         return returnedImageUrl; 
-      }
-      else { 
-         return null; 
-      }
-   }, [initial]);
 
    // ? update ImageUrl to keep up with imageBuffer()
    useEffect(() => {
-      if (!imageBuffer) { 
-         if (initialImageState.status === 'ready') { setImageUrl(initialImageState.data); }
-         else { setImageUrl(null); }
-      }
+      if (!imageBuffer) { setImageUrl(initial ?? null); }
       else {
          const uploadUrl = URL.createObjectURL(imageBuffer);
          setImageUrl(uploadUrl);

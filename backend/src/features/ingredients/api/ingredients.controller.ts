@@ -1,13 +1,13 @@
 import Elysia, { status, t } from "elysia";
 import { ingredientsService } from "../../../container";
-import { SearchValidator } from "./validators/search.validator";
-import { PostgresIdParamsValidator } from "../../../common/api/validators/postgresId.validator";
-import { GetValidator } from "./validators/get.validator";
-import { PaginationValidator } from "../../../common/api/validators/pagination.validator";
-import { DepartingIngredientValidator } from "../../../global/departingData/validators/departingIngredient.validator";
-import { DepartingPaginatedList } from "../../../global/departingData/validators/departingPaginatedList";
-import { DepartingIngredientConversionValidator } from "../../../global/departingData/validators/departingIngredientConversion.validator";
-import { DepartingFoodGroupValidator } from "../../../global/departingData/validators/departingFoodGroup.validator";
+import { ValidatorIncomingIngredientsGetBody } from "./validators/get.validator";
+import { ValidatorCommonPostgresId } from "../../../common/domain/validators/postgresId.validator";
+import { ValidatorIncomingIngredientsSearchBody } from "./validators/search.validator";
+import { ValidatorCommonPaginatedList } from "../../../common/domain/validators/pagination.validator";
+import { ValidatorIncomingIngredientsSearchConversionBody } from "./validators/searchConversion.validator";
+import { ValidatorCommonIngredientConversion } from "../domain/validators/ingredientConversion.validator";
+import { ValidatorCommonFoodGroup } from "../domain/validators/foodGroup.validator";
+import { ValidatorCommonIngredient } from "../domain/validators/ingredient.validator";
 
 const service = ingredientsService;
 
@@ -16,14 +16,14 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
 
 
    .get( '/get/:_id',
-      async ({ params, query }) => {
+      async ({ params }) => {
          const { _id } = params;
          const ingredient = await service.get(_id);
          return status(200, ingredient);
       },
       {
-         params: PostgresIdParamsValidator,
-         query: GetValidator,
+         params: t.Object({ _id: ValidatorCommonPostgresId }),
+         query: ValidatorIncomingIngredientsGetBody,
       }
    )
 
@@ -36,8 +36,8 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
          return status(200, ingredients);
       },
       {
-         query: SearchValidator,
-         response: DepartingPaginatedList(t.Omit(DepartingIngredientValidator, ['portion'])),
+         query: ValidatorIncomingIngredientsSearchBody,
+         response: ValidatorCommonPaginatedList(ValidatorCommonIngredient),
       }
    )
 
@@ -51,9 +51,9 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
          return status(200, conversions);
       },
       {
-         params: PostgresIdParamsValidator,
-         query: PaginationValidator,
-         response: DepartingPaginatedList(DepartingIngredientConversionValidator)
+         params: t.Object({ _id: ValidatorCommonPostgresId }),
+         query: ValidatorIncomingIngredientsSearchConversionBody,
+         response: ValidatorCommonPaginatedList(ValidatorCommonIngredientConversion),
       }
    )
 
@@ -65,6 +65,6 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
          return status(200, foodGroups);
       },
       {
-         response: DepartingPaginatedList(DepartingFoodGroupValidator),
+         response: ValidatorCommonPaginatedList(ValidatorCommonFoodGroup),
       }
    )

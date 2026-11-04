@@ -1,14 +1,13 @@
 import { Elysia, status, t } from 'elysia';
-import { RegisterValidator } from './validators/register.validator';
-import { LoginValidator } from './validators/login.validator';
 import { authenticateMiddleware, authorizeMiddleware } from '../auth.middleware';
-import { requestPasswordResetValidator } from './validators/requestPasswordReset.validator';
-import { resetPasswordValidator } from './validators/resetPassword.validator';
-import { changePasswordValidator } from './validators/changePassword.validator';
 import { authService } from '../../../container';
 import { NotFoundError } from '../../../global/departingData/errorClasses';
-import { DepartingIdValidator } from '../../../global/departingData/validators/departingId.validator';
-import { DepartingStringValidator } from '../../../global/departingData/validators/primitives/departingString.validator';
+import { ValidatorCommonMongooseId } from '../../../common/domain/validators/mongooseId.validator';
+import { ValidatorIncomingAuthLoginBody } from './validators/login.validator';
+import { ValidatorIncomingAuthRegisterBody } from './validators/register.validator';
+import { ValidatorIncomingAuthRequestPasswordResetBody } from './validators/requestPasswordReset.validator';
+import { ValidatorIncomingAuthResetPasswordBody } from './validators/resetPassword.validator';
+import { ValidatorIncomingAuthChangePasswordBody } from './validators/changePassword.validator';
 
 const service = authService;
 
@@ -35,12 +34,12 @@ export const authController = new Elysia({ prefix: '/auth' })
          return status(200, authResult.userId);
       },
       {
-         body: LoginValidator,
+         body: ValidatorIncomingAuthLoginBody,
          cookie: t.Object({
             accessToken: t.Optional(t.String()),
             refreshToken: t.Optional(t.String()),
          }),
-         response: DepartingIdValidator,
+         response: { 200: ValidatorCommonMongooseId },
       }
    )
 
@@ -68,7 +67,7 @@ export const authController = new Elysia({ prefix: '/auth' })
             accessToken: t.Optional(t.String()),
             refreshToken: t.String(),
          }),
-         response: DepartingStringValidator
+         response: { 200: t.String() }
       }
    )
 
@@ -92,12 +91,12 @@ export const authController = new Elysia({ prefix: '/auth' })
          return status(200, authResult.userId);
       },
       {
-         body: RegisterValidator,
+         body: ValidatorIncomingAuthRegisterBody,
          cookie: t.Object({
             accessToken: t.Optional(t.String()),
             refreshToken: t.Optional(t.String()),
          }),
-         response: DepartingIdValidator,
+         response: ValidatorCommonMongooseId,
       }
    )
 
@@ -114,7 +113,7 @@ export const authController = new Elysia({ prefix: '/auth' })
          return status(204);
       },
       {
-         body: requestPasswordResetValidator,
+         body: ValidatorIncomingAuthRequestPasswordResetBody,
       }
    )
 
@@ -127,7 +126,7 @@ export const authController = new Elysia({ prefix: '/auth' })
          return status(204);
       },
       {
-         body: resetPasswordValidator,
+         body: ValidatorIncomingAuthResetPasswordBody,
       }
    )
 
@@ -145,7 +144,7 @@ export const authController = new Elysia({ prefix: '/auth' })
          return status(201);
       },
       {
-         body: changePasswordValidator,
+         body: ValidatorIncomingAuthChangePasswordBody,
       }
    )
 
@@ -156,7 +155,7 @@ export const authController = new Elysia({ prefix: '/auth' })
          return status(200, authId)
       },
       {
-         response: DepartingIdValidator
+         response: { 200: ValidatorCommonMongooseId }
       }
    )
 

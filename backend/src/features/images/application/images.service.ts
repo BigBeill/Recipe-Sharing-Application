@@ -1,11 +1,11 @@
 import { randomUUID } from "crypto";
 import bucketClient from "../infrastructure/bucket";
 import type { ImagesRepository } from "../infrastructure/images.repository";
-import type { AuthIdParam } from "../../../common/api/authIdParam";
 import { UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { Types } from "mongoose";
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
 import type { TypeImageReference } from "../domain/images.types";
+import type { TypeAuthId } from "../../../common/domain/types.common";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 
@@ -33,7 +33,7 @@ export class ImagesService {
 
 
 
-   async claimImage(_id: Types.ObjectId, { authId }: AuthIdParam): Promise<TypeImageReference> {
+   async claimImage(_id: Types.ObjectId, { authId }: TypeAuthId): Promise<TypeImageReference> {
       const imageRecord = await this.repository.getImageReference(_id);
       if (!imageRecord.owner.equals(authId)) { throw new UnauthorizedError(); }
       await this.repository.updateImageReferenceStatus(imageRecord._id, 'active');
@@ -78,13 +78,14 @@ export class ImagesService {
 
    
 
-   async getPresignedURL(key: string): Promise<string> {
-      return bucketClient.presign(key);
+   async getSignedURL(_id: Types.ObjectId): Promise<string> {
+      const imageReference = await this.getImageReference(_id);
+      return bucketClient.presign(imageReference.key);
    }
 
 
 
-   async pushImage(location: ('recipes' | 'users'), file: File, { authId }: AuthIdParam): Promise<TypeImageReference> {
+   async pushImage(location: ('recipes' | 'users'), file: File, { authId }: TypeAuthId): Promise<TypeImageReference> {
       if (!authId){ throw new UnauthorizedError(); }
       if (file.size > MAX_BYTES) { throw new Error("Image too large"); }
 
@@ -101,7 +102,7 @@ export class ImagesService {
 
 
 
-   async update(oldImageReferenceId: Types.ObjectId | undefined, newImageReference: TypeImageReference, { authId }: AuthIdParam): Promise<TypeImageReference> {
+   async update(oldImageReferenceId: Types.ObjectId | undefined, newImageReference: TypeImageReference, { authId }: TypeAuthId): Promise<TypeImageReference> {
       this.claimImage(newImageReference._id, { authId });
       if (!oldImageReferenceId) { return newImageReference; }
       else {

@@ -6,9 +6,9 @@ import type { DeleteResult, Types } from 'mongoose';
 import { generateRefreshToken, signAccessToken } from '../tokenSigner';
 import { graceCache } from "../lib/refreshTokenGraceCache";
 import type { PasswordResetTokenRecord } from "../../../externalResources/database/mongoose/schemas/passwordResetToken.schema";
-import type { AuthIdParam } from "../../../common/api/authIdParam";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { TypeAuthResult, TypeSavedRefreshToken } from "../auth.types";
+import type { TypeAuthId } from "../../../common/domain/types.common";
 
 type TypeBuildAuthResultOptions = { cachedRefreshToken: string; expiresAt?: undefined; } | { cachedRefreshToken?: undefined; expiresAt: Date };
 
@@ -33,7 +33,7 @@ export class AuthService {
 
 
 
-   async changePassword(oldPassword: string, newPassword: string, { authId }: AuthIdParam): Promise<void> {
+   async changePassword(oldPassword: string, newPassword: string, { authId }: TypeAuthId): Promise<void> {
       if(!authId) { throw new UnauthorizedError(); }
 
       const userAndPassword = await this.repository.getUserWithPasswordIncluded(authId);

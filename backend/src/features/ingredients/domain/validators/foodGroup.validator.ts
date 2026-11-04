@@ -1,6 +1,6 @@
 import { t } from "elysia";
 
-export const DepartingFoodGroupValidator = t.Object({
+export const ValidatorCommonFoodGroup = t.Object({
    _id: t.Number(),
    description: t.String(),
 });

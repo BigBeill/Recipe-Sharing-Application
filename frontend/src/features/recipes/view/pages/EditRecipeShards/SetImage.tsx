@@ -3,7 +3,7 @@ import { DataHandle} from "@/shared/domain/shared.types";
 import { Ref } from "react";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { InputChooseValue } from "@/shared/view/components/Input.components";
-import { TypeImageReference } from "@/features/images/domain/image.types";
+import { TypeImageReference, TypeSignedImageUrl } from "@/features/images/domain/image.types";
 
 interface ComponentProps {
    refs: {
@@ -11,7 +11,7 @@ interface ComponentProps {
       visibility: Ref<DataHandle<'public' | 'private' | 'personal'>>;
    }
    initial: { 
-      imageReference?: TypeImageReference, 
+      signedImageUrl?: TypeSignedImageUrl, 
       visibility: 'public' | 'private' | 'personal' 
    }
 }
@@ -24,7 +24,7 @@ export default function EditRecipeShardSetImage ({ refs, initial }: ComponentPro
          <div style={{ width: '12rem', height: '12rem', margin: '0rem 0rem 3rem 3rem' }}>
             <ImageUploader 
                ref={ refs.image }
-               initial={ initial?.imageReference }
+               initial={ initial?.signedImageUrl }
                category='recipes'
             />
          </div>

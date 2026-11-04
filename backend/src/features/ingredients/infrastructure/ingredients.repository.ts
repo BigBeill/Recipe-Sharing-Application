@@ -1,4 +1,4 @@
-import type { PaginatedListType } from "../../../common/api/apiResponse.types";
+import type { TypePaginatedList } from "../../../common/domain/types.common";
 import postgresConnection from "../../../externalResources/database/postgres/config.postgreDatabase";
 import { postgresQueryBuilder } from "../../../externalResources/database/postgres/queryBuilder.postgreDatabase";
 import { NotFoundError } from "../../../global/departingData/errorClasses";
@@ -95,7 +95,7 @@ export class IngredientsRepository {
 
 
 
-   async searchGroup ({ description, skip = 0, limit }: SearchGroupParams): Promise<PaginatedListType<TypeIngredientGroup>> {
+   async searchGroup ({ description, skip = 0, limit }: SearchGroupParams): Promise<TypePaginatedList<TypeIngredientGroup>> {
       const { list, count } = await postgresQueryBuilder<TypeIngredientGroup & { count: number }>('SELECT * FROM food_group', {
          where: [
             description && { column: 'description', operation: 'ILIKE', value: `%${description}%` },
@@ -110,7 +110,7 @@ export class IngredientsRepository {
 
 
 
-   async  searchIngredient ({ description, food_group_id, skip = 0, limit }: SearchIngredientParams): Promise<PaginatedListType<TypeIngredientDraft>> {
+   async  searchIngredient ({ description, food_group_id, skip = 0, limit }: SearchIngredientParams): Promise<TypePaginatedList<TypeIngredientDraft>> {
       const descriptionConditionList = (description?.trim().split(/\s+/) ?? []).filter(Boolean).map((entry) => {
          return { column: 'description', operation: 'ILIKE', value: `%${ entry }%` };
       });
@@ -128,7 +128,7 @@ export class IngredientsRepository {
 
 
 
-   async searchConversionOption (food_id: number, { skip = 0, limit }: { skip?: number, limit?: number } ): Promise<PaginatedListType<TypeIngredientConversion>> {
+   async searchConversionOption (food_id: number, { skip = 0, limit }: { skip?: number, limit?: number } ): Promise<TypePaginatedList<TypeIngredientConversion>> {
 
       // get a list of all possible conversionFactors from the conversion_factor table
       const { list: incompleteConversionFactorList, count } = await postgresQueryBuilder('SELECT food_id, measure_id, value FROM conversion_factor', {

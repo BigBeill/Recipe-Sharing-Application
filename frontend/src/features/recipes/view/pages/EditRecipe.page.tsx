@@ -35,7 +35,7 @@ export default function EditRecipePage({ recipe }: ComponentParams ) {
 	}
 
 	const saveMutator = useServiceMutation(async () => {
-		await recipeService.update(recipe._id, (await harvestRefsObject(refs)));
+		await recipeService.update(recipe, (await harvestRefsObject(refs)));
 		router.push('/recipes');
 	});
 
@@ -49,7 +49,7 @@ export default function EditRecipePage({ recipe }: ComponentParams ) {
 		<NotebookPage components={ {
 			list: [
 				<EditRecipeShardSetTitle newRecipe={ !('_id' in recipe) } refs={ { title: refs.title, description: refs.description } } initial={ { title: recipe.title, description: recipe.description } } />,
-				<EditRecipeShardSetImage refs={ { image: refs.imageReference, visibility: refs.visibility } } initial={ { imageReference: recipe.imageReference || undefined, visibility: recipe.visibility } } />,
+				<EditRecipeShardSetImage refs={ { image: refs.imageReference, visibility: refs.visibility } } initial={ { signedImageUrl: recipe.signedImageUrl || undefined, visibility: recipe.visibility } } />,
 				<EditRecipeShardSetIngredientList refs={ { ingredientList: refs.ingredientList } } initial={ { ingredientList: recipe.ingredientList } } />,
 				<EditRecipeShardSetInstructionList refs={ { instructionList: refs.instructionList } } initial={ { instructionList: recipe.instructionList } } />,
 				<EditRecipeShardSubmit saveMutator={ saveMutator } deleteMutator={ deleteMutator } />,

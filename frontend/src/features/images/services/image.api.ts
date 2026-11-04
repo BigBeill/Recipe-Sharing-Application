@@ -3,14 +3,6 @@ import { TypeImageReference } from "../domain/image.types";
 
 export function createImageApi(call: TypeApiCaller) {
    return {
-
-      get: (_id: string) => {
-         return call<string>({
-            url: `/images/get/${_id}`,
-            method: 'get',
-         });
-      },
-
       upload: (location: 'users' | 'recipes', file: File) => {
          const body = new FormData();
          body.append('location', location);

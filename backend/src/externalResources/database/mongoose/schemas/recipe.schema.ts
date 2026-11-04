@@ -60,7 +60,7 @@ export type RecordNutrition = InferSchemaType<typeof nutritionSchema>;
 
 
 const recipeDefinition = {
-    ownerId: { type: Schema.Types.ObjectId, required: true },
+    ownerId: { type: Schema.Types.ObjectId, required: true, immutable: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
     imageReferenceId: { type: Schema.Types.ObjectId },

@@ -1,16 +1,15 @@
 import type { PermissionsService } from "../../permissions/permissions.service";
-import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import type { RecipesRepository } from "../infrastructure/recipes.repository";
 import type { IngredientsService } from "../../ingredients/application/ingredients.service";
 import type { TypeNutrition, TypeRecipe, TypeRecipeDraft } from "../domain/recipes.types";
 import type { TypeIngredient } from "../../ingredients/domain/ingredients.types";
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
-import type { AuthIdParam } from "../../../common/api/authIdParam";
 import { NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { ImagesService } from "../../images/application/images.service";
 import type { Types } from "mongoose";
 import type { TypeImageReference } from "../../images/domain/images.types";
 import type { RecordRecipe } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
+import type { TypeAuthId, TypePaginatedList } from "../../../common/domain/types.common";
 
 interface GetRecipeListParams { 
    authId?: Types.ObjectId,
@@ -58,7 +57,7 @@ export class RecipesService {
 
 
 
-   async create(recipeDraft: TypeRecipeDraft, params: AuthIdParam): Promise<TypeRecipe> {
+   async create(recipeDraft: TypeRecipeDraft, params: TypeAuthId): Promise<TypeRecipe> {
       const { authId } = params;
       if (!authId) { throw new UnauthorizedError(); }
 
@@ -74,7 +73,7 @@ export class RecipesService {
 
 
 
-   async delete(_id: Types.ObjectId, { authId }: AuthIdParam): Promise<boolean> {
+   async delete(_id: Types.ObjectId, { authId }: TypeAuthId): Promise<boolean> {
       const recipe = await this.repository.get(_id);
       if (!recipe) { throw new NotFoundError('Recipe not found'); }
       if (!recipe.ownerId.equals(authId)) { throw new UnauthorizedError(); }
@@ -85,7 +84,7 @@ export class RecipesService {
 
 
 
-   async deleteMany(ownerId: Types.ObjectId, { authId }: AuthIdParam): Promise<boolean> {
+   async deleteMany(ownerId: Types.ObjectId, { authId }: TypeAuthId): Promise<boolean> {
 
       // get all the recipes that need to be deleted
       const recipes = await this.repository.search({ ownerIdList: [ownerId], authId,  visibilityList: ['public', 'personal', 'private'] });
@@ -101,7 +100,7 @@ export class RecipesService {
 
 
 
-   async get(_id: Types.ObjectId, { authId }: AuthIdParam): Promise<TypeRecipe> {
+   async get(_id: Types.ObjectId, { authId }: TypeAuthId): Promise<TypeRecipe> {
       const recipeRecord = await this.repository.get(_id);
 
       // ? check for any reason a person should not be allowed to view this recipe
@@ -120,13 +119,13 @@ export class RecipesService {
 
 
 
-   async populate(recipeRecord: RecordRecipe, knownFields?: { imageReference?: TypeImageReference, ingredientList?: TypeIngredient[] }): Promise<TypeRecipe> {
+   async populate(recipeRecord: RecordRecipe, knownFields?: { signedImageUrl?: string, ingredientList?: TypeIngredient[] }): Promise<TypeRecipe> {
       const { imageReferenceId, ...normalizedRecipe } = removeMongooseNoise(recipeRecord);
 
-      const fetchImageReference = async (): Promise<TypeImageReference | undefined> => {
-         if(knownFields?.imageReference) { return knownFields.imageReference; }
+      const fetchSignedImageUrl = async (): Promise<string | undefined> => {
+         if(knownFields?.signedImageUrl) { return knownFields.signedImageUrl; }
          else if(!imageReferenceId) { return undefined; }
-         else { return await this.imagesService.getImageReference(imageReferenceId); }
+         else { return await this.imagesService.getSignedURL(imageReferenceId); }
       }
 
       const fetchIngredientList = async (): Promise<TypeIngredient[]> => {
@@ -134,17 +133,17 @@ export class RecipesService {
          else { return await Promise.all(normalizedRecipe.ingredientList.map(async (ingredient) => { return await this.ingredientsService.populate(ingredient); }) ); }
       }
 
-      const [imageReference, ingredientList] = await Promise.all([
-         fetchImageReference(),
+      const [signedImageUrl, ingredientList] = await Promise.all([
+         fetchSignedImageUrl(),
          fetchIngredientList(),
       ]);
 
-      return { ...normalizedRecipe, imageReference, ingredientList };
+      return { ...normalizedRecipe, signedImageUrl, ingredientList };
    }
 
 
 
-   async search(params: GetRecipeListParams): Promise<PaginatedListType<TypeRecipe>> {
+   async search(params: GetRecipeListParams): Promise<TypePaginatedList<TypeRecipe>> {
       const { authId, title, ownerIdList = [], ingredientIdList, visibilityList = ['public'], skip = 0, limit = 12 } = params;
 
       let allowedOwnerIdList = ownerIdList;
@@ -174,7 +173,7 @@ export class RecipesService {
 
 
 
-   async update(_id: Types.ObjectId, updateFields: Partial<TypeRecipeDraft>, params: AuthIdParam): Promise<TypeRecipe> {
+   async update(_id: Types.ObjectId, updateFields: Partial<TypeRecipeDraft>, params: TypeAuthId): Promise<TypeRecipe> {
       const { authId } = params;
       if(!authId) { throw new UnauthorizedError("AuthId was not provided to recipeService.update"); }
       console.log(updateFields);
@@ -188,7 +187,8 @@ export class RecipesService {
       ]);
 
       const returnedRecord = await this.repository.update(_id, { ...updateFields, nutrition, imageReferenceId: imageReference?._id });
-      return this.populate(returnedRecord, { imageReference: imageReference, ingredientList: updateFields.ingredientList });
+      const signedImageUrl = imageReference ? await this.imagesService.getSignedURL(imageReference._id) : undefined;
+      return this.populate(returnedRecord, { signedImageUrl: signedImageUrl, ingredientList: updateFields.ingredientList });
    }
    
 }

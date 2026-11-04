@@ -4,3 +4,5 @@ export interface TypeImageReference {
    key: string,
    status: "active" | "deleting" | "pending",
 }
+
+export type TypeSignedImageUrl = string;

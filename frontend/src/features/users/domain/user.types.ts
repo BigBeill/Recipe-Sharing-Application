@@ -1,15 +1,21 @@
-import { TypeImageReference } from "@/features/images/domain/image.types";
+import { TypeImageReference, TypeSignedImageUrl } from "@/features/images/domain/image.types";
 
-export interface TypeUserDraft {
+export type TypeUser = {
+   _id: string;
    name: string;
    email?: string;
    bio?: string;
-   imageReference?: TypeImageReference;
-}
-export interface TypeUser extends TypeUserDraft{
-   _id: string;
+   signedImageUrl?: TypeSignedImageUrl;
    relationship?: TypeRelationship | null;
 }
+
+export type TypeUserDraft = Omit<TypeUser,
+      | '_id'
+      | 'relationship'
+      | 'signedImageUrl'
+   > & {
+      imageReference?: TypeImageReference;
+   }
 
 export interface TypeRelationship {
    _id: string;

@@ -1,6 +1,6 @@
 import { t } from "elysia"
 
-export const NutritionValidator = t.Object({
+export const ValidatorCommonNutrition = t.Object({
    calories: t.Number(),
    fat: t.Number(),
    cholesterol: t.Number(),

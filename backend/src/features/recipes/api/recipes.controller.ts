@@ -1,12 +1,10 @@
-import Elysia, { status } from "elysia";
+import Elysia, { status, t } from "elysia";
 import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
-import { IdParamsValidator } from "../../../common/api/validators/id.validator";
 import { recipesService } from "../../../container";
-import { SearchValidator } from "./validators/search.validator";
-import { DepartingRecipeValidator } from "../../../global/departingData/validators/departingRecipe.validator";
-import { DepartingPaginatedList } from "../../../global/departingData/validators/departingPaginatedList";
-import { RecipeDraftValidator } from "./validators/recipeDraft.Validator";
-import { ValidatorRecipesUpdate } from "./validators/update.validator";
+import { ValidatorCommonMongooseId } from "../../../common/domain/validators/mongooseId.validator";
+import { ValidatorCommonRecipe, ValidatorCommonRecipeDraft } from "../domain/validators/recipe.validator";
+import { ValidatorIncomingRecipesSearchBody } from "./validators/search.validator";
+import { ValidatorCommonPaginatedList } from "../../../common/domain/validators/pagination.validator";
 
 const service = recipesService;
 
@@ -26,8 +24,8 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
          return status(200, recipe);
       },
       {
-         params: IdParamsValidator,
-         response: DepartingRecipeValidator,
+         params: t.Object({ _id: ValidatorCommonMongooseId }),
+         response: ValidatorCommonRecipe,
       }
    )
 
@@ -40,8 +38,8 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
          return status(200, recipes)
       },
       {
-         query: SearchValidator,
-         response: DepartingPaginatedList(DepartingRecipeValidator),
+         query: ValidatorIncomingRecipesSearchBody,
+         response: ValidatorCommonPaginatedList(ValidatorCommonRecipe),
       }
    )
 
@@ -58,8 +56,8 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
          return status(201, recipe);
       },
       {
-         body: RecipeDraftValidator,
-         response: { 201: DepartingRecipeValidator }
+         body: ValidatorCommonRecipeDraft,
+         response: { 201: ValidatorCommonRecipe }
       }
    )
 
@@ -72,8 +70,8 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
          return status(201, updatedRecipe);
       },
       {
-         params: IdParamsValidator,
-         body: ValidatorRecipesUpdate,
-         response: { 201: DepartingRecipeValidator }
+         params: t.Object({ _id: ValidatorCommonMongooseId }),
+         body: t.Partial(ValidatorCommonRecipeDraft),
+         response: { 201: ValidatorCommonRecipe }
       }
    )

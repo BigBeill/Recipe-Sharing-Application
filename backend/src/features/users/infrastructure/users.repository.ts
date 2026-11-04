@@ -1,11 +1,11 @@
 import type { Types } from "mongoose";
-import type { PaginatedListType } from "../../../common/api/apiResponse.types";
 import { escapeRegex } from "../../../common/utils/filter";
 import { FriendRequestModel, type FriendRequestRecord } from "../../../externalResources/database/mongoose/schemas/friendRequest.schema";
 import { FriendshipModel, type FriendshipRecord } from "../../../externalResources/database/mongoose/schemas/friendship.schema";
 import { UserModel, type UserRecord } from "../../../externalResources/database/mongoose/schemas/user.schema";
 import type { TypeRelationship } from "../domain/users.types";
 import { NotFoundError } from "elysia";
+import type { TypePaginatedList } from "../../../common/domain/types.common";
 
 interface SearchUserParams {
    _id?: Types.ObjectId,
@@ -116,7 +116,7 @@ export class UsersRepository {
 
 
 
-   async searchUser({ _id, name, email, skip, limit, searchExact = false }: SearchUserParams): Promise<PaginatedListType<UserRecord>> {
+   async searchUser({ _id, name, email, skip, limit, searchExact = false }: SearchUserParams): Promise<TypePaginatedList<UserRecord>> {
       const resultList = await UserModel.aggregate<{
          recordList: UserRecord[];
          countList: { count: number }[];

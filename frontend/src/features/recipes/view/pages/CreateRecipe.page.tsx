@@ -28,16 +28,14 @@ export default function CreateRecipePage({ recipe }: ComponentParams ) {
    const refs = {
       title: useRef<DataHandle<string>>(null),
       description: useRef<DataHandle<string>>(null),
-      image: useRef<DataHandle<TypeImageReference | undefined>>(null),
+      imageReference: useRef<DataHandle<TypeImageReference | undefined>>(null),
       visibility: useRef<DataHandle<'public' | 'private' | 'personal'>>(null),
       ingredientList: useRef<DataHandle<IngredientType[]>>(null),
       instructionList: useRef<DataHandle<string[]>>(null),
    }
 
    const saveMutator = useServiceMutation(async () => {
-      await recipeService.create({
-         ...await harvestRefsObject(refs),
-      });
+      await recipeService.create((await harvestRefsObject(refs)));
       router.push('/recipes');
    });
 
@@ -50,7 +48,7 @@ export default function CreateRecipePage({ recipe }: ComponentParams ) {
       <NotebookPage components={ {
          list: [
             <EditRecipeShardSetTitle newRecipe={ !('_id' in recipe) } refs={ { title: refs.title, description: refs.description } } initial={ { title: recipe.title, description: recipe.description } } />,
-            <EditRecipeShardSetImage refs={ { image: refs.image, visibility: refs.visibility } } initial={ { imageReference: undefined, visibility: recipe.visibility } } />,
+            <EditRecipeShardSetImage refs={ { image: refs.imageReference, visibility: refs.visibility } } initial={ { signedImageUrl: undefined, visibility: recipe.visibility } } />,
             <EditRecipeShardSetIngredientList refs={ { ingredientList: refs.ingredientList } } initial={ { ingredientList: recipe.ingredientList } } />,
             <EditRecipeShardSetInstructionList refs={ { instructionList: refs.instructionList } } initial={ { instructionList: recipe.instructionList } } />,
             <EditRecipeShardSubmit saveMutator={ saveMutator } deleteMutator={ deleteMutator } />,
