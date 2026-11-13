@@ -1,26 +1,24 @@
 import Elysia, { status, t } from "elysia";
-import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
-import { recipesService } from "../../../container";
+import { authenticateMiddleware } from "../../authentication/authentication.middleware";
 import { ValidatorCommonMongooseId } from "../../../common/domain/validators/mongooseId.validator";
 import { ValidatorCommonRecipe, ValidatorCommonRecipeDraft } from "../domain/validators/recipe.validator";
 import { ValidatorIncomingRecipesSearchBody } from "./validators/search.validator";
 import { ValidatorCommonPaginatedList } from "../../../common/domain/validators/pagination.validator";
-
-const service = recipesService;
+import type { RecipesService } from "../application/recipes.service";
+import { authorizeMiddleware } from "../../authorization/authorization.middleware";
 
 export const recipesController = new Elysia({ prefix: '/recipes' })
-
-
-
-   //* Routes past this point use but do not require an accessToken
    .use(authenticateMiddleware)
+   .derive(({ scope }) => ({
+      service: scope.resolve<RecipesService>("recipesService"),
+   }))
 
 
 
    .get( '/get/:_id',
-      async ({ authId, params }) => {
+      async ({ service, params }) => {
          const { _id } = params;
-         const recipe = await service.get(_id, { authId });
+         const recipe = await service.get(_id);
          return status(200, recipe);
       },
       {
@@ -32,9 +30,9 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
 
 
    .get( '/search', 
-      async ({ authId, query }) => {
+      async ({ service, query }) => {
          const { title, ownerIdList, ingredientIdList, visibilityList, limit, skip } = query;
-         const recipes = await service.search({ authId, title, ownerIdList, ingredientIdList, visibilityList, skip, limit });
+         const recipes = await service.search({ title, ownerIdList, ingredientIdList, visibilityList, skip, limit });
          return status(200, recipes)
       },
       {
@@ -45,14 +43,13 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
 
 
 
-   //* Routes past this point require an access token
    .use(authorizeMiddleware)
 
 
 
    .post( '/create',
-      async ({ authId, body }) => {
-         const recipe = await service.create(body, { authId })
+      async ({ service, body }) => {
+         const recipe = await service.create(body)
          return status(201, recipe);
       },
       {
@@ -64,9 +61,9 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
 
 
    .put( '/update/:_id',
-      async ({ authId, body, params }) => {
+      async ({ body, params, service }) => {
          const { _id } = params;
-         const updatedRecipe = await service.update(_id, body, { authId });
+         const updatedRecipe = await service.update(_id, body);
          return status(201, updatedRecipe);
       },
       {

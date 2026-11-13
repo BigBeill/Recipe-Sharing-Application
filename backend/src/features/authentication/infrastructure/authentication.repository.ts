@@ -3,7 +3,8 @@ import { RefreshTokenModel, type RefreshTokenRecord } from "../../../externalRes
 import { UserModel, type UserRecord } from "../../../externalResources/database/mongoose/schemas/user.schema";
 import { PasswordResetTokenModel, type PasswordResetTokenRecord } from "../../../externalResources/database/mongoose/schemas/passwordResetToken.schema";
 import type { TypeUserDraft } from "../auth.types";
-import { NotFoundError } from "../../../global/departingData/errorClasses";
+import { NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
+import { Protected, ProtectedRepository } from "../../authorization/decorators/ProtectedRepository";
 
 type UserWithPassword = UserRecord & { passwordHash: string; };
 
@@ -13,7 +14,8 @@ interface createRefreshTokenParams {
    expiresAt: Date;
 }
 
-export class AuthRepository {
+export class AuthenticationRepository extends ProtectedRepository {
+   readonly resourceName = 'authentication';
 
 
 
@@ -77,16 +79,17 @@ export class AuthRepository {
 
    async getUser(_id: Types.ObjectId): Promise<UserRecord> {
       const userRecord = await UserModel.findById(_id).lean();
-      if (!userRecord) { throw new NotFoundError(`Database could not find user: ${_id}`) }
+      if (!userRecord) { throw new NotFoundError('user') }
       else { return userRecord; }
    }
 
 
 
    //! VALUES FROM THIS REPOSITORY CONTAINS CONFIDENTIAL INFORMATION THAT SHOULD NOT BE RETURNED TO THE FRONTEND (returned object contains passwordHash)
-   async getUserWithPasswordIncluded(_id: Types.ObjectId): Promise<UserWithPassword> {
-      const userRecord = await UserModel.findOne({ _id }).select('+passwordHash').lean<UserWithPassword>();
-      if (!userRecord) { throw new NotFoundError(`Database could not find user: ${_id}`); }
+   @Protected
+   async getUserWithPasswordIncluded(): Promise<UserWithPassword> {
+      const userRecord = await UserModel.findOne({ _id: this.clientId }).select('+passwordHash').lean<UserWithPassword>();
+      if (!userRecord) { throw new NotFoundError('user'); }
       else { return userRecord; }
    }
 
@@ -107,8 +110,9 @@ export class AuthRepository {
 
    
 
-   async updatePassword(_id: Types.ObjectId, passwordHash: string): Promise<void> {
-      const result = await UserModel.updateOne({ _id }, { $set: { passwordHash } });
-      if (result.matchedCount === 0) { throw new NotFoundError(`Database could not find user: ${_id}`); }
+   @Protected
+   async updatePassword(passwordHash: string): Promise<void> {
+      const result = await UserModel.updateOne({ _id: this.clientId }, { $set: { passwordHash } });
+      if (result.matchedCount === 0) { throw new NotFoundError(); }
    }
 }

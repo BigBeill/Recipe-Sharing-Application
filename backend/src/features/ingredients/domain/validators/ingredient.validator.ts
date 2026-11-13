@@ -14,3 +14,9 @@ export const ValidatorCommonIngredient = t.Object({
    }),
    nutrition: t.Optional(ValidatorCommonNutrition),
 });
+
+export const ValidatorCommonIngredientDraft = t.Omit(ValidatorCommonIngredient, [
+   'label',
+   'portion',
+   'nutrition',
+]);

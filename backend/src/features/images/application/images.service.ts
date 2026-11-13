@@ -5,7 +5,6 @@ import { UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { Types } from "mongoose";
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
 import type { TypeImageReference } from "../domain/images.types";
-import type { TypeAuthId } from "../../../common/domain/types.common";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 
@@ -33,9 +32,8 @@ export class ImagesService {
 
 
 
-   async claimImage(_id: Types.ObjectId, { authId }: TypeAuthId): Promise<TypeImageReference> {
+   async claimImage(_id: Types.ObjectId): Promise<TypeImageReference> {
       const imageRecord = await this.repository.getImageReference(_id);
-      if (!imageRecord.owner.equals(authId)) { throw new UnauthorizedError(); }
       await this.repository.updateImageReferenceStatus(imageRecord._id, 'active');
       return { ...removeMongooseNoise(imageRecord), status: 'active' }
    }
@@ -65,7 +63,7 @@ export class ImagesService {
 
 
    async delete(_id: Types.ObjectId): Promise<void> {
-      const imageRecord = await this.repository.getImageReference(_id);
+      const imageRecord = await this.repository.updateImageReferenceStatus(_id, 'deleting');
       await bucketClient.file(imageRecord.key).delete();
       await this.repository.deleteImageReference(_id);
    }
@@ -85,8 +83,8 @@ export class ImagesService {
 
 
 
-   async pushImage(location: ('recipes' | 'users'), file: File, { authId }: TypeAuthId): Promise<TypeImageReference> {
-      if (!authId){ throw new UnauthorizedError(); }
+   async pushImage(location: ('recipes' | 'users'), file: File): Promise<TypeImageReference> {
+
       if (file.size > MAX_BYTES) { throw new Error("Image too large"); }
 
       const header = new Uint8Array(await file.arrayBuffer()).subarray(0, 12);
@@ -95,15 +93,15 @@ export class ImagesService {
 
       const key = `${location}/${randomUUID()}`;
       await bucketClient.file(key).write(file, { type: "image/webp" });
-      const imageReference = await this.repository.createImageReference({ key, owner: authId, status: 'pending' });
+      const imageReference = await this.repository.createImageReference({ key, status: 'pending' });
 
       return imageReference;
    }
 
 
 
-   async update(oldImageReferenceId: Types.ObjectId | undefined, newImageReference: TypeImageReference, { authId }: TypeAuthId): Promise<TypeImageReference> {
-      this.claimImage(newImageReference._id, { authId });
+   async update(oldImageReferenceId: Types.ObjectId | undefined, newImageReference: TypeImageReference): Promise<TypeImageReference> {
+      this.claimImage(newImageReference._id);
       if (!oldImageReferenceId) { return newImageReference; }
       else {
          const oldImageReference = await this.getImageReference(oldImageReferenceId);

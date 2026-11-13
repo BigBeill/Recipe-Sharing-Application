@@ -1,6 +1,5 @@
 import { Elysia, status, t } from 'elysia';
-import { authenticateMiddleware, authorizeMiddleware } from '../auth.middleware';
-import { authService } from '../../../container';
+import { authenticateMiddleware } from '../authentication.middleware';
 import { NotFoundError } from '../../../global/departingData/errorClasses';
 import { ValidatorCommonMongooseId } from '../../../common/domain/validators/mongooseId.validator';
 import { ValidatorIncomingAuthLoginBody } from './validators/login.validator';
@@ -8,15 +7,16 @@ import { ValidatorIncomingAuthRegisterBody } from './validators/register.validat
 import { ValidatorIncomingAuthRequestPasswordResetBody } from './validators/requestPasswordReset.validator';
 import { ValidatorIncomingAuthResetPasswordBody } from './validators/resetPassword.validator';
 import { ValidatorIncomingAuthChangePasswordBody } from './validators/changePassword.validator';
+import type { AuthenticationService } from '../application/authentication.service';
+import { authorizeMiddleware } from '../../authorization/authorization.middleware';
 
-const service = authService;
-
-export const authController = new Elysia({ prefix: '/auth' })
-
-
-
-   .post( '/login',
-      async ({ body, cookie: { accessToken, refreshToken } }) => {
+export const authenticationController = new Elysia({ prefix: '/auth' })
+   .use(authenticateMiddleware)
+   .derive(({ scope }) => ({
+      service: scope.resolve<AuthenticationService>('authenticationService'),
+   }))
+   .post( '/login', 
+      async ({ body, cookie: { accessToken, refreshToken }, service }) => {
          const { name, password, rememberMe } = body;
 
          const authResult = await service.login({ name, password, rememberMe });
@@ -46,7 +46,7 @@ export const authController = new Elysia({ prefix: '/auth' })
 
 
    .post( '/refresh',
-      async ({ cookie: { accessToken, refreshToken } }) => {
+      async ({ cookie: { accessToken, refreshToken }, service }) => {
 
          const authResult = await service.refresh(refreshToken.value);
 
@@ -74,7 +74,7 @@ export const authController = new Elysia({ prefix: '/auth' })
 
 
    .post( '/register',
-      async ({ body, cookie: { accessToken, refreshToken } }) => {
+      async ({ body, cookie: { accessToken, refreshToken }, service }) => {
          const { name, email, password } = body;
 
          const authResult = await service.register({ name, email, password });
@@ -103,7 +103,7 @@ export const authController = new Elysia({ prefix: '/auth' })
 
 
    .post('/requestPasswordReset',
-      async ({ body }) => {
+      async ({ body, service }) => {
          const { email } = body;
 
          // ? catch any not found errors and return as if the request was a success (prevents an enumeration attack)
@@ -120,7 +120,7 @@ export const authController = new Elysia({ prefix: '/auth' })
 
 
    .post('/resetPassword',
-      async ({ body }) => {
+      async ({ body, service }) => {
          const { password, token } = body;
          await service.resetPassword(password, token);
          return status(204);
@@ -132,15 +132,14 @@ export const authController = new Elysia({ prefix: '/auth' })
 
 
 
-   .use(authenticateMiddleware)
-   .use(authorizeMiddleware) // * Routes past this point require a valid accessToken to use
+   .use(authorizeMiddleware)
 
 
 
    .post( '/changePassword',
-      async ({ body, authId }) => {
+      async ({ body, service }) => {
          const { oldPassword, newPassword } = body;
-         await service.changePassword(oldPassword, newPassword, { authId });
+         await service.changePassword({ oldPassword, newPassword });
          return status(201);
       },
       {
@@ -151,8 +150,8 @@ export const authController = new Elysia({ prefix: '/auth' })
 
 
    .get( '/status', 
-      ({ authId }) => {
-         return status(200, authId)
+      ({ authorization }) => {
+         return status(200, authorization.id);
       },
       {
          response: { 200: ValidatorCommonMongooseId }
@@ -162,7 +161,7 @@ export const authController = new Elysia({ prefix: '/auth' })
 
 
    .post( '/logout',
-      async ({ cookie: { accessToken, refreshToken } }) => {
+      async ({ cookie: { accessToken, refreshToken }, service }) => {
          await service.deleteRefreshToken(refreshToken.value);
 
          // * set cookies

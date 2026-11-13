@@ -1,5 +1,5 @@
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
-import type { AuthService } from "../../auth/application/auth.service";
+import type { AuthService } from "../../authentication/application/authentication.service";
 import type { RecipesService } from "../../recipes/application/recipes.service";
 import type { UsersRepository } from "../infrastructure/users.repository";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";

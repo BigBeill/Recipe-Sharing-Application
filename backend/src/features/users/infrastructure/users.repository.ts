@@ -4,8 +4,9 @@ import { FriendRequestModel, type FriendRequestRecord } from "../../../externalR
 import { FriendshipModel, type FriendshipRecord } from "../../../externalResources/database/mongoose/schemas/friendship.schema";
 import { UserModel, type UserRecord } from "../../../externalResources/database/mongoose/schemas/user.schema";
 import type { TypeRelationship } from "../domain/users.types";
-import { NotFoundError } from "elysia";
 import type { TypePaginatedList } from "../../../common/domain/types.common";
+import { NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
+import { Protected, ProtectedRepository } from "../../authorization/decorators/ProtectedRepository";
 
 interface SearchUserParams {
    _id?: Types.ObjectId,
@@ -23,60 +24,74 @@ interface UpdateUserParams {
    imageReferenceId?: Types.ObjectId,
 }
 
-export class UsersRepository {
+export class UsersRepository extends ProtectedRepository{
+   readonly resourceName = "users";
 
-   async createFriendRequest(userId: Types.ObjectId, targetId: Types.ObjectId): Promise<FriendRequestRecord> {
-      const friendRequest = await FriendRequestModel.create({ senderId: userId, receiverId: targetId });
+
+
+   @Protected
+   async createFriendRequest(targetId: Types.ObjectId): Promise<FriendRequestRecord> {
+      const friendRequest = await FriendRequestModel.create({ senderId: this.clientId, receiverId: targetId });
       return friendRequest.toObject();
    }
 
 
 
-   async createFriendship(friendIds: [string, string]): Promise<FriendshipRecord> {
-      const friendship = await FriendshipModel.create({ friendIds });
-      return friendship.toObject();
+   @Protected
+   async createFriendship(targetId: Types.ObjectId): Promise<FriendshipRecord> {
+      const pendingFriendRequestRecord = FriendRequestModel.findOneAndDelete({ receiverId: this.authorization.id, senderId: targetId });
+      if (!pendingFriendRequestRecord) { throw new NotFoundError(); }
+      const friendship = await FriendshipModel.create({ friendIds: [this.clientId, targetId] });
+      return friendship;
    }
 
 
 
+   @Protected
    async deleteFriendRequest(_id: Types.ObjectId) {
-      await FriendRequestModel.deleteOne({ _id });
+      const deleteResponse = await FriendRequestModel.deleteOne({ $match: { _id, $or: [{ senderId: this.clientId }, { receiverId: this.clientId }] } });
+      if (deleteResponse.deletedCount === 0) { throw new NotFoundError(); }
    }
 
 
 
+   @Protected
    async deleteFriendship(_id: Types.ObjectId) {
-      await FriendshipModel.deleteOne({ _id });
+      const deleteResponse = await FriendshipModel.deleteOne({ _id, friendIds: this.authorization.id });
+      if (deleteResponse.deletedCount === 0) { throw new NotFoundError(); }
    }
 
 
 
+   @Protected
    async deleteUser(_id: Types.ObjectId): Promise<void> {
-      await UserModel.deleteOne({ _id });
+      const deleteResponse = await UserModel.deleteOne({ _id });
+      if (deleteResponse.deletedCount === 0) { throw new NotFoundError(); }
    }
 
 
 
-   async findRelationship(params: { ownerId: Types.ObjectId, targetId: Types.ObjectId, skipRequests?: boolean, skipFriendships?: boolean }): Promise<TypeRelationship | null> {
-      const { ownerId, targetId, skipRequests = false, skipFriendships = false } = params;
+   @Protected
+   async findRelationship(params: { targetId: Types.ObjectId, skipRequests?: boolean, skipFriendships?: boolean }): Promise<TypeRelationship | null> {
+      const { targetId, skipRequests = false, skipFriendships = false } = params;
 
       if (!skipRequests) {
          const friendRequestRecord = await FriendRequestModel.findOne({
             $or: [
-               { senderId: ownerId, receiverId: targetId },
-               { senderId: targetId, receiverId: ownerId },
+               { senderId: this.authorization.id, receiverId: targetId },
+               { senderId: targetId, receiverId: this.authorization.id },
             ],
          }).lean();
 
          if (friendRequestRecord !== null) {
-            if (ownerId.equals(friendRequestRecord.senderId)) { return { _id: friendRequestRecord._id, ownerId, targetId, type: "requestSent" } }
-            else { return { _id: friendRequestRecord._id, ownerId, targetId, type: "requestReceived" } } 
+            if (this.clientId.equals(friendRequestRecord.senderId)) { return { _id: friendRequestRecord._id, ownerId: this.clientId, targetId, type: "requestSent" } }
+            else { return { _id: friendRequestRecord._id, ownerId: this.clientId, targetId, type: "requestReceived" } } 
          }
       }
 
       if (!skipFriendships) {
-         const friendship = await FriendshipModel.findOne({ friendIds: { $all: [ownerId, targetId] } }).lean();
-         if (friendship != null) { return { _id: friendship._id, targetId, ownerId, type: 'friend' } }
+         const friendship = await FriendshipModel.findOne({ friendIds: { $all: [this.authorization.id, targetId] } }).lean();
+         if (friendship != null) { return { _id: friendship._id, targetId, ownerId: this.clientId, type: 'friend' } }
       }
 
       return null;
@@ -84,9 +99,10 @@ export class UsersRepository {
 
 
 
+   @Protected
    async getFriendRequest(_id: Types.ObjectId): Promise<FriendRequestRecord> {
       const friendRequestRecord = await FriendRequestModel.findOne({ _id }).lean();
-      if (!friendRequestRecord) { throw new NotFoundError(`Database could not find friend request with _id: ${ _id }`); }
+      if (!friendRequestRecord) { throw new NotFoundError(); }
       else { return friendRequestRecord; }
    }
 
@@ -94,7 +110,7 @@ export class UsersRepository {
 
    async getFriendship(_id: Types.ObjectId): Promise<FriendshipRecord> {
       const friendshipRecord = await FriendshipModel.findOne({ _id }).lean();
-      if (!friendshipRecord) { throw new NotFoundError(`Database could not find friendship with _id: ${ _id }`) }
+      if (!friendshipRecord) { throw new NotFoundError(`friendship`) }
       else { return friendshipRecord; }
    }
 
@@ -102,7 +118,7 @@ export class UsersRepository {
 
    async getUser(_id: Types.ObjectId): Promise<UserRecord> {
       const user = await UserModel.findOne({_id }).lean<UserRecord>();
-      if (!user) { throw new NotFoundError(`Database could not find user is _id: ${ _id } `); }
+      if (!user) { throw new NotFoundError(`friendship`); }
       else { return user; }
    }
 
@@ -151,9 +167,10 @@ export class UsersRepository {
 
 
 
-   async updateUser(_id: Types.ObjectId, { name, email, bio, imageReferenceId }: UpdateUserParams): Promise<UserRecord | null> {
+   @Protected
+   async updateUser({ name, email, bio, imageReferenceId }: UpdateUserParams): Promise<UserRecord | null> {
       return UserModel.findByIdAndUpdate(
-         _id,
+         this.clientId,
          { $set: { 
             ...(name && { name }), 
             ...(email && { email }), 

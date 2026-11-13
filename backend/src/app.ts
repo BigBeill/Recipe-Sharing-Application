@@ -1,11 +1,11 @@
 import { Elysia } from 'elysia';
-import { authController } from './features/auth/api/auth.controller';
+import { authenticationController } from './features/authentication/api/authentication.controller';
 import { usersController } from './features/users/api/users.controller';
 import removeMongooseNoise from './common/utils/removeMongooseNoise';
 import { ingredientsController } from './features/ingredients/api/ingredients.controller';
 import { imagesController } from './features/images/api/images.controller';
 import { recipesController } from './features/recipes/api/recipes.controller';
-import { jwksPlugin } from './features/auth/jwk.plugin';
+import { jwksPlugin } from './features/authentication/jwk.plugin';
 import { circuitBreaker } from './global/security/circuitBreaker.root';
 import { cookieConfig } from './global/config/cookies.config';
 import { ipRateLimit } from './global/security/ipRateLimit.root';
@@ -29,7 +29,7 @@ export const app = new Elysia({ cookie: cookieConfig })
    .get('/health', () => ({ status: 'ok' }))
    .group('/api/v1', (api) =>
       api
-         .use(authController)
+         .use(authenticationController)
          .use(imagesController)
          .use(ingredientsController)
          .use(recipesController)

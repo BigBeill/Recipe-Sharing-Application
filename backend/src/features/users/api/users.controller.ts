@@ -1,5 +1,5 @@
 import Elysia, { status, t } from "elysia";
-import { authenticateMiddleware, authorizeMiddleware } from "../../auth/auth.middleware";
+import { authenticateMiddleware, authorizeMiddleware } from "../../authentication/authentication.middleware";
 import { usersService } from "../../../container";
 import { ValidatorIncomingUsersGetBody } from "./validators/get.validator";
 import { ValidatorCommonMongooseId } from "../../../common/domain/validators/mongooseId.validator";
