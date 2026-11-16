@@ -3,11 +3,13 @@ import type { IngredientsService } from "../../ingredients/application/ingredien
 import type { TypeNutrition, TypeRecipe, TypeRecipeDraft } from "../domain/recipes.types";
 import type { TypeIngredient } from "../../ingredients/domain/ingredients.types";
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
-import { UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { ImagesService } from "../../images/application/images.service";
 import type { Types } from "mongoose";
 import type { RecordRecipe, RecordRecipeDraft } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
 import type { TypePaginatedList } from "../../../common/domain/types.common";
+import { ScopeAware } from "../../../common/decorators/scopeAware";
+import type { AuthorizationService } from "../../authorization/authorization.service";
+import { Protected } from "../../authorization/decorators/Protected";
 
 interface GetRecipeListParams { 
    title?: string,
@@ -19,19 +21,23 @@ interface GetRecipeListParams {
    limit?: number,
 }
 
+@ScopeAware
 export class RecipesService { 
    private readonly repository: RecipesRepository;
    private readonly imagesService: ImagesService;
    private readonly ingredientsService: IngredientsService;
+   private readonly authorization: AuthorizationService;
 
-   constructor({ recipesRepository, imagesService, ingredientsService }: { 
+   constructor({ recipesRepository, imagesService, ingredientsService, authorization }: { 
       recipesRepository: RecipesRepository, 
       imagesService: ImagesService, 
-      ingredientsService: IngredientsService, 
+      ingredientsService: IngredientsService,
+      authorization: AuthorizationService,
    }) {
       this.repository = recipesRepository;
       this.imagesService = imagesService;
       this.ingredientsService = ingredientsService;
+      this.authorization = authorization
    }
 
 
@@ -70,10 +76,11 @@ export class RecipesService {
 
 
 
-   async deleteMany(ownerId: Types.ObjectId): Promise<void> {
+   @Protected
+   async deleteMany(): Promise<void> {
 
       // get all the recipes that need to be deleted
-      const recipes = await this.repository.search({ ownerIdList: [ownerId], visibilityList: ['public', 'personal', 'private'] });
+      const recipes = await this.repository.search({ ownerIdList: [this.authorization.requireClientId()], visibilityList: ['public', 'personal', 'private'] });
       // check for images associated with the recipes and then delete both the images and recipes
       await Promise.all(recipes.list.map(async (recipe) => {
          if (recipe.imageReferenceId) { await this.imagesService.delete(recipe.imageReferenceId); }
@@ -141,7 +148,6 @@ export class RecipesService {
 
    async update(_id: Types.ObjectId, updateFields: Partial<TypeRecipeDraft>): Promise<TypeRecipe> {
       const oldRecipeRecord = await this.repository.get(_id);
-
       const [nutrition, imageReference] = await Promise.all([
          (updateFields.ingredientList ? this.calculateNutrition({ ingredientList: updateFields.ingredientList }) : oldRecipeRecord.nutrition), // get the updated nutrition field
          (updateFields.imageReference ? this.imagesService.update(oldRecipeRecord.imageReferenceId ?? undefined, updateFields.imageReference) : undefined) // replace the image saved in the bucket

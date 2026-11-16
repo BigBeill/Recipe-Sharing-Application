@@ -157,6 +157,14 @@ export class AuthenticationService {
 
 
 
+   async verifyPassword(password: string): Promise<void> {
+      const user = await this.repository.getUserWithPasswordIncluded();
+      const passwordConfirmation = await verifyPassword(password, user.passwordHash);
+      if (passwordConfirmation !== true) { throw new UnauthorizedError('password could not be verified') }
+   }
+
+
+
    private async buildAuthResult(userId: Types.ObjectId, options: TypeBuildAuthResultOptions): Promise<TypeAuthResult> {
 
       // * create access token

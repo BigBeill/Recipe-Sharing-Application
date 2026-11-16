@@ -2,28 +2,33 @@ import { type Types } from "mongoose";
 import { NotFoundError } from "../../../global/departingData/errorClasses";
 import type { TypeImageReferenceDraft } from "../domain/images.types";
 import { ModelImageReference, type RecordImageReference } from "../../../externalResources/database/mongoose/schemas/imageReference.schema";
-import { Protected, ProtectedRepository } from "../../authorization/decorators/ProtectedRepository";
+import { Protected } from "../../authorization/decorators/Protected";
+import type { AuthorizationService } from "../../authorization/authorization.service";
 
 interface FetchParams {
    cutoff?: Date;
    statusList?: ('active' | 'deleting' | 'pending')[]
 }
 
-export class ImagesRepository extends ProtectedRepository {
-   readonly resourceName = 'images';
+export class ImagesRepository {
+   private readonly authorization: AuthorizationService;
+
+   constructor({ authorizationService }: { authorizationService: AuthorizationService }) {
+      this.authorization = authorizationService;
+   }
 
 
 
    @Protected
    async createImageReference({ key, status = 'pending' }: Omit<TypeImageReferenceDraft, 'owner'>): Promise<RecordImageReference> {
-      return await ModelImageReference.create({ key, owner: this.clientId, status });
+      return await ModelImageReference.create({ key, owner: this.authorization.requireClientId(), status });
    }
 
 
 
    @Protected
    async deleteImageReference(_id: Types.ObjectId): Promise<void> {
-      const deletedRecord = await ModelImageReference.findByIdAndDelete({ _id, owner: this.clientId });
+      const deletedRecord = await ModelImageReference.findByIdAndDelete({ _id, owner: this.authorization.requireClientId() });
       if (!deletedRecord) { throw new NotFoundError(); }
    }
 
@@ -51,7 +56,7 @@ export class ImagesRepository extends ProtectedRepository {
 
    @Protected
    async updateImageReferenceStatus(_id: Types.ObjectId , status: "pending" | "active" | "deleting"): Promise<RecordImageReference> {
-      const updatedRecord = await ModelImageReference.findOneAndUpdate({ _id, owner: this.clientId }, { status }, { runValidators: true } ).lean();
+      const updatedRecord = await ModelImageReference.findOneAndUpdate({ _id, owner: this.authorization.requireClientId() }, { status }, { runValidators: true } ).lean();
       if (!updatedRecord) { throw new NotFoundError(); }
       return updatedRecord;
    }

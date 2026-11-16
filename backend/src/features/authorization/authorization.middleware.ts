@@ -4,6 +4,7 @@ import { UnauthorizedError } from "../../global/departingData/errorClasses";
 
 export const authorizeMiddleware = new Elysia({ name: 'authenticate' })
 .use(authenticateMiddleware)
-.derive(({ authorization }) => {
-   if (!authorization.authId) { throw new UnauthorizedError('CLient needs a valid authId to access this endpoint') }
+.derive({ as: 'scoped' }, ({ authorization }) => {
+   if (!authorization?.clientId) { throw new UnauthorizedError('CLient needs a valid authId to access this endpoint') }
+   return { clientId: authorization.clientId };
 });

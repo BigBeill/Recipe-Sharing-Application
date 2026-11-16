@@ -151,7 +151,7 @@ export const authenticationController = new Elysia({ prefix: '/auth' })
 
    .get( '/status', 
       ({ authorization }) => {
-         return status(200, authorization.id);
+         return status(200, authorization.clientId);
       },
       {
          response: { 200: ValidatorCommonMongooseId }

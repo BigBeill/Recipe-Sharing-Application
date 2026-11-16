@@ -5,8 +5,9 @@ import { FriendshipModel, type FriendshipRecord } from "../../../externalResourc
 import { UserModel, type UserRecord } from "../../../externalResources/database/mongoose/schemas/user.schema";
 import type { TypeRelationship } from "../domain/users.types";
 import type { TypePaginatedList } from "../../../common/domain/types.common";
-import { NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
-import { Protected, ProtectedRepository } from "../../authorization/decorators/ProtectedRepository";
+import { NotFoundError } from "../../../global/departingData/errorClasses";
+import { Protected } from "../../authorization/decorators/Protected";
+import type { AuthorizationService } from "../../authorization/authorization.service";
 
 interface SearchUserParams {
    _id?: Types.ObjectId,
@@ -24,14 +25,17 @@ interface UpdateUserParams {
    imageReferenceId?: Types.ObjectId,
 }
 
-export class UsersRepository extends ProtectedRepository{
-   readonly resourceName = "users";
+export class UsersRepository {
+   private readonly authorization;
 
+   constructor ({ authorization }: { authorization: AuthorizationService }) {
+      this.authorization = authorization;
+   }
 
 
    @Protected
    async createFriendRequest(targetId: Types.ObjectId): Promise<FriendRequestRecord> {
-      const friendRequest = await FriendRequestModel.create({ senderId: this.clientId, receiverId: targetId });
+      const friendRequest = await FriendRequestModel.create({ senderId: this.authorization.requireClientId(), receiverId: targetId });
       return friendRequest.toObject();
    }
 
@@ -39,9 +43,9 @@ export class UsersRepository extends ProtectedRepository{
 
    @Protected
    async createFriendship(targetId: Types.ObjectId): Promise<FriendshipRecord> {
-      const pendingFriendRequestRecord = FriendRequestModel.findOneAndDelete({ receiverId: this.authorization.id, senderId: targetId });
+      const pendingFriendRequestRecord = FriendRequestModel.findOneAndDelete({ receiverId: this.authorization.requireClientId(), senderId: targetId });
       if (!pendingFriendRequestRecord) { throw new NotFoundError(); }
-      const friendship = await FriendshipModel.create({ friendIds: [this.clientId, targetId] });
+      const friendship = await FriendshipModel.create({ friendIds: [this.authorization.requireClientId(), targetId] });
       return friendship;
    }
 
@@ -49,7 +53,7 @@ export class UsersRepository extends ProtectedRepository{
 
    @Protected
    async deleteFriendRequest(_id: Types.ObjectId) {
-      const deleteResponse = await FriendRequestModel.deleteOne({ $match: { _id, $or: [{ senderId: this.clientId }, { receiverId: this.clientId }] } });
+      const deleteResponse = await FriendRequestModel.deleteOne({ $match: { _id, $or: [{ senderId: this.authorization.requireClientId() }, { receiverId: this.authorization.requireClientId() }] } });
       if (deleteResponse.deletedCount === 0) { throw new NotFoundError(); }
    }
 
@@ -57,41 +61,40 @@ export class UsersRepository extends ProtectedRepository{
 
    @Protected
    async deleteFriendship(_id: Types.ObjectId) {
-      const deleteResponse = await FriendshipModel.deleteOne({ _id, friendIds: this.authorization.id });
+      const deleteResponse = await FriendshipModel.deleteOne({ _id, friendIds: this.authorization.requireClientId() });
       if (deleteResponse.deletedCount === 0) { throw new NotFoundError(); }
    }
 
 
 
    @Protected
-   async deleteUser(_id: Types.ObjectId): Promise<void> {
-      const deleteResponse = await UserModel.deleteOne({ _id });
+   async deleteUser(): Promise<void> {
+      const deleteResponse = await UserModel.deleteOne({ _id: this.authorization.requireClientId() });
       if (deleteResponse.deletedCount === 0) { throw new NotFoundError(); }
    }
 
 
 
-   @Protected
-   async findRelationship(params: { targetId: Types.ObjectId, skipRequests?: boolean, skipFriendships?: boolean }): Promise<TypeRelationship | null> {
-      const { targetId, skipRequests = false, skipFriendships = false } = params;
+   async findRelationship(params: { ownerId: Types.ObjectId, targetId: Types.ObjectId, skipRequests?: boolean, skipFriendships?: boolean }): Promise<TypeRelationship | null> {
+      const { ownerId, targetId, skipRequests = false, skipFriendships = false } = params;
 
-      if (!skipRequests) {
+      if (!skipRequests && (ownerId.equals(this.authorization.clientId) || targetId.equals(this.authorization.clientId))) {
          const friendRequestRecord = await FriendRequestModel.findOne({
             $or: [
-               { senderId: this.authorization.id, receiverId: targetId },
-               { senderId: targetId, receiverId: this.authorization.id },
+               { senderId: ownerId, receiverId: targetId },
+               { senderId: targetId, receiverId: ownerId },
             ],
          }).lean();
 
          if (friendRequestRecord !== null) {
-            if (this.clientId.equals(friendRequestRecord.senderId)) { return { _id: friendRequestRecord._id, ownerId: this.clientId, targetId, type: "requestSent" } }
-            else { return { _id: friendRequestRecord._id, ownerId: this.clientId, targetId, type: "requestReceived" } } 
+            if (this.authorization.requireClientId().equals(friendRequestRecord.senderId)) { return { _id: friendRequestRecord._id, ownerId: this.authorization.requireClientId(), targetId, type: "requestSent" } }
+            else { return { _id: friendRequestRecord._id, ownerId: this.authorization.requireClientId(), targetId, type: "requestReceived" } } 
          }
       }
 
       if (!skipFriendships) {
-         const friendship = await FriendshipModel.findOne({ friendIds: { $all: [this.authorization.id, targetId] } }).lean();
-         if (friendship != null) { return { _id: friendship._id, targetId, ownerId: this.clientId, type: 'friend' } }
+         const friendship = await FriendshipModel.findOne({ friendIds: { $all: [this.authorization.requireClientId(), targetId] } }).lean();
+         if (friendship != null) { return { _id: friendship._id, targetId, ownerId: this.authorization.requireClientId(), type: 'friend' } }
       }
 
       return null;
@@ -170,7 +173,7 @@ export class UsersRepository extends ProtectedRepository{
    @Protected
    async updateUser({ name, email, bio, imageReferenceId }: UpdateUserParams): Promise<UserRecord | null> {
       return UserModel.findByIdAndUpdate(
-         this.clientId,
+         this.authorization.requireClientId(),
          { $set: { 
             ...(name && { name }), 
             ...(email && { email }), 

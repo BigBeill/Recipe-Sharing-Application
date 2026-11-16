@@ -10,6 +10,7 @@ import { IngredientsService } from "./features/ingredients/application/ingredien
 import { UsersRepository } from "./features/users/infrastructure/users.repository";
 import { ImagesRepository } from "./features/images/infrastructure/images.repository";
 import { AuthorizationService } from "./features/authorization/authorization.service";
+import { AuthorizationRepository } from "./features/authorization/authorization.repository";
 
 export const container = createContainer({ strict: true });
 
@@ -17,10 +18,12 @@ container.register({
    authId: asValue<string | null | undefined>(undefined),
 
    authenticationRepository: asClass(AuthenticationRepository).scoped(),
+   authorizationRepository: asClass(AuthorizationRepository).scoped(),
    recipesRepository: asClass(RecipesRepository).scoped(),
    usersRepository: asClass(UsersRepository).scoped(),
    imagesRepository: asClass(ImagesRepository).scoped(),
    ingredientsRepository: asClass(IngredientsRepository).scoped(),
+
    authenticationService: asClass(AuthenticationService).scoped(),
    authorizationService: asClass(AuthorizationService).scoped(),
    imagesService: asClass(ImagesService).scoped(),
