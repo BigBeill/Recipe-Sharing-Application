@@ -43,16 +43,16 @@ export class UsersService {
    private readonly imagesService: ImagesService;
    private readonly authorization: AuthorizationService;
 
-   constructor({ usersRepository, recipesService, imagesService, authorization }: { 
+   constructor({ usersRepository, recipesService, imagesService, authorizationService }: { 
       usersRepository: UsersRepository, 
       recipesService: RecipesService, 
       imagesService: ImagesService,
-      authorization: AuthorizationService,
+      authorizationService: AuthorizationService,
    }) {
       this.repository = usersRepository;
       this.recipesService = recipesService;
       this.imagesService = imagesService;
-      this.authorization = authorization;
+      this.authorization = authorizationService;
    }
 
 

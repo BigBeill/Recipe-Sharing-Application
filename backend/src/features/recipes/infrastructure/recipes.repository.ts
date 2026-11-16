@@ -25,8 +25,8 @@ interface SearchParams {
 export class RecipesRepository {
    private readonly authorization;
 
-   constructor ({ authorization }: { authorization: AuthorizationService }) {
-      this.authorization = authorization;
+   constructor ({ authorizationService }: { authorizationService: AuthorizationService }) {
+      this.authorization = authorizationService;
    }
 
 
@@ -48,18 +48,19 @@ export class RecipesRepository {
 
 
    async get(_id: Types.ObjectId): Promise<RecordRecipe> {
-      const recipeRecord = await ModelRecipe.findOne({ $match: {
+      console.log("clientId:", this.authorization.clientId);
+      const recipeRecord = await ModelRecipe.findOne({
          _id,
          $or: [
             { visibility: 'public' },
-            ...(this.authorization.clientId !== undefined ? [
-                     { visibility: 'private', ownerId: this.authorization.clientId },
-                     { visibility: 'private', ownerId: { $in: (await this.authorization.getFriendIdList()) } },
-                     { visibility: 'personal', ownerId : this.authorization.clientId },
+            ...(this.authorization.clientId ? [
+                  { visibility: 'private' as const, ownerId: this.authorization.clientId },
+                  { visibility: 'private' as const, ownerId: { $in: (await this.authorization.getFriendIdList()) } },
+                  { visibility: 'personal' as const, ownerId : this.authorization.clientId },
                ] : []
             ),
          ]
-      } }).lean<RecordRecipe | null>();
+      }).lean<RecordRecipe | null>();
       if (!recipeRecord) { throw new NotFoundError('recipe'); }
       return recipeRecord;
    }

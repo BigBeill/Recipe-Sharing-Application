@@ -28,8 +28,8 @@ interface UpdateUserParams {
 export class UsersRepository {
    private readonly authorization;
 
-   constructor ({ authorization }: { authorization: AuthorizationService }) {
-      this.authorization = authorization;
+   constructor ({ authorizationService }: { authorizationService: AuthorizationService }) {
+      this.authorization = authorizationService;
    }
 
 
