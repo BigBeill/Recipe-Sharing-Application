@@ -20,8 +20,8 @@ interface createRefreshTokenParams {
 export class AuthenticationRepository {
    private readonly authorization: AuthorizationService
 
-   constructor ({ authorization }: { authorization: AuthorizationService }) {
-      this.authorization = authorization;
+   constructor ({ authorizationService }: { authorizationService: AuthorizationService }) {
+      this.authorization = authorizationService;
    }
 
 

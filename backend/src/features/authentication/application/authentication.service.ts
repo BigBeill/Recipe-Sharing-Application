@@ -26,8 +26,8 @@ interface RegisterParams {
 export class AuthenticationService {
    private readonly repository: AuthenticationRepository;
 
-   constructor({ authRepository }: { authRepository: AuthenticationRepository }) {
-      this.repository = authRepository;
+   constructor({ authenticationRepository }: { authenticationRepository: AuthenticationRepository }) {
+      this.repository = authenticationRepository;
    }
 
 
