@@ -1,13 +1,14 @@
 import { hashPassword, verifyPassword } from "../../../common/utils/password";
 import { sendPasswordResetEmail } from '../../../externalResources/email/email.service';
 import { randomBytes } from 'node:crypto';
-import type { DeleteResult, Types } from 'mongoose';
+import type { Types } from 'mongoose';
 import { generateRefreshToken, signAccessToken } from '../tokenSigner';
 import { graceCache } from "../lib/refreshTokenGraceCache";
-import type { PasswordResetTokenRecord } from "../../../externalResources/database/mongoose/schemas/passwordResetToken.schema";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { TypeAuthResult, TypeSavedRefreshToken } from "../auth.types";
 import type { AuthenticationRepository } from "../infrastructure/authentication.repository";
+import { Reauthenticate, type ReauthenticateParams } from "../decorators/Reauthenticate";
+import { ScopeAware } from "../../../common/decorators/scopeAware";
 
 type TypeBuildAuthResultOptions = { cachedRefreshToken: string; expiresAt?: undefined; } | { cachedRefreshToken?: undefined; expiresAt: Date };
 
@@ -23,6 +24,7 @@ interface RegisterParams {
    password: string,
 }
 
+@ScopeAware
 export class AuthenticationService {
    private readonly repository: AuthenticationRepository;
 
@@ -32,22 +34,17 @@ export class AuthenticationService {
 
 
 
-   async changePassword({ oldPassword, newPassword } : { oldPassword: string, newPassword: string } ): Promise<void> {
-      const userAndPassword = await this.repository.getUserWithPasswordIncluded();
-
-      const validPassword = await verifyPassword(oldPassword, userAndPassword.passwordHash);
-      if (!validPassword) { throw new UnauthorizedError(); }
-
+   @Reauthenticate
+   async changePassword(_reauthenticateParams: ReauthenticateParams, newPassword: string ): Promise<void> {
       const passwordHash = await hashPassword(newPassword);
-
       await this.repository.updatePassword(passwordHash);
    }
 
 
 
-   async deleteRefreshToken(token: string): Promise<DeleteResult> {
+   async deleteRefreshToken(token: string): Promise<void> {
       const tokenHash = new Bun.CryptoHasher("sha256").update(token).digest("hex");
-      return await this.repository.deleteRefreshTokenByHash(tokenHash);
+      await this.repository.deleteRefreshTokenByHash(tokenHash);
    }
 
 
@@ -56,7 +53,6 @@ export class AuthenticationService {
       const { name, password, rememberMe } = params;
 
       const userAndPassword = await this.repository.findUserWithPasswordIncluded(name);
-      if (!userAndPassword) { throw new UnauthorizedError('Invalid Username'); }
 
       const validPassword = await verifyPassword(password, userAndPassword.passwordHash);
       if (!validPassword) { throw new UnauthorizedError('Invalid Password'); }
@@ -132,15 +128,8 @@ export class AuthenticationService {
       const tokenHash = new Bun.CryptoHasher("sha256").update(resetToken).digest("hex");
 
       // fetch the reset token by hash
-      let tokenHashRecord: PasswordResetTokenRecord | null;
-      try { tokenHashRecord = await this.repository.consumePasswordResetToken(tokenHash); }
-      catch (error) { 
-         console.log("auth.service.resetPassword failed to fetch token form the database:", error); 
-         throw new NotFoundError(""); 
-      }
+      const tokenHashRecord = await this.repository.consumePasswordResetToken(tokenHash);
 
-      if (!tokenHashRecord) { throw new NotFoundError(""); }
-      
       // hash the new password and grab the userId its for
       const hashedPassword = await hashPassword(password);
 
@@ -151,8 +140,6 @@ export class AuthenticationService {
          this.repository.deletePasswordResetTokens(userId),
          this.repository.deleteRefreshTokensByUserId(userId),
       ]);
-
-      return;
    }
 
 

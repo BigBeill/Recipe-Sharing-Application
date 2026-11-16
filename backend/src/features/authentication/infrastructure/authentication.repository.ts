@@ -26,14 +26,18 @@ export class AuthenticationRepository {
 
 
 
-   async consumePasswordResetToken(tokenHash: string): Promise<PasswordResetTokenRecord | null> {
-      return await PasswordResetTokenModel.findOneAndDelete({ tokenHash }).lean<PasswordResetTokenRecord>();
+   async consumePasswordResetToken(tokenHash: string): Promise<PasswordResetTokenRecord> {
+      const passwordResetToken = await PasswordResetTokenModel.findOneAndDelete({ tokenHash }).lean<PasswordResetTokenRecord>();
+      if (!passwordResetToken) { throw new NotFoundError("PasswordResetToken"); }
+      return passwordResetToken;
    }
 
 
 
-   async consumeRefreshToken(tokenHash: string): Promise<RefreshTokenRecord | null> {
-      return await RefreshTokenModel.findOneAndDelete({ hash: tokenHash }).lean<RefreshTokenRecord>();
+   async consumeRefreshToken(tokenHash: string): Promise<RefreshTokenRecord> {
+      const refreshToken = await RefreshTokenModel.findOneAndDelete({ hash: tokenHash }).lean<RefreshTokenRecord>();
+      if (!refreshToken) { throw new NotFoundError('RefreshToken'); }
+      return refreshToken;
    }
 
 
@@ -65,8 +69,8 @@ export class AuthenticationRepository {
 
 
 
-   async deleteRefreshTokenByHash(hash: string): Promise<DeleteResult> {
-      return await RefreshTokenModel.deleteOne({ hash })
+   async deleteRefreshTokenByHash(hash: string): Promise<void> {
+      await RefreshTokenModel.deleteOne({ hash })
    }
 
 
@@ -78,8 +82,10 @@ export class AuthenticationRepository {
 
 
    //! FUNCTION RETURNS CONFIDENTIAL INFORMATION THAT SHOULD NOT BE RETURNED TO THE FRONTEND (returned object contains passwordHash)
-   async findUserWithPasswordIncluded(name: string): Promise<UserWithPassword | null> {
-      return await UserModel.findOne({ name }).select('+passwordHash').lean<UserWithPassword>();
+   async findUserWithPasswordIncluded(name: string): Promise<UserWithPassword> {
+      const userRecord = await UserModel.findOne({ name }).select('+passwordHash').lean<UserWithPassword>();
+      if (!userRecord) { throw new NotFoundError('user'); }
+      return userRecord;
    }
 
 

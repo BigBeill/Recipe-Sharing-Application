@@ -139,7 +139,7 @@ export const authenticationController = new Elysia({ prefix: '/auth' })
    .post( '/changePassword',
       async ({ body, service }) => {
          const { oldPassword, newPassword } = body;
-         await service.changePassword({ oldPassword, newPassword });
+         await service.changePassword({ password: oldPassword }, newPassword);
          return status(201);
       },
       {

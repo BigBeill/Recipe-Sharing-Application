@@ -8,7 +8,7 @@ import type { Types } from "mongoose";
 import type { TypeImageReference } from "../../images/domain/images.types";
 import type { TypePaginatedList } from "../../../common/domain/types.common";
 import { ScopeAware } from "../../../common/decorators/scopeAware";
-import { Reauthenticate } from "../../authentication/decorators/Reauthenticate";
+import { Reauthenticate, type ReauthenticateParams } from "../../authentication/decorators/Reauthenticate";
 import type { AuthorizationService } from "../../authorization/authorization.service";
 
 interface DefinedRelationshipParams {
@@ -58,7 +58,7 @@ export class UsersService {
 
 
    @Reauthenticate
-   async deleteAccount(_ReauthenticateParams: { password: string }): Promise<boolean> {
+   async deleteAccount(_reauthenticateParams: ReauthenticateParams): Promise<boolean> {
 
       // delete any recipes associated with the account
       await this.recipesService.deleteMany();
