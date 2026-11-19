@@ -5,10 +5,11 @@ import { ValidatorCommonMongooseId } from "../../../common/domain/validators/mon
 import { ValidatorCommonUser, ValidatorCommonUserDraft } from "../domain/validators/user.validator";
 import { ValidatorIncomingUsersSearchBody } from "./validators/search.validator";
 import { ValidatorCommonPaginatedList } from "../../../common/domain/validators/pagination.validator";
-import { ValidatorCommonRelationship } from "../domain/validators/relationship.validator";
-import { ValidatorIncomingUsersProcessFriendRequestBody } from "./validators/processFriendRequest.validator";
 import type { UsersService } from "../application/users.service";
 import { authorizeMiddleware } from "../../authorization/authorization.middleware";
+import { ValidatorIncomingAuthRegisterBody } from "./validators/register.validator";
+import { ValidatorIncomingAuthResetPasswordBody } from "./validators/resetPassword.validator";
+import { ValidatorIncomingAuthChangePasswordBody } from "./validators/changePassword.validator";
 
 export const usersController = new Elysia({ prefix: '/users' })
    .use(authenticateMiddleware)
@@ -26,9 +27,38 @@ export const usersController = new Elysia({ prefix: '/users' })
          return status(200, user);
       },
       {
-         params: t.Object(ValidatorCommonMongooseId),
+         params: t.Object({ _id: ValidatorCommonMongooseId }),
          query: ValidatorIncomingUsersGetBody,
          response: { 200: ValidatorCommonUser },
+      }
+   )
+
+
+
+   .post( '/register',
+      async ({ body, cookie: { accessToken, refreshToken }, service }) => {
+         const { name, email, password } = body;
+
+         const authResult = await service.create({ name, email, password });
+
+         // * set cookies
+         accessToken.set({
+            value: authResult.tokens.accessToken,
+            maxAge: 60 * 15 // 15 minutes in seconds
+         });
+         refreshToken.set({
+            value: authResult.tokens.refreshToken,
+         });
+
+         return status(200, authResult.userId);
+      },
+      {
+         body: ValidatorIncomingAuthRegisterBody,
+         cookie: t.Object({
+            accessToken: t.Optional(t.String()),
+            refreshToken: t.Optional(t.String()),
+         }),
+         response: ValidatorCommonMongooseId,
       }
    )
 
@@ -54,60 +84,42 @@ export const usersController = new Elysia({ prefix: '/users' })
 
 
 
-   .get( '/defineRelationship/:_id',
-      async ({ params, service, clientId }) => {
-         const { _id } = params
-         const definedRelationship = await service.findRelationship({ ownerId: clientId, targetId: _id });
-         if (definedRelationship) { return status(200, definedRelationship); }
-         else { return status(204, undefined); }
-      },
-      {
-         params: t.Object({ _id: ValidatorCommonMongooseId }),
-         response: { 
-            200: ValidatorCommonRelationship,
-            204: t.Void()
-         }
-      }
-   )
-
-
-
-   .post( '/deleteFriendship/:_id',
-      async ({ service, params }) => {
-         const { _id } = params;
-         await service.deleteFriendship(_id);
+   .post( '/changePassword',
+      async ({ body, service, authorization }) => {
+         const { oldPassword, newPassword } = body;
+         const reauthenticationProof = await authorization.reauthenticate(oldPassword);
+         await service.changePassword(reauthenticationProof, newPassword);
          return status(201);
       },
       {
-         params: t.Object({ _id: ValidatorCommonMongooseId }),
+         body: ValidatorIncomingAuthChangePasswordBody,
       }
    )
 
 
 
-   .post( '/processFriendRequest/:_id/:response',
-      async ({ service, params }) => {
-         const{ _id, response } = params;
-         const relationship = await service.processFriendRequest(_id, response);
-         return status(201, relationship);
+   .post('/delete',
+      async ({ service, body, authorization }) => {
+         const { password } = body;
+         const reauthenticationProof = await authorization.reauthenticate(password);
+         service.delete(reauthenticationProof);
+         return status(204);
       },
       {
-         params: ValidatorIncomingUsersProcessFriendRequestBody,
-         response: { 201: t.Union([ValidatorCommonRelationship, t.Void()]) }
+         body: t.Object({ password: t.String() })
       }
    )
 
 
 
-   .post( '/sendFriendRequest/:_id',
-      async ({ service, params }) => {
-         const { _id } = params;
-         const friendRequest = await service.sendFriendRequest(_id);
-         return status(200, friendRequest);
+   .post('/resetPassword',
+      async ({ body, service }) => {
+         const { password, token } = body;
+         await service.resetPassword(password, token);
+         return status(204);
       },
       {
-         params: t.Object({ _id: ValidatorCommonMongooseId }),
-         response: ValidatorCommonRelationship,
+         body: ValidatorIncomingAuthResetPasswordBody,
       }
    )
 

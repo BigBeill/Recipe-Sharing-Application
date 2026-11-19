@@ -16,6 +16,7 @@ import { TypeImageReference } from '@/features/images/domain/image.types';
 import { TypeRelationship, TypeUser } from '../domain/user.types';
 import harvestRefsObject from '@/shared/lib/harvestRefsObject';
 import ImageDisplay from '@/features/images/components/ImageDisplay';
+import ReauthenticatePopup from '@/features/auth/components/ReauthenticateAction';
 
 interface Props {
    initial: TypeUser
@@ -35,6 +36,8 @@ export default function ProfilePage({ initial }: Props) {
       bio: useRef<DataHandle<string>>(null),
       imageReference: useRef<DataHandle<TypeImageReference | undefined>>(null),
    }
+
+   const reauthenticateRef = useRef<DataHandle<boolean>>(null);
 
    // ? functions and variables for editing the current user
    const [editMode, setEditMode] = useState<boolean>(false);
@@ -110,7 +113,7 @@ export default function ProfilePage({ initial }: Props) {
                { editMode ? (
                   <>
                      <ButtonShielded key='save' message='Save Changes' showLoading={ true } onClick={ saveChanges } />
-                     <ButtonShielded key='delete' message='Delete Changes' onClick={ () => { setEditMode(false); } }/>
+                     <ButtonShielded key='delete' message='Delete Account' onClick={ () => { reauthenticateRef.current?.setData(true) } }/>
                   </>
                ) : session?.userId === user._id ? (
                   <>
@@ -142,6 +145,8 @@ export default function ProfilePage({ initial }: Props) {
                ) : null }
             </div>
          </LoadingProvider>
+
+         <ReauthenticatePopup ref={ reauthenticateRef } action={ { description: 'Deleting an account', function: (async (password: string) => { await userService.delete(password); router.push('/') } ) } } />
 
       </div >
    )

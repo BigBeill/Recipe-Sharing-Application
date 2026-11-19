@@ -3,10 +3,7 @@ import { authenticateMiddleware } from '../authentication.middleware';
 import { NotFoundError } from '../../../global/departingData/errorClasses';
 import { ValidatorCommonMongooseId } from '../../../common/domain/validators/mongooseId.validator';
 import { ValidatorIncomingAuthLoginBody } from './validators/login.validator';
-import { ValidatorIncomingAuthRegisterBody } from './validators/register.validator';
 import { ValidatorIncomingAuthRequestPasswordResetBody } from './validators/requestPasswordReset.validator';
-import { ValidatorIncomingAuthResetPasswordBody } from './validators/resetPassword.validator';
-import { ValidatorIncomingAuthChangePasswordBody } from './validators/changePassword.validator';
 import type { AuthenticationService } from '../application/authentication.service';
 import { authorizeMiddleware } from '../../authorization/authorization.middleware';
 
@@ -73,35 +70,6 @@ export const authenticationController = new Elysia({ prefix: '/auth' })
 
 
 
-   .post( '/register',
-      async ({ body, cookie: { accessToken, refreshToken }, service }) => {
-         const { name, email, password } = body;
-
-         const authResult = await service.register({ name, email, password });
-
-         // * set cookies
-         accessToken.set({
-            value: authResult.tokens.accessToken,
-            maxAge: 60 * 15 // 15 minutes in seconds
-         });
-         refreshToken.set({
-            value: authResult.tokens.refreshToken,
-         });
-
-         return status(200, authResult.userId);
-      },
-      {
-         body: ValidatorIncomingAuthRegisterBody,
-         cookie: t.Object({
-            accessToken: t.Optional(t.String()),
-            refreshToken: t.Optional(t.String()),
-         }),
-         response: ValidatorCommonMongooseId,
-      }
-   )
-
-
-
    .post('/requestPasswordReset',
       async ({ body, service }) => {
          const { email } = body;
@@ -119,33 +87,7 @@ export const authenticationController = new Elysia({ prefix: '/auth' })
 
 
 
-   .post('/resetPassword',
-      async ({ body, service }) => {
-         const { password, token } = body;
-         await service.resetPassword(password, token);
-         return status(204);
-      },
-      {
-         body: ValidatorIncomingAuthResetPasswordBody,
-      }
-   )
-
-
-
    .use(authorizeMiddleware)
-
-
-
-   .post( '/changePassword',
-      async ({ body, service }) => {
-         const { oldPassword, newPassword } = body;
-         await service.changePassword({ password: oldPassword }, newPassword);
-         return status(201);
-      },
-      {
-         body: ValidatorIncomingAuthChangePasswordBody,
-      }
-   )
 
 
 

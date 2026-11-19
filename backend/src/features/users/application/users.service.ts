@@ -3,18 +3,19 @@ import type { RecipesService } from "../../recipes/application/recipes.service";
 import type { UsersRepository } from "../infrastructure/users.repository";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { ImagesService } from "../../images/application/images.service";
-import type { TypeRelationship, TypeUser } from "../domain/users.types";
+import type { TypeUser } from "../domain/users.types";
 import type { Types } from "mongoose";
 import type { TypeImageReference } from "../../images/domain/images.types";
 import type { TypePaginatedList } from "../../../common/domain/types.common";
-import { ScopeAware } from "../../../common/decorators/scopeAware";
-import { Reauthenticate, type ReauthenticateParams } from "../../authentication/decorators/Reauthenticate";
-import type { AuthorizationService } from "../../authorization/authorization.service";
+import { Reauthenticate } from "../../authorization/decorators/Reauthenticate";
+import type { AuthorizationService, ReauthenticationProof } from "../../authorization/authorization.service";
+import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
+import type { RelationshipsService } from "../../relationships/application/relationships.service";
+import { hashPassword } from "../../../common/utils/password";
+import type { AuthenticationService } from "../../authentication/application/authentication.service";
+import type { TypeAuthResult } from "../../authentication/domain/auth.types";
 
-interface DefinedRelationshipParams {
-   ownerId: Types.ObjectId;
-   targetId: Types.ObjectId;
-}
+
 
 interface GetUserParams {
    includeRelationship?: boolean;
@@ -36,61 +37,61 @@ interface UpdateAccountParams {
    imageReference?: TypeImageReference;
 }
 
-@ScopeAware
-export class UsersService {
+interface RegisterParams {
+   name: string, 
+   email: string, 
+   password: string,
+}
+
+
+
+export class UsersService extends AccessControlled {
    private readonly repository: UsersRepository;
    private readonly recipesService: RecipesService;
    private readonly imagesService: ImagesService;
-   private readonly authorization: AuthorizationService;
+   private readonly relationshipService: RelationshipsService;
+   private readonly authenticationService: AuthenticationService;
 
-   constructor({ usersRepository, recipesService, imagesService, authorizationService }: { 
+   constructor({ authorizationService, usersRepository, recipesService, imagesService, relationshipsService, authenticationService }: { 
+      authorizationService: AuthorizationService,
       usersRepository: UsersRepository, 
       recipesService: RecipesService, 
       imagesService: ImagesService,
-      authorizationService: AuthorizationService,
+      relationshipsService: RelationshipsService,
+      authenticationService: AuthenticationService,
    }) {
+      super({ authorizationService });
       this.repository = usersRepository;
       this.recipesService = recipesService;
       this.imagesService = imagesService;
-      this.authorization = authorizationService;
+      this.relationshipService = relationshipsService;
+      this.authenticationService = authenticationService;  
    }
 
 
 
    @Reauthenticate
-   async deleteAccount(_reauthenticateParams: ReauthenticateParams): Promise<boolean> {
+   async changePassword(_reauthenticationProof: ReauthenticationProof, newPassword: string ): Promise<void> {
+      const passwordHash = await hashPassword(newPassword);
+      await this.repository.updatePassword(passwordHash);
+   }
+
+
+
+   @Reauthenticate
+   async delete(_reauthenticationProof: ReauthenticationProof): Promise<void> {
 
       // delete any recipes associated with the account
       await this.recipesService.deleteMany();
+      console.log("checkpoint 1");
 
       // delete users avatar image
       const user = await this.repository.getUser(this.authorization.requireClientId());
       if (user.imageReferenceId) { await this.imagesService.delete(user.imageReferenceId); }
+      console.log("checkpoint 2");
 
-      await this.repository.deleteUser();
-      return true;
-   }
-
-
-
-   async deleteFriendship(_id: Types.ObjectId): Promise<void> {
-      await this.repository.deleteFriendship(_id);
-   }
-
-
-
-   async findRelationship(params: DefinedRelationshipParams): Promise<TypeRelationship | null> {
-      const { ownerId, targetId } = params;
-      return await this.repository.findRelationship({ targetId, ownerId });
-   }
-
-
-
-   async getFriendIdList(userId: Types.ObjectId) {
-      const friendshipList = await this.repository.searchFriendship(userId);
-      
-      // filter out the userId from each friendship and return an array of Ids
-      return friendshipList.flatMap((friendship) => { return friendship.friendIds.filter((id) => !id.equals(userId)) });
+      await this.repository.delete();
+      console.log("checkpoint 3");
    }
 
 
@@ -98,48 +99,27 @@ export class UsersService {
    async get(_id: Types.ObjectId, { includeRelationship }: GetUserParams): Promise<TypeUser> {
       const [user, relationship] = await Promise.all([
          this.repository.getUser(_id),
-         (includeRelationship ? this.findRelationship({ ownerId: _id, targetId: this.authorization.requireClientId() }) : null),
+         (includeRelationship ? this.relationshipService.findRelationship({ ownerId: _id, targetId: this.authorization.requireClientId() }) : null),
       ]);
       return { ...removeMongooseNoise(user), ...(relationship != null && { relationship }) };
    }
 
 
 
-   async sendFriendRequest(targetId: Types.ObjectId): Promise<TypeRelationship> {
-      const friendRequest = await this.repository.createFriendRequest(targetId);
-      return {
-         _id: friendRequest._id,
-         ownerId: targetId,
-         targetId: this.authorization.requireClientId(),
-         type: 'requestReceived',
+   async create(params: RegisterParams): Promise<TypeAuthResult> {
+      const { name, email, password } = params;
+
+      const conflictingUserList = await this.repository.searchUserExact({ name, email });
+      if (conflictingUserList.length > 0) { 
+         throw new ConflictError("Some user information has already been taken");
       }
-   }
+      
+      const passwordHash = await hashPassword(password);
+      const user = await this.repository.create({ name, email, passwordHash });
 
+      const refreshExpiresAt = new Date(Date.now() + (60 * 60 * 24 * 1000)) // 1 day in milliseconds
 
-
-   async processFriendRequest(_id: Types.ObjectId, approve: boolean): Promise<TypeRelationship | null> {
-      // get friendship from the database
-      const friendRequest = await this.repository.getFriendRequest(_id);
-
-      // check if friendship can be approved
-      if (approve && friendRequest.receiverId.equals(this.authorization.clientId)) {
-         const friendship = await this.repository.createFriendship(friendRequest.senderId);
-         return {
-            _id: friendship._id,
-            ownerId: friendRequest.senderId,
-            targetId: this.authorization.requireClientId(),
-            type: "friend",
-         }
-      }
-
-      // check if friendship can be declined
-      else if (!approve && (friendRequest.receiverId.equals(this.authorization.clientId) || friendRequest.senderId.equals(this.authorization.clientId))) {
-         await this.repository.deleteFriendRequest(_id);
-         return null;
-      }
-
-      // whatever the client is attempting to do was not executable
-      else { throw new UnauthorizedError('Invalid credentials'); }
+      return this.authenticationService.buildAuthResult(user._id, { expiresAt: refreshExpiresAt });
    }
 
 
@@ -152,7 +132,7 @@ export class UsersService {
       if (!includeRelationship) { return users; }
       else {
          const list = await Promise.all(users.list.map(async (user) => {
-            const relationship = await this.findRelationship({ ownerId: user._id, targetId: authId! });
+            const relationship = await this.relationshipService.findRelationship({ ownerId: user._id, targetId: authId! });
             return {
                ...user,
                relationship
@@ -163,6 +143,26 @@ export class UsersService {
             list,
          }
       }
+   }
+
+
+
+   async resetPassword(password: string, resetToken: string): Promise<void> {
+   
+      const tokenHash = new Bun.CryptoHasher("sha256").update(resetToken).digest("hex");
+
+      // fetch the reset token by hash
+      const tokenHashRecord = await this.authenticationService.consumePasswordResetToken(tokenHash);
+
+      // hash the new password and grab the userId its for
+      const hashedPassword = await hashPassword(password);
+
+      // hahs the new password and remove any old instances of password reset requests
+      const userId = tokenHashRecord.userId;
+      const [] = await Promise.all([
+         this.repository.updatePassword(hashedPassword),
+         this.authenticationService.cleanSavedTokens(userId),
+      ]);
    }
 
 

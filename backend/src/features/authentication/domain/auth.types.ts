@@ -21,9 +21,3 @@ export interface TypeSavedRefreshToken {
    hash: string;
    expiresAt: Date;
 }
-
-export interface TypeUserDraft {
-   name: string;
-   email: string;
-   passwordHash: string;
-}

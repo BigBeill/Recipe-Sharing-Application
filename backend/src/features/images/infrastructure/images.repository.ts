@@ -3,19 +3,14 @@ import { NotFoundError } from "../../../global/departingData/errorClasses";
 import type { TypeImageReferenceDraft } from "../domain/images.types";
 import { ModelImageReference, type RecordImageReference } from "../../../externalResources/database/mongoose/schemas/imageReference.schema";
 import { Protected } from "../../authorization/decorators/Protected";
-import type { AuthorizationService } from "../../authorization/authorization.service";
+import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
 
 interface FetchParams {
    cutoff?: Date;
    statusList?: ('active' | 'deleting' | 'pending')[]
 }
 
-export class ImagesRepository {
-   private readonly authorization: AuthorizationService;
-
-   constructor({ authorizationService }: { authorizationService: AuthorizationService }) {
-      this.authorization = authorizationService;
-   }
+export class ImagesRepository extends AccessControlled {
 
 
 

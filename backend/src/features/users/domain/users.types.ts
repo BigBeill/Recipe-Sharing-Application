@@ -1,4 +1,5 @@
 import type { Types } from "mongoose";
+import type { TypeRelationship } from "../../relationships/domain/relationships.types";
 
 export interface TypeUser {
    _id: Types.ObjectId;
@@ -9,9 +10,9 @@ export interface TypeUser {
    relationship?: TypeRelationship | null;
 }
 
-export interface TypeRelationship {
-   _id: Types.ObjectId;
-   ownerId: Types.ObjectId;
-   targetId: Types.ObjectId;
-   type: "friend" | "requestReceived" | "requestSent";
+
+export interface TypeUserDraft {
+   name: string;
+   email: string;
+   passwordHash: string;
 }

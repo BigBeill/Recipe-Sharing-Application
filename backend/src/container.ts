@@ -11,6 +11,8 @@ import { UsersRepository } from "./features/users/infrastructure/users.repositor
 import { ImagesRepository } from "./features/images/infrastructure/images.repository";
 import { AuthorizationService } from "./features/authorization/authorization.service";
 import { AuthorizationRepository } from "./features/authorization/authorization.repository";
+import { RelationshipsRepository } from "./features/relationships/infrastructure/relationships.repository";
+import { RelationshipsService } from "./features/relationships/application/relationships.service";
 
 export const container = createContainer({ strict: true });
 
@@ -23,6 +25,7 @@ container.register({
    usersRepository: asClass(UsersRepository).scoped(),
    imagesRepository: asClass(ImagesRepository).scoped(),
    ingredientsRepository: asClass(IngredientsRepository).scoped(),
+   relationshipsRepository: asClass(RelationshipsRepository).scoped(),
 
    authenticationService: asClass(AuthenticationService).scoped(),
    authorizationService: asClass(AuthorizationService).scoped(),
@@ -30,4 +33,5 @@ container.register({
    recipesService: asClass(RecipesService).scoped(),
    usersService: asClass(UsersService).scoped(),
    ingredientsService: asClass(IngredientsService).scoped(),
+   relationshipsService: asClass(RelationshipsService).scoped(),
 });

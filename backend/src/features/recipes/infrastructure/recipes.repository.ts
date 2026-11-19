@@ -5,6 +5,7 @@ import { NotFoundError } from "../../../global/departingData/errorClasses";
 import type { TypePaginatedList } from "../../../common/domain/types.common";
 import { Protected } from "../../authorization/decorators/Protected";
 import type { AuthorizationService } from "../../authorization/authorization.service";
+import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
 
 
 
@@ -22,12 +23,7 @@ interface SearchParams {
 
 
 
-export class RecipesRepository {
-   private readonly authorization;
-
-   constructor ({ authorizationService }: { authorizationService: AuthorizationService }) {
-      this.authorization = authorizationService;
-   }
+export class RecipesRepository extends AccessControlled {
 
 
 
@@ -48,7 +44,6 @@ export class RecipesRepository {
 
 
    async get(_id: Types.ObjectId): Promise<RecordRecipe> {
-      console.log("clientId:", this.authorization.clientId);
       const recipeRecord = await ModelRecipe.findOne({
          _id,
          $or: [

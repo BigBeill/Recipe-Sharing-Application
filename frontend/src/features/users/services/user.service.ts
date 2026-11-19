@@ -15,6 +15,10 @@ export function createUserService(api: TypeUserApi) {
          return api.defineRelationship(userId);
       },
 
+      delete: (password: string): Promise<void> => {
+         return api.delete({ password });
+      },
+
       get: (userId: string, payload?: PayloadUserApiGet) => {
          return api.get(userId, payload);
       },

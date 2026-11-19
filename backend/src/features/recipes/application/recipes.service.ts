@@ -7,9 +7,9 @@ import type { ImagesService } from "../../images/application/images.service";
 import type { Types } from "mongoose";
 import type { RecordRecipe, RecordRecipeDraft } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
 import type { TypePaginatedList } from "../../../common/domain/types.common";
-import { ScopeAware } from "../../../common/decorators/scopeAware";
 import type { AuthorizationService } from "../../authorization/authorization.service";
 import { Protected } from "../../authorization/decorators/Protected";
+import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
 
 interface GetRecipeListParams { 
    title?: string,
@@ -21,23 +21,21 @@ interface GetRecipeListParams {
    limit?: number,
 }
 
-@ScopeAware
-export class RecipesService { 
+export class RecipesService extends AccessControlled { 
    private readonly repository: RecipesRepository;
    private readonly imagesService: ImagesService;
    private readonly ingredientsService: IngredientsService;
-   private readonly authorization: AuthorizationService;
 
-   constructor({ recipesRepository, imagesService, ingredientsService, authorizationService }: { 
+   constructor({ authorizationService, recipesRepository, imagesService, ingredientsService }: {
+      authorizationService: AuthorizationService,
       recipesRepository: RecipesRepository, 
       imagesService: ImagesService, 
       ingredientsService: IngredientsService,
-      authorizationService: AuthorizationService,
    }) {
+      super({ authorizationService });
       this.repository = recipesRepository;
       this.imagesService = imagesService;
       this.ingredientsService = ingredientsService;
-      this.authorization = authorizationService;
    }
 
 

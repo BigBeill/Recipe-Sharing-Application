@@ -43,7 +43,7 @@ export function createAuthApi(call: TypeApiCaller) {
 
       register: (body: PayloadAuthApiRegister): Promise<string> =>
          call({
-            url: "/auth/register",
+            url: "/users/register",
             method: "POST",
             body,
          }),
@@ -57,7 +57,7 @@ export function createAuthApi(call: TypeApiCaller) {
 
       resetPassword: (body: PayloadAuthApiResetPassword): Promise<void> =>
          call({
-            url: "/auth/resetPassword",
+            url: "/users/resetPassword",
             method: "POST",
             body,
          }),

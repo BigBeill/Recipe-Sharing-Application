@@ -3,12 +3,13 @@ import { sendPasswordResetEmail } from '../../../externalResources/email/email.s
 import { randomBytes } from 'node:crypto';
 import type { Types } from 'mongoose';
 import { generateRefreshToken, signAccessToken } from '../tokenSigner';
-import { graceCache } from "../lib/refreshTokenGraceCache";
-import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
-import type { TypeAuthResult, TypeSavedRefreshToken } from "../auth.types";
+import { NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
+import type { TypeAuthResult, TypeSavedRefreshToken } from "../domain/auth.types";
 import type { AuthenticationRepository } from "../infrastructure/authentication.repository";
-import { Reauthenticate, type ReauthenticateParams } from "../decorators/Reauthenticate";
-import { ScopeAware } from "../../../common/decorators/scopeAware";
+import type { AuthorizationService } from "../../authorization/authorization.service";
+import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
+import type { PasswordResetTokenRecord } from "../../../externalResources/database/mongoose/schemas/passwordResetToken.schema";
+import { graceCache } from "../lib/refreshTokenGraceCache";
 
 type TypeBuildAuthResultOptions = { cachedRefreshToken: string; expiresAt?: undefined; } | { cachedRefreshToken?: undefined; expiresAt: Date };
 
@@ -18,26 +19,13 @@ interface LoginParams {
    rememberMe?: boolean,
 }
 
-interface RegisterParams {
-   name: string, 
-   email: string, 
-   password: string,
-}
-
-@ScopeAware
 export class AuthenticationService {
    private readonly repository: AuthenticationRepository;
 
-   constructor({ authenticationRepository }: { authenticationRepository: AuthenticationRepository }) {
+   constructor({ authenticationRepository }: { 
+      authenticationRepository: AuthenticationRepository,
+   }) {
       this.repository = authenticationRepository;
-   }
-
-
-
-   @Reauthenticate
-   async changePassword(_reauthenticateParams: ReauthenticateParams, newPassword: string ): Promise<void> {
-      const passwordHash = await hashPassword(newPassword);
-      await this.repository.updatePassword(passwordHash);
    }
 
 
@@ -64,24 +52,6 @@ export class AuthenticationService {
 
       const expiresAt = new Date(Date.now() + (rememberMe ? oneDay * 30 : oneDay ));
       return this.buildAuthResult(user._id, { expiresAt });
-   }
-
-
-
-   async register(params: RegisterParams): Promise<TypeAuthResult> {
-      const { name, email, password } = params;
-
-      const conflictingUserList = await this.repository.searchUserExact({ name, email });
-      if (conflictingUserList.length > 0) { 
-         throw new ConflictError("Some user information has already been taken");
-      }
-      
-      const passwordHash = await hashPassword(password);
-      const user = await this.repository.createUser({ name, email, passwordHash });
-
-      const refreshExpiresAt = new Date(Date.now() + (60 * 60 * 24 * 1000)) // 1 day in milliseconds
-
-      return this.buildAuthResult(user._id, { expiresAt: refreshExpiresAt });
    }
 
 
@@ -123,36 +93,15 @@ export class AuthenticationService {
 
 
 
-   async resetPassword(password: string, resetToken: string): Promise<void> {
-   
-      const tokenHash = new Bun.CryptoHasher("sha256").update(resetToken).digest("hex");
-
-      // fetch the reset token by hash
-      const tokenHashRecord = await this.repository.consumePasswordResetToken(tokenHash);
-
-      // hash the new password and grab the userId its for
-      const hashedPassword = await hashPassword(password);
-
-      // hahs the new password and remove any old instances of password reset requests
-      const userId = tokenHashRecord.userId;
-      const [] = await Promise.all([
-         this.repository.updatePassword(hashedPassword),
-         this.repository.deletePasswordResetTokens(userId),
-         this.repository.deleteRefreshTokensByUserId(userId),
-      ]);
-   }
-
-
-
-   async verifyPassword(password: string): Promise<void> {
-      const user = await this.repository.getUserWithPasswordIncluded();
+   async verifyPassword(userId: Types.ObjectId, password: string): Promise<void> {
+      const user = await this.repository.getUserWithPasswordIncluded(userId);
       const passwordConfirmation = await verifyPassword(password, user.passwordHash);
       if (passwordConfirmation !== true) { throw new UnauthorizedError('password could not be verified') }
    }
 
 
 
-   private async buildAuthResult(userId: Types.ObjectId, options: TypeBuildAuthResultOptions): Promise<TypeAuthResult> {
+   async buildAuthResult(userId: Types.ObjectId, options: TypeBuildAuthResultOptions): Promise<TypeAuthResult> {
 
       // * create access token
       const accessToken = await signAccessToken(userId);
@@ -174,7 +123,7 @@ export class AuthenticationService {
 
 
    // function that removes all tokens from a database for a specific user. refresh tokens, reset tokens, other I add down the road. Make user sign in and request everything from scratch.
-   private async cleanSavedTokens(userId: Types.ObjectId): Promise<void> {
+   async cleanSavedTokens(userId: Types.ObjectId): Promise<void> {
       const results = await Promise.allSettled([
          this.repository.deletePasswordResetTokens(userId),
          this.repository.deleteRefreshTokensByUserId(userId),
@@ -188,6 +137,12 @@ export class AuthenticationService {
          }
          throw new Error(`token cleanup failed for userId ${userId}`);
       }
+   }
+
+
+
+   async consumePasswordResetToken(tokenHash: string): Promise<PasswordResetTokenRecord> {
+      return await this.repository.consumePasswordResetToken(tokenHash);;
    }
 
 

@@ -1,20 +1,20 @@
-//* Requires the client to be authenticated in to utilize a repository resource
-//? If the client is not authenticated, throw a generic unauthorized error
-
-import { getScope } from "../../../common/decorators/scopeAware";
 import { NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { AuthorizationService } from "../authorization.service";
+import type { AccessControlled } from "./AccessControlled.function";
+
+type RequireAccessControlled<This> = This extends AccessControlled ? unknown : "@Protected can only be used in a class that extends AccessControlled";
 
 //? If resource is not found, throw an unauthorized error, (data mask, protected routes shouldn't tell the client if the resource is real or not)
 export function Protected<This extends object, Args extends unknown[], R>(
    target: (this: This, ...args: Args) => Promise<R>,
-   context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => Promise<R>>
+   context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => Promise<R>> & RequireAccessControlled<This>
 ) {
    const methodName = String(context.name);
 
    return async function (this: This, ...args: Args): Promise<R> {
       const className = this.constructor.name;
-      const authorization = getScope(this, "Protected").resolve<AuthorizationService>("authorization");
+      //? protected is compile-time only; the AccessControlled base class guarantees this exists at runtime
+      const { authorization } = this as unknown as { authorization: AuthorizationService };
 
       if (!authorization.clientId) { throw new UnauthorizedError(`Unauthenticated clients cannot call ${className}.${methodName}`); }
       try { return await target.apply(this, args); }

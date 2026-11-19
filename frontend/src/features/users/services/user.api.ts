@@ -23,8 +23,14 @@ export function createUserApi(call: TypeApiCaller) {
    return {
       defineRelationship: (userId: string) =>
          call<TypeRelationship>({
-            url: `/users/defineRelationship/${userId}`,
+            url: `/relationships/defineRelationship/${userId}`,
             method: 'get'
+         }),
+      delete: (body: { password: string }) => 
+         call<void>({
+            url: `/users/delete`,
+            method: 'post',
+            body,
          }),
       get: (userId: string, body?: PayloadUserApiGet) =>
          call<TypeUser>({
@@ -34,13 +40,13 @@ export function createUserApi(call: TypeApiCaller) {
          }),
       processFriendRequest: (relationshipId: string, body: PayloadUserApiProcessFriendRequest) =>
          call<TypeRelationship>({
-            url:`/users/processFriendRequest/${relationshipId}`,
+            url:`/relationships/processFriendRequest/${relationshipId}`,
             method: 'post',
             body,
          }),
       removeFriend: (relationshipId: string) => 
          call<TypeRelationship>({
-            url: `/users/removeFriend/${relationshipId}`,
+            url: `/relationships/removeFriend/${relationshipId}`,
             method: 'post',
          }),
       search: (body: PayloadUserApiSearch) =>
@@ -51,7 +57,7 @@ export function createUserApi(call: TypeApiCaller) {
          }),
       sendFriendRequest: (userId: string) =>
          call<TypeRelationship>({
-            url: `/users/sendFriendRequest/${userId}`,
+            url: `/relationships/sendFriendRequest/${userId}`,
             method: 'post',
          }),
       update: (userId: string, body: PayloadUserApiUpdate) =>
