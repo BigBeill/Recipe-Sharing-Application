@@ -39,8 +39,8 @@ export function createUserService(api: TypeUserApi) {
          return api.sendFriendRequest(userId);
       },
 
-      update: (userId: string, payload: PayloadUserApiUpdate): Promise<TypeUser> => {
-         return api.update(userId, payload);
+      update: (payload: PayloadUserApiUpdate): Promise<TypeUser> => {
+         return api.update(payload);
       },
    }
 }

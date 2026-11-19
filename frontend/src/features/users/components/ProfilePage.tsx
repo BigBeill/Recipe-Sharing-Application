@@ -41,7 +41,7 @@ export default function ProfilePage({ initial }: Props) {
 
    // ? functions and variables for editing the current user
    const [editMode, setEditMode] = useState<boolean>(false);
-   const userMutator = useServiceMutation(async (): Promise<TypeUser> => { return await userService.update(user._id, (await harvestRefsObject(refs))) });
+   const userMutator = useServiceMutation(async (): Promise<TypeUser> => { return await userService.update(await harvestRefsObject(refs)) });
 
    async function saveChanges() {
       if (!editMode) { return; }

@@ -132,7 +132,6 @@ export const usersController = new Elysia({ prefix: '/users' })
          return status(201, response);
       },
       {
-         params: t.Object({ _id: ValidatorCommonMongooseId }),
          body: t.Partial(ValidatorCommonUserDraft),
          response: { 201: ValidatorCommonUser }
       }

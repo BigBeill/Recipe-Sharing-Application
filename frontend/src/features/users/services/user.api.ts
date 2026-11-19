@@ -60,9 +60,9 @@ export function createUserApi(call: TypeApiCaller) {
             url: `/relationships/sendFriendRequest/${userId}`,
             method: 'post',
          }),
-      update: (userId: string, body: PayloadUserApiUpdate) =>
+      update: (body: PayloadUserApiUpdate) =>
          call<TypeUser>({
-            url: `/users/update/${ userId }`,
+            url: `/users/update`,
             method: 'put',
             body,
          }),
