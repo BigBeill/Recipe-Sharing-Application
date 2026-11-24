@@ -1,18 +1,13 @@
 "use client"
 
-import { createContext, use, useContext, useState } from 'react';
-import { TypeSession } from '../server/session';
-import { logout } from '../server/logout';
+import { createContext, use, useContext, useEffect, useEffectEvent, useState } from 'react';
+import type { TypeSession } from '../server/session';
+import { type AuthEvent, authEvents } from './authentication.events.client';
+import { useRouter } from 'next/navigation';
 
 type AuthState = { session: TypeSession; sessionStatus: 'authenticated'; } 
 	| { session: null; sessionStatus: 'pending' | 'guest'; }
-
-type AuthContextValue = AuthState & { 
-	overrideSession: (session: TypeSession | null) => void;
-	logoutSession: () => Promise<void>;
-};
-
-const SessionContext = createContext<AuthContextValue | null>(null);
+const SessionContext = createContext<AuthState | null>(null);
 
 interface props {
 	sessionPromise: Promise<TypeSession | null>
@@ -21,6 +16,7 @@ interface props {
 
 export default function AuthProvider({ sessionPromise, children }: props) {
 	const resolved = use(sessionPromise);
+	const router = useRouter();
 
 	const [override, setOverride] = useState<{
 		source: Promise<TypeSession | null>;
@@ -29,21 +25,30 @@ export default function AuthProvider({ sessionPromise, children }: props) {
 
 	const session = override?.source === sessionPromise ? override.session : resolved;
 
-	const state: AuthState = session
-		? { session, sessionStatus: 'authenticated' }
-		: { session: null, sessionStatus: 'guest' };
-
 	function overrideSession(newSession: TypeSession | null) {
       setOverride({ source: sessionPromise, session: newSession });
    }
 
-	async function logoutSession() {
-		await logout();
-		overrideSession(null);
-	}
+	const onAuthEvent = useEffectEvent((event: AuthEvent) => {
+		if (event.type === 'signedOut') { 
+			overrideSession(null);
+			router.push('/auth/login');
+		}
+		else if (event.session) { 
+			overrideSession(event.session); 
+			router.push('/');
+		}
+   	else { router.refresh(); }
+	})
+
+	useEffect(() => { return authEvents.subscribe((event) => { onAuthEvent(event); }) }, []);
+
+	const state: AuthState = session
+		? { session, sessionStatus: 'authenticated' }
+		: { session: null, sessionStatus: 'guest' };
 
 	return (
-		<SessionContext.Provider value={ { ...state, overrideSession, logoutSession } }>
+		<SessionContext.Provider value={ state }>
 			{ children }
 		</SessionContext.Provider>
 	);

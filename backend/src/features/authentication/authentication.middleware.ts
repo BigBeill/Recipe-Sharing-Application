@@ -13,7 +13,7 @@ const OBJECT_ID_HEX = /^[0-9a-fA-F]{24}$/;
 
 
 
-async function readAuthId(token: string | undefined): Promise<Types.ObjectId | undefined> {
+async function readClientId(token: string | undefined): Promise<Types.ObjectId | undefined> {
    if (!token) { return undefined }
 
    try {
@@ -32,10 +32,10 @@ async function readAuthId(token: string | undefined): Promise<Types.ObjectId | u
 
 export const authenticateMiddleware = new Elysia({ name: 'authenticate' })
 .derive({ as: 'scoped' }, async ({ cookie: { accessToken } }) => {
-      const authId = await readAuthId(accessToken?.value as string | undefined);
+      const clientId = await readClientId(accessToken?.value as string | undefined);
 
       const scope = container.createScope();
-      scope.register({ authId: asValue(authId ?? null) });
+      scope.register({ clientId: asValue(clientId ?? null) });
       const authorization = scope.resolve<AuthorizationService>('authorizationService');
 
       return { scope, authorization };

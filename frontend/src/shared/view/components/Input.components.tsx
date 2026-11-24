@@ -12,7 +12,7 @@
    * 
    * expected props: {
    *    label: string;
-   *    dataRef: Ref<DataHandle<string>>;
+   *    dataRef: Ref<TypeDataHandle<string>>;
    *    initial?: string;
    *    readOnlyOptions?: {
    *       condition: boolean;
@@ -22,7 +22,7 @@
    * && any other props you would expect to find in the respected component type
    * 
    * This component will prompt the user to enter a number, and store the number for the parent to use
-   * The string can be accessed through ref using the { DataHandle<string> } getData + setData properties
+   * The string can be accessed through ref using the { TypeDataHandle<string> } getData + setData properties
    * 
    * readOnlyOptions provides the parent with the ability to show an uneditable version of the string if { condition } is true ({ placeholder } is whats shown if the string is empty)
    * 
@@ -34,7 +34,7 @@
    * expected props: {
    *    type: 'text' | 'textarea'
    *    label: string;
-   *    dataRef: Ref<DataHandle<string>>;
+   *    dataRef: Ref<TypeDataHandle<string>>;
    *    initial?: string;
    *    readOnlyOptions?: {
    *       condition: boolean;
@@ -44,7 +44,7 @@
    * && any other props you would expect to find in the respected component type
    * 
    * This component will prompt the user to create a string, and store the string for the parent to use
-   * The string can be accessed through ref using the { DataHandle<string> } getData + setData properties
+   * The string can be accessed through ref using the { TypeDataHandle<string> } getData + setData properties
    * 
    * readOnlyOptions provides the parent with the ability to show an uneditable version of the string if { condition } is true ({ placeholder } is whats shown if the string is empty)
    * 
@@ -57,7 +57,7 @@
    * expected props: {
    *    type: 'radio' | 'select'
    *    label: string;
-   *    ref: Ref<DataHandle<T>>;
+   *    ref: Ref<TypeDataHandle<T>>;
    *    initial?: {
    *       label: string;
    *       value: T;
@@ -70,7 +70,7 @@
    * && any other props you would expect to find in the respected component type
    * 
    * This component will prompt the user to select a string from { optionList }, and store the choice for the parent to use
-   * The string can be accessed through ref using the { DataHandle<T> } getData + setData properties
+   * The string can be accessed through ref using the { TypeDataHandle<T> } getData + setData properties
    * 
    * initial should be set to the label 
 */
@@ -80,7 +80,7 @@
 
 import styles from './styles/inputs.module.scss';
 import { Ref, useId, useImperativeHandle, useState } from 'react';
-import { DataHandle } from '../../domain/shared.types';
+import { TypeDataHandle } from '../../domain/shared.types';
 
 
 
@@ -89,7 +89,7 @@ import { DataHandle } from '../../domain/shared.types';
 
 type InputNumberBaseProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'type'> & {
    label: string;
-   ref?: Ref<DataHandle<number>>;
+   ref?: Ref<TypeDataHandle<number>>;
    initial?: number;
    readOnlyOptions?: {
       condition: boolean;
@@ -130,7 +130,7 @@ export function InputNumber({ label, initial, ref, className, readOnlyOptions, .
 
 type InputStringBaseProps = {
    label: string;
-   ref?: Ref<DataHandle<string>>;
+   ref?: Ref<TypeDataHandle<string>>;
    initial?: string;
    readOnlyOptions?: {
       condition: boolean;
@@ -189,7 +189,7 @@ export function InputString({ className, label, initial, ref, readOnlyOptions, .
 
 type InputChooseValueBaseProps<T> = {
    label: string;
-   ref?: Ref<DataHandle<T>>;
+   ref?: Ref<TypeDataHandle<T>>;
    initial?: T;
    optionList: {
       label: string;

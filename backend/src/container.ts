@@ -17,7 +17,7 @@ import { RelationshipsService } from "./features/relationships/application/relat
 export const container = createContainer({ strict: true });
 
 container.register({
-   authId: asValue<string | null | undefined>(undefined),
+   clientId: asValue<string | null | undefined>(undefined),
 
    authenticationRepository: asClass(AuthenticationRepository).scoped(),
    authorizationRepository: asClass(AuthorizationRepository).scoped(),

@@ -16,9 +16,8 @@ export class AuthenticationRepository {
 
 
 
-   async consumePasswordResetToken(tokenHash: string): Promise<PasswordResetTokenRecord> {
+   async consumePasswordResetToken(tokenHash: string): Promise<PasswordResetTokenRecord | null> {
       const passwordResetToken = await PasswordResetTokenModel.findOneAndDelete({ tokenHash }).lean<PasswordResetTokenRecord>();
-      if (!passwordResetToken) { throw new NotFoundError("PasswordResetToken"); }
       return passwordResetToken;
    }
 

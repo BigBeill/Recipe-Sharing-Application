@@ -1,4 +1,4 @@
-import { DataHandle } from "@/shared/domain/shared.types";
+import { TypeDataHandle } from "@/shared/domain/shared.types";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { KeyboardEvent, Ref, useEffect, useRef } from "react";
@@ -9,7 +9,7 @@ import { InputString } from "@/shared/view/components/Input.components";
 
 interface ComponentProps {
    refs: {
-      instructionList: Ref<DataHandle<string[]>>;
+      instructionList: Ref<TypeDataHandle<string[]>>;
    }
    initial: { 
       instructionList: string[];
@@ -18,7 +18,7 @@ interface ComponentProps {
 
 export default function EditRecipeShardSetInstructionList ({ refs, initial }: ComponentProps) {
 
-   const newInstructionRef = useRef<DataHandle<string>>(null);
+   const newInstructionRef = useRef<TypeDataHandle<string>>(null);
 
    const instructionList = useInteractableList({
       initial: initial.instructionList,

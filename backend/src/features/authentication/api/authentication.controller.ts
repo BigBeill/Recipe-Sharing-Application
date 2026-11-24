@@ -1,9 +1,7 @@
 import { Elysia, status, t } from 'elysia';
 import { authenticateMiddleware } from '../authentication.middleware';
-import { NotFoundError } from '../../../global/departingData/errorClasses';
 import { ValidatorCommonMongooseId } from '../../../common/domain/validators/mongooseId.validator';
 import { ValidatorIncomingAuthLoginBody } from './validators/login.validator';
-import { ValidatorIncomingAuthRequestPasswordResetBody } from './validators/requestPasswordReset.validator';
 import type { AuthenticationService } from '../application/authentication.service';
 import { authorizeMiddleware } from '../../authorization/authorization.middleware';
 
@@ -65,23 +63,6 @@ export const authenticationController = new Elysia({ prefix: '/auth' })
             refreshToken: t.String(),
          }),
          response: { 200: t.String() }
-      }
-   )
-
-
-
-   .post('/requestPasswordReset',
-      async ({ body, service }) => {
-         const { email } = body;
-
-         // ? catch any not found errors and return as if the request was a success (prevents an enumeration attack)
-         try { await service.requestPasswordReset(email); }
-         catch (error) { if (!(error instanceof NotFoundError)) { throw error; } }
-
-         return status(204);
-      },
-      {
-         body: ValidatorIncomingAuthRequestPasswordResetBody,
       }
    )
 

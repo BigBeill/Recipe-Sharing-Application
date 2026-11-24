@@ -1,5 +1,4 @@
 import { checkValidEmail, checkValidPassword } from "./auth.utils";
-import { ErrorValidation } from "@/shared/domain/errorClasses";
 import type {
    TypeAuthApi,
    PayloadAuthApiLogin,
@@ -8,28 +7,21 @@ import type {
    PayloadAuthApiResetPassword,
 } from './auth.api';
 
+export type AuthClientOnlyMethods = {
+   login: (payload: PayloadAuthApiLogin) => Promise<void>;
+   logout: () => Promise<void>;
+   register: (payload: Omit<PayloadAuthApiRegister, 'password'> & { passwordOne: string, passwordTwo: string }) => Promise<void>;
+};
+
+function clientOnly<const Name extends keyof AuthClientOnlyMethods>(name: Name) {
+   const message = `authService.${name} is only accessible through the .client implementation` as const;
+   return (() => { throw new Error(message); }) as unknown as { readonly [K in typeof message]: never };
+}
+
 export function createAuthService(api: TypeAuthApi) {
    return {
-
       checkAuthStatus: (): Promise<string> => {
          return api.checkStatus();
-      },
-
-      login: async (payload: PayloadAuthApiLogin): Promise<string> => {
-         checkValidPassword(payload.password);
-         const response = await api.login(payload);
-         return response;
-      },
-
-      logout: (): Promise<void> => {
-         return api.logout();
-      },
-
-      register: (payload: Omit<PayloadAuthApiRegister, 'password'> & { passwordOne: string, passwordTwo: string }): Promise<string> => {
-         checkValidEmail(payload.email);
-         checkValidPassword(payload.passwordOne);
-         if (payload.passwordOne != payload.passwordTwo) { throw new ErrorValidation('Register validation failed', [{ field: 'passwords', reasonList: ['do not match'] }]); }
-         return api.register({ name: payload.name, email: payload.email, password: payload.passwordOne });
       },
 
       requestPasswordReset: (payload: PayloadAuthApiRequestPasswordReset) => {
@@ -42,5 +34,11 @@ export function createAuthService(api: TypeAuthApi) {
          return api.resetPassword(payload);
       },
 
-   }
+      /** @deprecated authService.login is only accessible through the .client implementation */
+      login: clientOnly('login'),
+      /** @deprecated authService.logout is only accessible through the .client implementation */
+      logout: clientOnly('logout'),
+      /** @deprecated authService.register is only accessible through the .client implementation */
+      register: clientOnly('register'),
+   };
 }

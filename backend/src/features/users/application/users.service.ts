@@ -14,6 +14,7 @@ import type { RelationshipsService } from "../../relationships/application/relat
 import { hashPassword } from "../../../common/utils/password";
 import type { AuthenticationService } from "../../authentication/application/authentication.service";
 import type { TypeAuthResult } from "../../authentication/domain/auth.types";
+import { Protected } from "../../authorization/decorators/Protected";
 
 
 
@@ -22,7 +23,6 @@ interface GetUserParams {
 }
 
 interface SearchUsersParams {
-   authId?: Types.ObjectId,
    _id?: Types.ObjectId,
    name?: string,
    includeRelationship?: boolean,
@@ -83,15 +83,12 @@ export class UsersService extends AccessControlled {
 
       // delete any recipes associated with the account
       await this.recipesService.deleteMany();
-      console.log("checkpoint 1");
 
       // delete users avatar image
       const user = await this.repository.getUser(this.authorization.requireClientId());
       if (user.imageReferenceId) { await this.imagesService.delete(user.imageReferenceId); }
-      console.log("checkpoint 2");
 
       await this.repository.delete();
-      console.log("checkpoint 3");
    }
 
 
@@ -125,14 +122,14 @@ export class UsersService extends AccessControlled {
 
 
    async searchUsers(params: SearchUsersParams): Promise<TypePaginatedList<TypeUser>> {
-      const { authId, _id, name, skip, limit, includeRelationship } = params;
-      if (includeRelationship && !authId) { throw new UnauthorizedError('Include relationship flag cannot be set to true without a valid session'); }
+      const { _id, name, skip, limit, includeRelationship } = params;
+      if (includeRelationship && !this.authorization.clientId) { throw new UnauthorizedError('Include relationship flag cannot be set to true without a valid session'); }
 
       const users = removeMongooseNoise(await this.repository.searchUser({ _id, name, skip, limit }));
       if (!includeRelationship) { return users; }
       else {
          const list = await Promise.all(users.list.map(async (user) => {
-            const relationship = await this.relationshipService.findRelationship({ ownerId: user._id, targetId: authId! });
+            const relationship = await this.relationshipService.findRelationship({ ownerId: user._id, targetId: this.authorization.requireClientId() });
             return {
                ...user,
                relationship
@@ -147,21 +144,13 @@ export class UsersService extends AccessControlled {
 
 
 
-   async resetPassword(password: string, resetToken: string): Promise<void> {
-   
-      const tokenHash = new Bun.CryptoHasher("sha256").update(resetToken).digest("hex");
+   @Protected
+   async resetPassword(password: string): Promise<void> {
 
-      // fetch the reset token by hash
-      const tokenHashRecord = await this.authenticationService.consumePasswordResetToken(tokenHash);
-
-      // hash the new password and grab the userId its for
-      const hashedPassword = await hashPassword(password);
-
-      // hahs the new password and remove any old instances of password reset requests
-      const userId = tokenHashRecord.userId;
-      const [] = await Promise.all([
-         this.repository.updatePassword(hashedPassword),
-         this.authenticationService.cleanSavedTokens(userId),
+      // hash the new password and remove any old instances of password reset requests
+      await Promise.all([
+         this.repository.updatePassword(await hashPassword(password)),
+         this.authenticationService.cleanSavedTokens(this.authorization.requireClientId()),
       ]);
    }
 

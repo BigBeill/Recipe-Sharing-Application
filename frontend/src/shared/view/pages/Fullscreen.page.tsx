@@ -1,14 +1,14 @@
 "use client"
 
 import { createPortal } from 'react-dom';
-import { DataHandle } from '@/shared/domain/shared.types';
+import { TypeDataHandle } from '@/shared/domain/shared.types';
 import styles from './styles/fullscreen.module.scss'
 import { Ref, useEffect, useImperativeHandle, useState } from "react";
 import { ButtonIconList } from '../components/Button.components';
 import { faXmarkCircle } from '@fortawesome/free-regular-svg-icons';
 
 type ComponentParams = React.ComponentPropsWithoutRef<'div'> & {
-   ref: Ref<DataHandle<boolean>>,
+   ref: Ref<TypeDataHandle<boolean>>,
 }
 
 export function FullscreenPage({ ref, children, className, ...rest }: ComponentParams) {

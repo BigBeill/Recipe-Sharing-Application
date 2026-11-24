@@ -1,4 +1,5 @@
-import { ServiceMutationReturnType } from "@/shared/lib/hooks/useServiceMutation";
+
+import { TypeServiceMutator } from "@/shared/lib/hooks/useServiceMutation";
 import { ButtonShielded } from "@/shared/view/components/Button.components";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { StateErrorInsert } from "@/shared/view/states/Error.states";
@@ -6,8 +7,8 @@ import { StateLoadingInsert } from "@/shared/view/states/Loading.states";
 
 
 interface ComponentProps {
-   saveMutator: ServiceMutationReturnType<undefined, void>;
-   deleteMutator: ServiceMutationReturnType<undefined, void>;
+   saveMutator: TypeServiceMutator<undefined, void>;
+   deleteMutator: TypeServiceMutator<undefined, void>;
 }
 
 export default function EditRecipeShardSubmit({ saveMutator, deleteMutator }: ComponentProps) {

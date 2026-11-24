@@ -1,4 +1,4 @@
-import RequestPasswordResetPage from "@/features/auth/components/PasswordResetPage";
+import RequestPasswordResetPage from "@/features/auth/view/PasswordResetPage";
 import { verifySession } from "@/features/auth/server/session";
 import { redirect } from "next/navigation";
 

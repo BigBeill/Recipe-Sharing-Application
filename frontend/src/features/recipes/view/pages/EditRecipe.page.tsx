@@ -3,8 +3,8 @@
 import { useRef } from 'react';
 import { TypeRecipe } from '../../domain/recipes.types';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
-import { DataHandle } from '@/shared/domain/shared.types';
-import harvestRefsObject from '@/shared/lib/harvestRefsObject';
+import { TypeDataHandle } from '@/shared/domain/shared.types';
+import harvestRefsObject from '@/shared/lib/harvestRefCollection';
 import { recipeService } from '../../services/recipes.service.client';
 import { useRouter } from 'next/navigation';
 import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
@@ -26,12 +26,12 @@ export default function EditRecipePage({ recipe }: ComponentParams ) {
 
 	// data references
 	const refs = {
-		title: useRef<DataHandle<string>>(null),
-		description: useRef<DataHandle<string>>(null),
-		imageReference: useRef<DataHandle<TypeImageReference | undefined>>(null),
-		visibility: useRef<DataHandle<'public' | 'private' | 'personal'>>(null),
-		ingredientList: useRef<DataHandle<IngredientType[]>>(null),
-		instructionList: useRef<DataHandle<string[]>>(null),
+		title: useRef<TypeDataHandle<string>>(null),
+		description: useRef<TypeDataHandle<string>>(null),
+		imageReference: useRef<TypeDataHandle<TypeImageReference | undefined>>(null),
+		visibility: useRef<TypeDataHandle<'public' | 'private' | 'personal'>>(null),
+		ingredientList: useRef<TypeDataHandle<IngredientType[]>>(null),
+		instructionList: useRef<TypeDataHandle<string[]>>(null),
 	}
 
 	const saveMutator = useServiceMutation(async () => {

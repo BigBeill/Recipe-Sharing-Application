@@ -5,7 +5,7 @@ import GrowingText from '@/shared/view/components/GrowingText.component';
 import ImageUploader from '@/features/images/components/ImageUploader';
 import { useRouter } from 'next/navigation';
 import styles from './profilePage.module.scss';
-import { DataHandle } from '@/shared/domain/shared.types';
+import { TypeDataHandle } from '@/shared/domain/shared.types';
 import { userService } from '../services/user.service.client';
 import { useAuth } from '@/features/auth/providers/AuthProvider';
 import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
@@ -14,9 +14,10 @@ import { ButtonOval, ButtonShielded } from '@/shared/view/components/Button.comp
 import { InputString } from '@/shared/view/components/Input.components';
 import { TypeImageReference } from '@/features/images/domain/image.types';
 import { TypeRelationship, TypeUser } from '../domain/user.types';
-import harvestRefsObject from '@/shared/lib/harvestRefsObject';
+import harvestRefsObject from '@/shared/lib/harvestRefCollection';
 import ImageDisplay from '@/features/images/components/ImageDisplay';
-import ReauthenticatePopup from '@/features/auth/components/ReauthenticateAction';
+import ReauthenticatePopup from '@/features/auth/view/ReauthenticateAction';
+import { authService } from '@/features/auth/services/auth.service.client';
 
 interface Props {
    initial: TypeUser
@@ -24,7 +25,7 @@ interface Props {
 
 export default function ProfilePage({ initial }: Props) {
    const router = useRouter();
-   const { session, sessionStatus, logoutSession } = useAuth();
+   const { session, sessionStatus } = useAuth();
 
    const [sessionStatusOnMount] = useState(sessionStatus);
    if (sessionStatusOnMount !== 'authenticated') { throw new Error("Attempting to call ProfilePage without a sessionState of authenticated") }
@@ -32,12 +33,12 @@ export default function ProfilePage({ initial }: Props) {
    const [user, setUser] = useState<TypeUser>(initial);
 
    const refs = {
-      name: useRef<DataHandle<string>>(null),
-      bio: useRef<DataHandle<string>>(null),
-      imageReference: useRef<DataHandle<TypeImageReference | undefined>>(null),
+      name: useRef<TypeDataHandle<string>>(null),
+      bio: useRef<TypeDataHandle<string>>(null),
+      imageReference: useRef<TypeDataHandle<TypeImageReference | undefined>>(null),
    }
 
-   const reauthenticateRef = useRef<DataHandle<boolean>>(null);
+   const reauthenticateRef = useRef<TypeDataHandle<boolean>>(null);
 
    // ? functions and variables for editing the current user
    const [editMode, setEditMode] = useState<boolean>(false);
@@ -69,8 +70,7 @@ export default function ProfilePage({ initial }: Props) {
 
    // handle logout function
    function handleLogout() {
-      logoutSession()
-         .then(() => router.push('/auth/login'));
+      authService.logout();
    }
 
    return (

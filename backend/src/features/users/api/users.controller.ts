@@ -8,7 +8,6 @@ import { ValidatorCommonPaginatedList } from "../../../common/domain/validators/
 import type { UsersService } from "../application/users.service";
 import { authorizeMiddleware } from "../../authorization/authorization.middleware";
 import { ValidatorIncomingAuthRegisterBody } from "./validators/register.validator";
-import { ValidatorIncomingAuthResetPasswordBody } from "./validators/resetPassword.validator";
 import { ValidatorIncomingAuthChangePasswordBody } from "./validators/changePassword.validator";
 
 export const usersController = new Elysia({ prefix: '/users' })
@@ -107,19 +106,6 @@ export const usersController = new Elysia({ prefix: '/users' })
       },
       {
          body: t.Object({ password: t.String() })
-      }
-   )
-
-
-
-   .post('/resetPassword',
-      async ({ body, service }) => {
-         const { password, token } = body;
-         await service.resetPassword(password, token);
-         return status(204);
-      },
-      {
-         body: ValidatorIncomingAuthResetPasswordBody,
       }
    )
 

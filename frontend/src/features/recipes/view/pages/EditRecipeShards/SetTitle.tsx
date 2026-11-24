@@ -1,4 +1,4 @@
-import { DataHandle } from "@/shared/domain/shared.types";
+import { TypeDataHandle } from "@/shared/domain/shared.types";
 import { Ref } from "react";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { InputString } from "@/shared/view/components/Input.components";
@@ -6,8 +6,8 @@ import { InputString } from "@/shared/view/components/Input.components";
 interface ComponentProps {
 	newRecipe: boolean;
 	refs: { 
-		title: Ref<DataHandle<string>>;
-		description: Ref<DataHandle<string>>;
+		title: Ref<TypeDataHandle<string>>;
+		description: Ref<TypeDataHandle<string>>;
 	};
 	initial: { 
 		title?: string,

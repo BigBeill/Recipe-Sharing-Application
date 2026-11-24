@@ -3,20 +3,20 @@ import "client-only";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ServiceStateType } from "@/shared/domain/shared.types";
 
-export type ServiceMutationReturnType<TInput, TOutput> = ServiceStateType<TOutput> & {
+export type TypeServiceMutator<TInput, TOutput> = ServiceStateType<TOutput> & {
    send: [TInput] extends [void] ? () => Promise<TOutput> : (input: TInput) => Promise<TOutput>;
    resetToIdle: () => void;
    overrideOutput: (output: TOutput) => void;
 }
 
 // no-input overload
-export function useServiceMutation<TOutput>(mutationFunction: () => Promise<TOutput>): ServiceMutationReturnType<void, TOutput>;
+export function useServiceMutation<TOutput>(mutationFunction: () => Promise<TOutput>): TypeServiceMutator<void, TOutput>;
 
 // required-input overload
-export function useServiceMutation<TInput, TOutput>(mutationFunction: (input: TInput) => Promise<TOutput>): ServiceMutationReturnType<TInput, TOutput>;
+export function useServiceMutation<TInput, TOutput>(mutationFunction: (input: TInput) => Promise<TOutput>): TypeServiceMutator<TInput, TOutput>;
 
 // implementation
-export function useServiceMutation<TInput, TOutput>( mutationFunction: (input?: TInput) => Promise<TOutput> ): ServiceMutationReturnType<TInput, TOutput> {
+export function useServiceMutation<TInput, TOutput>( mutationFunction: (input?: TInput) => Promise<TOutput> ): TypeServiceMutator<TInput, TOutput> {
    const [state, setState] = useState<ServiceStateType<TOutput>>({ status: 'idle' });
 
    const mutationFunctionRef = useRef(mutationFunction);
@@ -67,5 +67,5 @@ export function useServiceMutation<TInput, TOutput>( mutationFunction: (input?: 
       send, 
       resetToIdle,
       overrideOutput
-   } as ServiceMutationReturnType<TInput, TOutput>;
+   } as TypeServiceMutator<TInput, TOutput>;
 }

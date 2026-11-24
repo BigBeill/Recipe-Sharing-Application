@@ -68,8 +68,8 @@ export class RecipesRepository extends AccessControlled {
 
       // ? quick safety check to make sure this function is being used correctly (not effective authorization)
       if (visibilityList.length === 0) { throw new Error('recipes.repository.search prop { visibilityList } was invalid'); }
-      if (visibilityList.includes('private') && !this.authorization.clientId) { throw new Error('recipes.repository.search prop { visibilityList } includes the value "private" however a valid { authId } was not provided'); }
-      if (visibilityList.includes('personal') && !this.authorization.clientId) { throw new Error('recipes.repository.search prop { visibilityList } includes "personal" however a valid { authId } was not provided'); }
+      if (visibilityList.includes('private') && !this.authorization.clientId) { throw new Error('recipes.repository.search prop { visibilityList } includes the value "private" however a valid { clientId } was not provided'); }
+      if (visibilityList.includes('personal') && !this.authorization.clientId) { throw new Error('recipes.repository.search prop { visibilityList } includes "personal" however a valid { clientId } was not provided'); }
 
       const recipeAccessConditionList = [
          ...(visibilityList.includes('public') ? [{ visibility: 'public' }] : []),

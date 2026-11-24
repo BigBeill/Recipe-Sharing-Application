@@ -3,7 +3,7 @@ import "client-only";
 import { ReactNode, Ref, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import styles from './styles/interactableList.module.scss'
 import { Reorder } from 'framer-motion';
-import { DataHandle } from "@/shared/domain/shared.types";
+import { TypeDataHandle } from "@/shared/domain/shared.types";
 
 interface InteractableListActions<T> {
    addItem: (item: T) => void;
@@ -12,7 +12,7 @@ interface InteractableListActions<T> {
 
 interface ComponentProps<T> {
    initial: T[];
-   ref: Ref<DataHandle<T[]>>;
+   ref: Ref<TypeDataHandle<T[]>>;
    renderItemContent: (item: T, index: number, actions: InteractableListActions<T>) => ReactNode;
    renderItemOptions: (item: T, index: number, actions: InteractableListActions<T>) => ReactNode;
    renderItemHeader?: (item: T, index: number, actions: InteractableListActions<T>) => ReactNode;

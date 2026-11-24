@@ -1,6 +1,6 @@
-export interface DataHandle<T> {
+export interface TypeDataHandle<T> {
    getData: () => Promise<T>;
-   setData: (newList: T) => Promise<void>;
+   setData: (newValue: T) => Promise<void>;
 };
 
 // all service functions should return this to force idle handling and preventing slow reactions waiting for API responses

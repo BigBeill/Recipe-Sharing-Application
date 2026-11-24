@@ -1,7 +1,5 @@
 import type { Types } from "mongoose";
 import { escapeRegex } from "../../../common/utils/filter";
-import { FriendRequestModel, type FriendRequestRecord } from "../../../externalResources/database/mongoose/schemas/friendRequest.schema";
-import { FriendshipModel, type FriendshipRecord } from "../../../externalResources/database/mongoose/schemas/friendship.schema";
 import { UserModel, type UserRecord } from "../../../externalResources/database/mongoose/schemas/user.schema";
 import type { TypeUserDraft } from "../domain/users.types";
 import type { TypePaginatedList } from "../../../common/domain/types.common";

@@ -4,7 +4,7 @@ import styles from './styles/recipe.module.scss';
 import { TypeRecipe } from "../../domain/recipes.types";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { ComponentPropsWithoutRef, Ref, useRef } from "react";
-import { DataHandle } from '@/shared/domain/shared.types';
+import { TypeDataHandle } from '@/shared/domain/shared.types';
 import BasicPage from '@/shared/view/pages/Basic.page';
 import NotebookPage from '@/shared/view/pages/Notebook.page';
 import { NotebookComponentDefault } from '@/shared/view/components/notebookPageSpecific/default.notebookComponent';
@@ -22,7 +22,7 @@ interface Props {
 
 export default function RecipePage ({ recipe }: Props) {
 
-   const fullscreenRef = useRef<DataHandle<boolean>>(null);
+   const fullscreenRef = useRef<TypeDataHandle<boolean>>(null);
 
    return (
       <>
@@ -106,7 +106,7 @@ function InstructionShard({ recipe, onClick }: Props & ComponentPropsWithoutRef<
    )
 }
 
-function FullscreenView({ recipe, ref }: Props & { ref: Ref<DataHandle<boolean>> }) {
+function FullscreenView({ recipe, ref }: Props & { ref: Ref<TypeDataHandle<boolean>> }) {
    return (
       <FullscreenPage ref={ ref } >
          <BasicPage>

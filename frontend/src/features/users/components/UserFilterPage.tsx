@@ -1,6 +1,6 @@
 "use client"
 
-import { DataHandle } from "@/shared/domain/shared.types";
+import { TypeDataHandle } from "@/shared/domain/shared.types";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useRef } from "react";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
@@ -15,8 +15,8 @@ export default function UserFilterPage() {
    const userId = searchParams.get('userId') || '';
    const name = searchParams.get('title') || '';
 
-   const userIdRef = useRef<DataHandle<string>>(null);
-   const nameRef = useRef<DataHandle<string>>(null);
+   const userIdRef = useRef<TypeDataHandle<string>>(null);
+   const nameRef = useRef<TypeDataHandle<string>>(null);
 
    async function handleFormSubmit() {
       const updatedParams = new URLSearchParams();

@@ -12,6 +12,8 @@ import { ipRateLimit } from './global/security/ipRateLimit.root';
 import { errorHandler } from './global/departingData/errorHandler.root';
 import { corsConfig } from './global/config/cors.config';
 import { logger } from './global/departingData/logger.root';
+import { relationshipsController } from './features/relationships/api/relationships.controller';
+import { passwordController } from './features/authentication/api/password.controller';
 
 export const app = new Elysia({ cookie: cookieConfig })
    .use(circuitBreaker({ limit: 2000, windowMs: 10_000, cooldownMs: 30_000 }))
@@ -30,9 +32,11 @@ export const app = new Elysia({ cookie: cookieConfig })
    .group('/api/v1', (api) =>
       api
          .use(authenticationController)
+         .use(passwordController)
          .use(imagesController)
          .use(ingredientsController)
          .use(recipesController)
+         .use(relationshipsController)
          .use(usersController),
    );
 

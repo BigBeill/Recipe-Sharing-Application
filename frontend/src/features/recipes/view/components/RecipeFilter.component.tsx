@@ -3,7 +3,7 @@
 import styles from "./styles/recipeFilter.module.scss";
 import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import { ingredientService } from "@/features/ingredients/services/ingredient.service.client";
-import { DataHandle } from "@/shared/domain/shared.types";
+import { TypeDataHandle } from "@/shared/domain/shared.types";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -14,7 +14,7 @@ import { NotebookComponentDefault } from "@/shared/view/components/notebookPageS
 import { ButtonOval } from "@/shared/view/components/Button.components";
 import IngredientSearch from "@/features/ingredients/view/components/IngredientSearch.component";
 import { InputChooseValue, InputString } from "@/shared/view/components/Input.components";
-import harvestRefsObject from "@/shared/lib/harvestRefsObject";
+import harvestRefsObject from "@/shared/lib/harvestRefCollection";
 
 
 
@@ -30,9 +30,9 @@ export default function RecipeFilterComponent() {
    const category: 'public' | 'friends' | 'personal' = (searchParams.get('category') || 'public') as 'public' | 'friends' | 'personal';
 
    const refs = {
-      title: useRef<DataHandle<string>>(null),
-      ingredientList: useRef<DataHandle<IngredientType[]>>(null),
-      category: useRef<DataHandle<"public" | "friends" | "personal">>(null),
+      title: useRef<TypeDataHandle<string>>(null),
+      ingredientList: useRef<TypeDataHandle<IngredientType[]>>(null),
+      category: useRef<TypeDataHandle<"public" | "friends" | "personal">>(null),
    }
 
    const categoryOptionList: { label: string, value: 'public' | 'friends' | 'personal' }[] = [ { label: 'Public', value: 'public' }, { label: 'Friends', value: 'friends' }, { label: 'Personal', value: 'personal' } ];

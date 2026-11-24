@@ -2,7 +2,7 @@
 
 import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import IngredientSearch from "@/features/ingredients/view/components/IngredientSearch.component";
-import { DataHandle } from "@/shared/domain/shared.types";
+import { TypeDataHandle } from "@/shared/domain/shared.types";
 import { useInteractableList } from "@/shared/lib/hooks/useInteractableList";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
@@ -11,7 +11,7 @@ import { Ref } from "react";
 
 interface ComponentProps {
    refs: {
-      ingredientList: Ref<DataHandle<IngredientType[]>>
+      ingredientList: Ref<TypeDataHandle<IngredientType[]>>
    }
    initial: {
       ingredientList: IngredientType[];

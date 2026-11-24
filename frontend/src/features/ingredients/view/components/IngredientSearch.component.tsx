@@ -4,12 +4,12 @@ import styles from './styles/ingredientSearch.module.scss';
 import { useRef, useState } from "react";
 import { InputChooseValue, InputNumber, InputString } from "@/shared/view/components/Input.components";
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
-import { DataHandle } from "@/shared/domain/shared.types";
+import { TypeDataHandle } from "@/shared/domain/shared.types";
 import useServiceState from '@/shared/lib/hooks/useServiceState';
 import { ButtonIconList } from '@/shared/view/components/Button.components';
 import { IngredientConversionType, IngredientType } from '../../domain/ingredient.types';
 import { ingredientService } from '../../services/ingredient.service.client';
-import harvestRefsObject from '@/shared/lib/harvestRefsObject';
+import harvestRefsObject from '@/shared/lib/harvestRefCollection';
 import ClientLazyLoad from '@/shared/lib/lazyLoad/Client.lazyLoad';
 
 type ComponentProps = Omit<React.ComponentPropsWithoutRef<'input'>, 'onSubmit' | 'type'> & {
@@ -23,9 +23,9 @@ export default function IngredientSearch({ extendedRequirements = false, onSubmi
    // Used if { extendedRequirements } is true
    const [ingredient, setIngredient] = useState<IngredientType | null>(null);
    const refs = {
-      label: useRef<DataHandle<string>>(null),
-      amount: useRef<DataHandle<number>>(null),
-      unit: useRef<DataHandle<IngredientConversionType | undefined>>(null),
+      label: useRef<TypeDataHandle<string>>(null),
+      amount: useRef<TypeDataHandle<number>>(null),
+      unit: useRef<TypeDataHandle<IngredientConversionType | undefined>>(null),
    }
 
    const emptyPaginatedList = { list: [], count: 0, firstItemIndex: 0 };

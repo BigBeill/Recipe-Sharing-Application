@@ -1,5 +1,5 @@
 import ImageUploader from "@/features/images/components/ImageUploader";
-import { DataHandle} from "@/shared/domain/shared.types";
+import { TypeDataHandle} from "@/shared/domain/shared.types";
 import { Ref } from "react";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { InputChooseValue } from "@/shared/view/components/Input.components";
@@ -7,8 +7,8 @@ import { TypeImageReference, TypeSignedImageUrl } from "@/features/images/domain
 
 interface ComponentProps {
    refs: {
-      image: Ref<DataHandle<TypeImageReference | undefined>>;
-      visibility: Ref<DataHandle<'public' | 'private' | 'personal'>>;
+      image: Ref<TypeDataHandle<TypeImageReference | undefined>>;
+      visibility: Ref<TypeDataHandle<'public' | 'private' | 'personal'>>;
    }
    initial: { 
       signedImageUrl?: TypeSignedImageUrl, 
@@ -33,7 +33,7 @@ export default function EditRecipeShardSetImage ({ refs, initial }: ComponentPro
             type='radio'
             initial={ initial.visibility }
             label="Recipe Visibility" 
-            ref={ refs.visibility as Ref<DataHandle<string>> }
+            ref={ refs.visibility as Ref<TypeDataHandle<string>> }
             optionList={ [
                { value: 'public', label: "Public - Anyone can view this recipe" },
                { value: 'private', label: "Private - You and friends can view this recipe" },

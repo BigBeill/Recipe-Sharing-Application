@@ -11,7 +11,7 @@ export interface TypeAuthResult {
 }
 
 export interface TypeJwtPayload {
-   authId: Types.ObjectId;
+   clientId: Types.ObjectId;
    issued?: number;
    expires?: number;
 }

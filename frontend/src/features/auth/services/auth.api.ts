@@ -50,14 +50,14 @@ export function createAuthApi(call: TypeApiCaller) {
 
       requestPasswordReset: (body: PayloadAuthApiRequestPasswordReset): Promise<void> =>
          call({
-            url: "/auth/requestPasswordReset",
+            url: "/password/reset/request",
             method: "POST",
             body,
          }),
 
       resetPassword: (body: PayloadAuthApiResetPassword): Promise<void> =>
          call({
-            url: "/users/resetPassword",
+            url: "/password/reset/confirm",
             method: "POST",
             body,
          }),

@@ -4,7 +4,7 @@ import styles from './input.module.scss';
 import { useState, useEffect, Ref, useImperativeHandle, useReducer, useRef } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
-import { DataHandle } from '@/shared/domain/shared.types';
+import { TypeDataHandle } from '@/shared/domain/shared.types';
 import { TypeImageReference, TypeSignedImageUrl } from '../domain/image.types';
 import { imageService } from '../services/image.service.client';
 
@@ -13,7 +13,7 @@ const RECIPE_IMAGE_FALLBACK = "/recipe-image-fallback.png";
 const USER_IMAGE_FALLBACK = "/recipe-image-fallback.png";
 
 interface ImageUploaderProps {
-   ref: Ref<DataHandle<TypeImageReference | undefined>>;
+   ref: Ref<TypeDataHandle<TypeImageReference | undefined>>;
    initial?: TypeSignedImageUrl;
    category: 'recipes' | 'users';
 }

@@ -15,12 +15,12 @@ export class AuthorizationService {
    private _friendIdList: Types.ObjectId[] | undefined;
    private _reauthenticated: boolean;
 
-   constructor({ authId, authorizationRepository, authenticationService }: { 
-      authId: Types.ObjectId | undefined, 
+   constructor({ clientId, authorizationRepository, authenticationService }: { 
+      clientId: Types.ObjectId | undefined, 
       authorizationRepository: AuthorizationRepository,
       authenticationService: AuthenticationService,
    }) {
-      this._clientId = authId
+      this._clientId = clientId
       this.repository = authorizationRepository;
       this.authenticationService = authenticationService;
       this._reauthenticated = false;

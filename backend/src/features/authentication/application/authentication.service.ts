@@ -1,4 +1,4 @@
-import { hashPassword, verifyPassword } from "../../../common/utils/password";
+import { verifyPassword } from "../../../common/utils/password";
 import { sendPasswordResetEmail } from '../../../externalResources/email/email.service';
 import { randomBytes } from 'node:crypto';
 import type { Types } from 'mongoose';
@@ -6,8 +6,6 @@ import { generateRefreshToken, signAccessToken } from '../tokenSigner';
 import { NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { TypeAuthResult, TypeSavedRefreshToken } from "../domain/auth.types";
 import type { AuthenticationRepository } from "../infrastructure/authentication.repository";
-import type { AuthorizationService } from "../../authorization/authorization.service";
-import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
 import type { PasswordResetTokenRecord } from "../../../externalResources/database/mongoose/schemas/passwordResetToken.schema";
 import { graceCache } from "../lib/refreshTokenGraceCache";
 
@@ -141,10 +139,11 @@ export class AuthenticationService {
 
 
 
-   async consumePasswordResetToken(tokenHash: string): Promise<PasswordResetTokenRecord> {
-      return await this.repository.consumePasswordResetToken(tokenHash);;
+   async consumePasswordResetToken(tokenHash: string): Promise<Types.ObjectId | null> {
+      const tokenRecord = await this.repository.consumePasswordResetToken(tokenHash);
+      return tokenRecord?.userId ?? null;
    }
 
 
-   
+
 }
