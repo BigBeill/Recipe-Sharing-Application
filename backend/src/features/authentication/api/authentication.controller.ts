@@ -87,11 +87,10 @@ export const authenticationController = new Elysia({ prefix: '/auth' })
       async ({ cookie: { accessToken, refreshToken }, service }) => {
          await service.deleteRefreshToken(refreshToken.value);
 
-         // * set cookies
          accessToken.remove();
          refreshToken.remove();
 
-         return status(204);
+         return status(201);
       },
       {
          cookie: t.Object({

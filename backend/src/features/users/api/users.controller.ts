@@ -98,14 +98,22 @@ export const usersController = new Elysia({ prefix: '/users' })
 
 
    .post('/delete',
-      async ({ service, body, authorization }) => {
+      async ({ service, body, authorization, cookie: { accessToken, refreshToken } }) => {
          const { password } = body;
          const reauthenticationProof = await authorization.reauthenticate(password);
          service.delete(reauthenticationProof);
+
+         accessToken.remove();
+         refreshToken.remove();
+
          return status(204);
       },
       {
-         body: t.Object({ password: t.String() })
+         body: t.Object({ password: t.String() }),
+         cookie: t.Object({
+            accessToken: t.Optional(t.String()),
+            refreshToken: t.String(),
+         })
       }
    )
 
