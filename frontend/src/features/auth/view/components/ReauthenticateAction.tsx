@@ -3,7 +3,7 @@
 import { Ref, useImperativeHandle, useRef, useState } from 'react';
 import { FullscreenPage } from '@/shared/view/pages/Fullscreen.page';
 import { TypeDataHandle } from '@/shared/domain/shared.types';
-import AuthenticationFormLayout, { AuthenticationFormSubmitButton, AuthenticationFormTextBox, AuthenticationFormTitle } from './pages/FormLayout';
+import AuthenticationFormLayout, { AuthenticationFormSubmitButton, AuthenticationFormTextBox, AuthenticationFormTitle } from '../pages/FormLayout';
 
 //* Some user actions are dangerous, the server is going to need to need a password attached to the request.
 //* This is to make sure the server can authenticate with the request and isn't relying on a potentially comprized accessToken

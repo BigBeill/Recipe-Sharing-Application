@@ -11,6 +11,7 @@ export type AuthClientOnlyMethods = {
    login: (payload: PayloadAuthApiLogin) => Promise<void>;
    logout: () => Promise<void>;
    register: (payload: Omit<PayloadAuthApiRegister, 'password'> & { passwordOne: string, passwordTwo: string }) => Promise<void>;
+   resetPassword: (Payload: PayloadAuthApiResetPassword) => Promise<void>;
 };
 
 function clientOnly<const Name extends keyof AuthClientOnlyMethods>(name: Name) {
@@ -29,16 +30,13 @@ export function createAuthService(api: TypeAuthApi) {
          return api.requestPasswordReset(payload);
       },
 
-      resetPassword: (payload: PayloadAuthApiResetPassword) => {
-         checkValidPassword(payload.password);
-         return api.resetPassword(payload);
-      },
-
       /** @deprecated authService.login is only accessible through the .client implementation */
       login: clientOnly('login'),
       /** @deprecated authService.logout is only accessible through the .client implementation */
       logout: clientOnly('logout'),
       /** @deprecated authService.register is only accessible through the .client implementation */
       register: clientOnly('register'),
+      /** @deprecated authService.login is only accessible through the .client implementation */
+      resetPassword: clientOnly('resetPassword'),
    };
 }

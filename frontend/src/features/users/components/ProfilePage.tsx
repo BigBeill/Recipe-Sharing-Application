@@ -16,7 +16,7 @@ import { TypeImageReference } from '@/features/images/domain/image.types';
 import { TypeRelationship, TypeUser } from '../domain/user.types';
 import harvestRefsObject from '@/shared/lib/harvestRefCollection';
 import ImageDisplay from '@/features/images/components/ImageDisplay';
-import ReauthenticatePopup from '@/features/auth/view/ReauthenticateAction';
+import ReauthenticatePopup from '@/features/auth/view/components/ReauthenticateAction';
 import { authService } from '@/features/auth/services/auth.service.client';
 
 interface Props {

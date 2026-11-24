@@ -6,7 +6,6 @@ import { generateRefreshToken, signAccessToken } from '../tokenSigner';
 import { NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { TypeAuthResult, TypeSavedRefreshToken } from "../domain/auth.types";
 import type { AuthenticationRepository } from "../infrastructure/authentication.repository";
-import type { PasswordResetTokenRecord } from "../../../externalResources/database/mongoose/schemas/passwordResetToken.schema";
 import { graceCache } from "../lib/refreshTokenGraceCache";
 
 type TypeBuildAuthResultOptions = { cachedRefreshToken: string; expiresAt?: undefined; } | { cachedRefreshToken?: undefined; expiresAt: Date };
@@ -139,7 +138,8 @@ export class AuthenticationService {
 
 
 
-   async consumePasswordResetToken(tokenHash: string): Promise<Types.ObjectId | null> {
+   async consumePasswordResetToken(resetToken: string): Promise<Types.ObjectId | null> {
+      const tokenHash = new Bun.CryptoHasher("sha256").update(resetToken).digest("hex");
       const tokenRecord = await this.repository.consumePasswordResetToken(tokenHash);
       return tokenRecord?.userId ?? null;
    }

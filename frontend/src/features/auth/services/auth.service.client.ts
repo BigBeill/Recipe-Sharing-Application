@@ -32,4 +32,9 @@ export const authService = {
       const response = await api.register({ name: payload.name, email: payload.email, password: payload.passwordOne });
       authEvents.emit({ type: 'signedIn', session: { userId: response, roles: [] } })
    },
+
+   resetPassword: (payload) => {
+      checkValidPassword(payload.password);
+      return api.resetPassword(payload);
+   },
 } satisfies Omit<ReturnType<typeof createAuthService>, keyof AuthClientOnlyMethods> & AuthClientOnlyMethods;

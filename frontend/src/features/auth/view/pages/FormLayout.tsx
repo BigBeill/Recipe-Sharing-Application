@@ -6,8 +6,9 @@ import harvestRefCollection, { TypeDataOfHarvestedCollection, TypeDataRefCollect
 import { TypeDataHandle } from '@/shared/domain/shared.types'
 import { ButtonOval } from '@/shared/view/components/Button.components'
 import { StateErrorInsert } from '@/shared/view/states/Error.states'
+import { StateInfoInsert } from '@/shared/view/states/Info.states'
 
-const AuthenticationFormErrorContext = createContext<{ hasError: boolean, error: unknown }>({ hasError: false, error: null });
+const AuthenticationFormErrorContext = createContext<{ success: boolean, hasError: boolean, error: unknown }>({ success: false, hasError: false, error: null });
 
 type LayoutProps<T extends TypeDataRefCollection> = {
    refs: T;
@@ -31,9 +32,11 @@ export default function AuthenticationFormLayout<T extends TypeDataRefCollection
    return (
       <LoadingProvider value={ authenticationMutator.status === "loading" }>
          <AuthenticationFormErrorContext.Provider value={
-            authenticationMutator.status === 'error'
-               ? { hasError: true, error: authenticationMutator.error }
-               : { hasError: false, error: null }
+            authenticationMutator.status === 'error' 
+               ? { success: false, hasError: true, error: authenticationMutator.error }
+               : authenticationMutator.status === 'ready'
+               ? { success: true, hasError: false, error: null }
+               : { success: false, hasError: false, error: null }
          }>
             <form 
                className={ styles.authenticationForm } 
@@ -113,8 +116,8 @@ export function AuthenticationFormCheckBox({ ref, name }: { ref: Ref<TypeDataHan
 
 
 
-export function AuthenticationFormSubmitButton({ children }: { children: string }) {
-   const { hasError, error } = useContext(AuthenticationFormErrorContext);
+export function AuthenticationFormSubmitButton({ children, successMessage }: { children: string, successMessage?: string }) {
+   const { success, hasError, error } = useContext(AuthenticationFormErrorContext);
 
    return (
       <>
@@ -129,6 +132,7 @@ export function AuthenticationFormSubmitButton({ children }: { children: string 
          </ButtonOval>
 
          { hasError && <StateErrorInsert style={ { margin: '0.6rem 0rem' } } error={ error as Error } /> }
+         { (successMessage && success) && <StateInfoInsert style={ { margin: '0.6rem 0rem' } }>{ successMessage }</StateInfoInsert> }
       </>
    )
 }

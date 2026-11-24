@@ -24,7 +24,7 @@ export default function RegisterPage() {
       >
          <AuthenticationFormTitle>Create Account</AuthenticationFormTitle>
          <AuthenticationFormTextBox type='text' name='username' ref={ refCollection.name } />
-         <AuthenticationFormTextBox type='email' name='username' ref={ refCollection.name } />
+         <AuthenticationFormTextBox type='email' name='email' ref={ refCollection.email } />
          <AuthenticationFormTextBox type='password' name='password' ref={ refCollection.passwordOne } />
          <AuthenticationFormTextBox type='password' name='confirm password' ref={ refCollection.passwordTwo } />
          <AuthenticationFormSubmitButton>Create Account</AuthenticationFormSubmitButton>
