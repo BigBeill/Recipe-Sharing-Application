@@ -1,8 +1,8 @@
 import type { DeleteResult, Types } from "mongoose";
 import { RefreshTokenModel, type RefreshTokenRecord } from "../../../externalResources/database/mongoose/schemas/refreshToken.schema";
 import { PasswordResetTokenModel, type PasswordResetTokenRecord } from "../../../externalResources/database/mongoose/schemas/passwordResetToken.schema";
-import { NotFoundError } from "../../../global/departingData/errorClasses";
 import { UserModel, type UserRecord } from "../../../externalResources/database/mongoose/schemas/user.schema";
+import { AppErrorNotFound } from "../../../global/departingData/errorClasses";
 
 type UserWithPassword = UserRecord & { passwordHash: string; };
 
@@ -25,7 +25,7 @@ export class AuthenticationRepository {
 
    async consumeRefreshToken(tokenHash: string): Promise<RefreshTokenRecord> {
       const refreshToken = await RefreshTokenModel.findOneAndDelete({ hash: tokenHash }).lean<RefreshTokenRecord>();
-      if (!refreshToken) { throw new NotFoundError('RefreshToken'); }
+      if (!refreshToken) { throw new AppErrorNotFound('RefreshToken'); }
       return refreshToken;
    }
 
@@ -65,7 +65,7 @@ export class AuthenticationRepository {
    //! FUNCTION RETURNS CONFIDENTIAL INFORMATION THAT SHOULD NOT BE RETURNED TO THE FRONTEND (returned object contains passwordHash)
    async findUserWithPasswordIncluded(name: string): Promise<UserWithPassword> {
       const userRecord = await UserModel.findOne({ name }).select('+passwordHash').lean<UserWithPassword>();
-      if (!userRecord) { throw new NotFoundError('user'); }
+      if (!userRecord) { throw new AppErrorNotFound('user'); }
       return userRecord;
    }
 
@@ -74,7 +74,7 @@ export class AuthenticationRepository {
    //! VALUES FROM THIS REPOSITORY CONTAINS CONFIDENTIAL INFORMATION THAT SHOULD NOT BE RETURNED TO THE FRONTEND (returned object contains passwordHash)
    async getUserWithPasswordIncluded(_id: Types.ObjectId): Promise<UserWithPassword> {
       const userRecord = await UserModel.findOne({ _id }).select('+passwordHash').lean<UserWithPassword>();
-      if (!userRecord) { throw new NotFoundError('user'); }
+      if (!userRecord) { throw new AppErrorNotFound('user'); }
       else { return userRecord; }
    }
 

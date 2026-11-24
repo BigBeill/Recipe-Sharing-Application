@@ -11,20 +11,20 @@ export class AppError extends Error {
    }
 }
 
-export class NotFoundError extends AppError {
+export class AppErrorNotFound extends AppError {
    constructor(resource?: string) {
       super(`${ resource ?? "resource" } not found`, 404, 'NOT_FOUND');
    }
 }
 
-export class UnauthorizedError extends AppError {
-   constructor(message: string = 'Unauthorized Access') {
-      super(message, 401, 'UNAUTHORIZED');
+export class AppErrorUnauthorized extends AppError {
+   constructor() {
+      super("client does not have access to requested resources", 401, 'UNAUTHORIZED');
    }
 }
 
-export class ConflictError extends AppError {
-   constructor(message: string) {
-      super(message, 409, 'CONFLICT');
+export class AppErrorConflict extends AppError {
+   constructor(resource: string) {
+      super(`${ resource } has already been taken`, 409, 'CONFLICT');
    }
 }

@@ -1,10 +1,10 @@
-import { NotFoundError } from "elysia";
 import type { IngredientsRepository } from "../infrastructure/ingredients.repository";
 import type { TypeIngredient, TypeIngredientConversion, TypeIngredientDraft, TypeIngredientGroup } from "../domain/ingredients.types";
 import { NutritionCalculator } from "./ingredients.nutritionCalculator";
 import type { TypeNutrition } from "../../recipes/domain/recipes.types";
 import type { RecordIngredient, RecordIngredientDraft } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
 import type { TypePaginatedList } from "../../../common/domain/types.common";
+import { AppErrorNotFound } from "../../../global/departingData/errorClasses";
 
 interface SearchGroupParams {
    description?: string,
@@ -48,7 +48,7 @@ export class IngredientsService {
 
    async get(_id: number): Promise<TypeIngredientDraft> {
       const ingredient = await this.repository.getIngredient(_id);
-      if (!ingredient) { throw new NotFoundError(); }
+      if (!ingredient) { throw new AppErrorNotFound('ingredient'); }
       return ingredient;
    }
 

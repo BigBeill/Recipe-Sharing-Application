@@ -3,7 +3,7 @@ import type { RelationshipsRepository } from "../infrastructure/relationships.re
 import type { TypeRelationship } from "../domain/relationships.types";
 import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
 import type { AuthorizationService } from "../../authorization/authorization.service";
-import { UnauthorizedError } from "../../../global/departingData/errorClasses";
+import { AppErrorUnauthorized } from "../../../global/departingData/errorClasses";
 
 
 
@@ -82,6 +82,6 @@ export class RelationshipsService extends AccessControlled {
       }
 
       // whatever the client is attempting to do was not executable
-      else { throw new UnauthorizedError('Invalid credentials'); }
+      else { throw new AppErrorUnauthorized(); }
    }
 }

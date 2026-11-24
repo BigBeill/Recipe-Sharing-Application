@@ -1,7 +1,6 @@
 import removeMongooseNoise from "../../../common/utils/removeMongooseNoise";
 import type { RecipesService } from "../../recipes/application/recipes.service";
 import type { UsersRepository } from "../infrastructure/users.repository";
-import { ConflictError, NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { ImagesService } from "../../images/application/images.service";
 import type { TypeUser } from "../domain/users.types";
 import type { Types } from "mongoose";
@@ -15,6 +14,7 @@ import { hashPassword } from "../../../common/utils/password";
 import type { AuthenticationService } from "../../authentication/application/authentication.service";
 import type { TypeAuthResult } from "../../authentication/domain/auth.types";
 import { Protected } from "../../authorization/decorators/Protected";
+import { AppErrorConflict, AppErrorNotFound, AppErrorUnauthorized } from "../../../global/departingData/errorClasses";
 
 
 
@@ -107,8 +107,9 @@ export class UsersService extends AccessControlled {
       const { name, email, password } = params;
 
       const conflictingUserList = await this.repository.searchUserExact({ name, email });
-      if (conflictingUserList.length > 0) { 
-         throw new ConflictError("Some user information has already been taken");
+      if (conflictingUserList.length > 0) {
+         if ( conflictingUserList[0]?.name === name ) { throw new AppErrorConflict("username"); }
+         else { throw new AppErrorConflict("email"); }
       }
       
       const passwordHash = await hashPassword(password);
@@ -123,7 +124,7 @@ export class UsersService extends AccessControlled {
 
    async searchUsers(params: SearchUsersParams): Promise<TypePaginatedList<TypeUser>> {
       const { _id, name, skip, limit, includeRelationship } = params;
-      if (includeRelationship && !this.authorization.clientId) { throw new UnauthorizedError('Include relationship flag cannot be set to true without a valid session'); }
+      if (includeRelationship && !this.authorization.clientId) { throw new AppErrorUnauthorized(); }
 
       const users = removeMongooseNoise(await this.repository.searchUser({ _id, name, skip, limit }));
       if (!includeRelationship) { return users; }
@@ -162,7 +163,7 @@ export class UsersService extends AccessControlled {
       const potentiallyConflictingUsers = await this.repository.searchUser({ name, email, searchExact: true });
       const conflictingUsersList = potentiallyConflictingUsers.list.filter((user) => { return !user._id.equals(this.authorization.requireClientId()); })
 
-      if(conflictingUsersList.length > 0) { throw new ConflictError("cant update users account"); }
+      if(conflictingUsersList.length > 0) { throw new AppErrorConflict("cant update users account"); }
 
       // replace the image if one has been provided
       if (imageReference) {
@@ -174,7 +175,7 @@ export class UsersService extends AccessControlled {
       }
 
       const updatedUser = await this.repository.updateUser({ name, email, bio, imageReferenceId: imageReference?._id });
-      if (!updatedUser) { throw new NotFoundError("user not updated"); }
+      if (!updatedUser) { throw new AppErrorNotFound("user"); }
       return removeMongooseNoise(updatedUser);
    }
 

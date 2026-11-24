@@ -3,10 +3,10 @@ import { sendPasswordResetEmail } from '../../../externalResources/email/email.s
 import { randomBytes } from 'node:crypto';
 import type { Types } from 'mongoose';
 import { generateRefreshToken, signAccessToken } from '../tokenSigner';
-import { NotFoundError, UnauthorizedError } from "../../../global/departingData/errorClasses";
 import type { TypeAuthResult, TypeSavedRefreshToken } from "../domain/auth.types";
 import type { AuthenticationRepository } from "../infrastructure/authentication.repository";
 import { graceCache } from "../lib/refreshTokenGraceCache";
+import { AppErrorNotFound, AppErrorUnauthorized } from "../../../global/departingData/errorClasses";
 
 type TypeBuildAuthResultOptions = { cachedRefreshToken: string; expiresAt?: undefined; } | { cachedRefreshToken?: undefined; expiresAt: Date };
 
@@ -40,7 +40,7 @@ export class AuthenticationService {
       const userAndPassword = await this.repository.findUserWithPasswordIncluded(name);
 
       const validPassword = await verifyPassword(password, userAndPassword.passwordHash);
-      if (!validPassword) { throw new UnauthorizedError('Invalid Password'); }
+      if (!validPassword) { throw new AppErrorUnauthorized(); }
 
       // remove the passwordHash before returning to client
       const { passwordHash, ...user } = userAndPassword;
@@ -66,7 +66,7 @@ export class AuthenticationService {
       else {
          const withinGrace = graceCache.get(hashedToken);
          if (withinGrace) { return this.buildAuthResult(withinGrace.userId, { cachedRefreshToken: withinGrace.token }); }
-         else { throw new UnauthorizedError('invalid refresh token'); }
+         else { throw new AppErrorUnauthorized(); }
       }
    }
 
@@ -77,7 +77,7 @@ export class AuthenticationService {
 
       const userList = await this.repository.searchUserExact({ email: normalizedEmail });
       const user = userList[0];
-      if (!user) { throw new NotFoundError(`Database could not find a user with the email: ${email}`); }
+      if (!user) { throw new AppErrorNotFound('email'); }
 
       await this.cleanSavedTokens(user._id);
 
@@ -93,7 +93,7 @@ export class AuthenticationService {
    async verifyPassword(userId: Types.ObjectId, password: string): Promise<void> {
       const user = await this.repository.getUserWithPasswordIncluded(userId);
       const passwordConfirmation = await verifyPassword(password, user.passwordHash);
-      if (passwordConfirmation !== true) { throw new UnauthorizedError('password could not be verified') }
+      if (passwordConfirmation !== true) { throw new AppErrorUnauthorized(); }
    }
 
 

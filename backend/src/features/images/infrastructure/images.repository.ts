@@ -1,9 +1,9 @@
 import { type Types } from "mongoose";
-import { NotFoundError } from "../../../global/departingData/errorClasses";
 import type { TypeImageReferenceDraft } from "../domain/images.types";
 import { ModelImageReference, type RecordImageReference } from "../../../externalResources/database/mongoose/schemas/imageReference.schema";
 import { Protected } from "../../authorization/decorators/Protected";
 import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
+import { AppErrorNotFound } from "../../../global/departingData/errorClasses";
 
 interface FetchParams {
    cutoff?: Date;
@@ -24,14 +24,14 @@ export class ImagesRepository extends AccessControlled {
    @Protected
    async deleteImageReference(_id: Types.ObjectId): Promise<void> {
       const deletedRecord = await ModelImageReference.findByIdAndDelete({ _id, owner: this.authorization.requireClientId() });
-      if (!deletedRecord) { throw new NotFoundError(); }
+      if (!deletedRecord) { throw new AppErrorNotFound('image'); }
    }
 
 
 
    async getImageReference(_id: Types.ObjectId): Promise<RecordImageReference> {
       const record = await ModelImageReference.findById(_id);
-      if (!record) { throw new NotFoundError('image'); }
+      if (!record) { throw new AppErrorNotFound('image'); }
       else { return record; }
    }
 
@@ -52,7 +52,7 @@ export class ImagesRepository extends AccessControlled {
    @Protected
    async updateImageReferenceStatus(_id: Types.ObjectId , status: "pending" | "active" | "deleting"): Promise<RecordImageReference> {
       const updatedRecord = await ModelImageReference.findOneAndUpdate({ _id, owner: this.authorization.requireClientId() }, { status }, { runValidators: true } ).lean();
-      if (!updatedRecord) { throw new NotFoundError(); }
+      if (!updatedRecord) { throw new AppErrorNotFound('image'); }
       return updatedRecord;
    }
 }

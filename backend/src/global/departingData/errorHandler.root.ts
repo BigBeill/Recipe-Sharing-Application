@@ -1,4 +1,4 @@
-import { Elysia, ValidationError } from 'elysia';
+import Elysia, { ValidationError } from 'elysia';
 import { AppError } from './errorClasses';
 
 export const errorHandler = new Elysia({ name: 'error-handler' })

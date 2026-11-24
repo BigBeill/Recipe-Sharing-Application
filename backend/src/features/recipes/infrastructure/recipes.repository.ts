@@ -1,11 +1,10 @@
 import { Types } from "mongoose";
 import { escapeRegex } from "../../../common/utils/filter";
 import { ModelRecipe, type RecordRecipe, type RecordRecipeDraft } from "../../../externalResources/database/mongoose/schemas/recipe.schema";
-import { NotFoundError } from "../../../global/departingData/errorClasses";
 import type { TypePaginatedList } from "../../../common/domain/types.common";
 import { Protected } from "../../authorization/decorators/Protected";
-import type { AuthorizationService } from "../../authorization/authorization.service";
 import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
+import { AppErrorNotFound } from "../../../global/departingData/errorClasses";
 
 
 
@@ -37,7 +36,7 @@ export class RecipesRepository extends AccessControlled {
    @Protected
    async delete(_id: Types.ObjectId): Promise<RecordRecipe> {
       const recipeRecord = await ModelRecipe.findOneAndDelete({ _id, ownerId: this.authorization.requireClientId() });
-      if (!recipeRecord) { throw new NotFoundError(); }
+      if (!recipeRecord) { throw new AppErrorNotFound('recipe'); }
       return recipeRecord;
    }
 
@@ -56,7 +55,7 @@ export class RecipesRepository extends AccessControlled {
             ),
          ]
       }).lean<RecordRecipe | null>();
-      if (!recipeRecord) { throw new NotFoundError('recipe'); }
+      if (!recipeRecord) { throw new AppErrorNotFound('recipe'); }
       return recipeRecord;
    }
 
@@ -105,7 +104,7 @@ export class RecipesRepository extends AccessControlled {
    @Protected
    async update(_id: Types.ObjectId, updateFields: Partial<RecordRecipeDraft>): Promise<RecordRecipe> {
       const recipeRecord = await ModelRecipe.findOneAndUpdate({ _id, ownerId: this.authorization.requireClientId() }, updateFields, { runValidators: true } );
-      if (!recipeRecord) { throw new NotFoundError(); }
+      if (!recipeRecord) { throw new AppErrorNotFound('recipe'); }
       return recipeRecord;
    }
 

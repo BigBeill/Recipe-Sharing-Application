@@ -1,3 +1,10 @@
+export class ErrorConflict extends Error{
+   constructor (message: string, options?: ErrorOptions) {
+      super(message, options);
+      this.name = `Conflict Error`
+   }
+}
+
 export class ErrorNotFound extends Error {
    constructor (message: string, options?: ErrorOptions) {
       super(message, options);

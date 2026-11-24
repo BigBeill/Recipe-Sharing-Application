@@ -3,8 +3,8 @@ import { FriendRequestModel, type FriendRequestRecord } from "../../../externalR
 import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
 import { Protected } from "../../authorization/decorators/Protected";
 import { FriendshipModel, type FriendshipRecord } from "../../../externalResources/database/mongoose/schemas/friendship.schema";
-import { NotFoundError } from "../../../global/departingData/errorClasses";
 import type { TypeRelationship } from "../domain/relationships.types";
+import { AppErrorNotFound } from "../../../global/departingData/errorClasses";
 
 
 export class RelationshipsRepository extends AccessControlled {
@@ -22,7 +22,7 @@ export class RelationshipsRepository extends AccessControlled {
    @Protected
    async createFriendship(targetId: Types.ObjectId): Promise<FriendshipRecord> {
       const pendingFriendRequestRecord = FriendRequestModel.findOneAndDelete({ receiverId: this.authorization.requireClientId(), senderId: targetId });
-      if (!pendingFriendRequestRecord) { throw new NotFoundError(); }
+      if (!pendingFriendRequestRecord) { throw new AppErrorNotFound(); }
       const friendship = await FriendshipModel.create({ friendIds: [this.authorization.requireClientId(), targetId] });
       return friendship;
    }
@@ -32,7 +32,7 @@ export class RelationshipsRepository extends AccessControlled {
    @Protected
    async deleteFriendRequest(_id: Types.ObjectId) {
       const deleteResponse = await FriendRequestModel.deleteOne({ $match: { _id, $or: [{ senderId: this.authorization.requireClientId() }, { receiverId: this.authorization.requireClientId() }] } });
-      if (deleteResponse.deletedCount === 0) { throw new NotFoundError(); }
+      if (deleteResponse.deletedCount === 0) { throw new AppErrorNotFound(); }
    }
 
 
@@ -40,7 +40,7 @@ export class RelationshipsRepository extends AccessControlled {
    @Protected
    async deleteFriendship(_id: Types.ObjectId) {
       const deleteResponse = await FriendshipModel.deleteOne({ _id, friendIds: this.authorization.requireClientId() });
-      if (deleteResponse.deletedCount === 0) { throw new NotFoundError(); }
+      if (deleteResponse.deletedCount === 0) { throw new AppErrorNotFound(); }
    }
 
 
@@ -75,7 +75,7 @@ export class RelationshipsRepository extends AccessControlled {
    @Protected
    async getFriendRequest(_id: Types.ObjectId): Promise<FriendRequestRecord> {
       const friendRequestRecord = await FriendRequestModel.findOne({ _id }).lean();
-      if (!friendRequestRecord) { throw new NotFoundError(); }
+      if (!friendRequestRecord) { throw new AppErrorNotFound(); }
       else { return friendRequestRecord; }
    }
 
@@ -83,7 +83,7 @@ export class RelationshipsRepository extends AccessControlled {
 
    async getFriendship(_id: Types.ObjectId): Promise<FriendshipRecord> {
       const friendshipRecord = await FriendshipModel.findOne({ _id }).lean();
-      if (!friendshipRecord) { throw new NotFoundError(`friendship`) }
+      if (!friendshipRecord) { throw new AppErrorNotFound(`friendship`) }
       else { return friendshipRecord; }
    }
 

@@ -1,4 +1,4 @@
-import { UnauthorizedError } from "../../../global/departingData/errorClasses";
+import { AppErrorUnauthorized } from "../../../global/departingData/errorClasses";
 import type { AuthorizationService, ReauthenticationProof } from "../authorization.service";
 import type { AccessControlled } from "./AccessControlled.function";
 
@@ -16,7 +16,7 @@ export function Reauthenticate<This extends object, Args extends [Reauthenticati
       //? protected is compile-time only; the AccessControlled base class guarantees this exists at runtime
       const { authorization } = this as unknown as { authorization: AuthorizationService };
 
-      if (!authorization.reauthenticated) { throw new UnauthorizedError(`${this.constructor.name}.${methodName} requires the client to reauthenticate first`); }
+      if (!authorization.reauthenticated) { throw new AppErrorUnauthorized(); }
       return target.apply(this, args);
    };
 }

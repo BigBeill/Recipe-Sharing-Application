@@ -1,4 +1,4 @@
-import { ErrorNotFound, ErrorUnauthorized, ErrorValidation } from '../../domain/errorClasses';
+import { ErrorConflict, ErrorNotFound, ErrorUnauthorized, ErrorValidation } from '../../domain/errorClasses';
 
 export default async function parseResponse<T>(response: Response): Promise<T> {
    if (response.status === 200 || response.status === 201) {
@@ -20,6 +20,7 @@ export default async function parseResponse<T>(response: Response): Promise<T> {
       if (response.status === 400) { throw new ErrorValidation('Server rejected the request', content?.rejectedFieldList || [], { cause: badResponse }); }
       else if (response.status === 401) { throw new ErrorUnauthorized('Unauthorized response from server', { cause: badResponse }); }
       else if (response.status === 404) { throw new ErrorNotFound('Resource not found', { cause: badResponse }); }
+      else if (response.status === 409) { throw new ErrorConflict(badResponse.message, { cause: badResponse }) }
       else { throw new Error(`Request failed with status ${response.status}`, { cause: badResponse  }); }
    }
 

@@ -1,8 +1,8 @@
 import type { Types } from "mongoose";
 import type { FriendshipRecord } from "../../externalResources/database/mongoose/schemas/friendship.schema";
 import type { AuthorizationRepository } from "./authorization.repository";
-import { UnauthorizedError } from "../../global/departingData/errorClasses";
 import type { AuthenticationService } from "../authentication/application/authentication.service";
+import { AppErrorUnauthorized } from "../../global/departingData/errorClasses";
 
 declare const reauthenticationProof: unique symbol;
 export type ReauthenticationProof = { readonly [reauthenticationProof]: true };
@@ -29,7 +29,7 @@ export class AuthorizationService {
    public get clientId() { return this._clientId; }
 
    public requireClientId() {
-      if (!this._clientId) { throw new UnauthorizedError(); }
+      if (!this._clientId) { throw new AppErrorUnauthorized(); }
       else { return this._clientId }
    }
 

@@ -3,9 +3,9 @@ import { escapeRegex } from "../../../common/utils/filter";
 import { UserModel, type UserRecord } from "../../../externalResources/database/mongoose/schemas/user.schema";
 import type { TypeUserDraft } from "../domain/users.types";
 import type { TypePaginatedList } from "../../../common/domain/types.common";
-import { NotFoundError } from "../../../global/departingData/errorClasses";
 import { Protected } from "../../authorization/decorators/Protected";
 import { AccessControlled } from "../../authorization/decorators/AccessControlled.function";
+import { AppErrorNotFound } from "../../../global/departingData/errorClasses";
 
 interface SearchUserParams {
    _id?: Types.ObjectId,
@@ -38,7 +38,7 @@ export class UsersRepository extends AccessControlled {
    @Protected
    async delete(): Promise<void> {
       const deleteResponse = await UserModel.deleteOne({ _id: this.authorization.requireClientId() });
-      if (deleteResponse.deletedCount === 0) { throw new NotFoundError(); }
+      if (deleteResponse.deletedCount === 0) { throw new AppErrorNotFound(); }
    }
 
 
@@ -60,7 +60,7 @@ export class UsersRepository extends AccessControlled {
 
    async getUser(_id: Types.ObjectId): Promise<UserRecord> {
       const user = await UserModel.findOne({_id }).lean<UserRecord>();
-      if (!user) { throw new NotFoundError(`friendship`); }
+      if (!user) { throw new AppErrorNotFound(`friendship`); }
       else { return user; }
    }
 
@@ -104,7 +104,7 @@ export class UsersRepository extends AccessControlled {
    @Protected
    async updatePassword(passwordHash: string): Promise<void> {
       const result = await UserModel.updateOne({ _id: this.authorization.requireClientId() }, { $set: { passwordHash } });
-      if (result.matchedCount === 0) { throw new NotFoundError(); }
+      if (result.matchedCount === 0) { throw new AppErrorNotFound(); }
    }
 
 
