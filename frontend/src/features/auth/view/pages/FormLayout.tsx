@@ -1,6 +1,6 @@
 import styles from './styles/layout.module.scss'
-import { LoadingProvider } from "@/shared/lib/hooks/loadingContext"
-import { useServiceMutation } from "@/shared/lib/hooks/useServiceMutation"
+import { LoadingProvider } from "@/shared/hooks/loadingContext"
+import { useServiceMutation } from "@/shared/hooks/useServiceMutation"
 import { createContext, ReactNode, Ref, useContext, useEffect, useImperativeHandle, useState } from 'react'
 import harvestRefCollection, { TypeDataOfHarvestedCollection, TypeDataRefCollection } from '@/shared/lib/harvestRefCollection'
 import { TypeDataHandle } from '@/shared/domain/shared.types'

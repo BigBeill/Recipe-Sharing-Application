@@ -10,5 +10,6 @@ export default async function Page({ params }: { params: Promise<{userId: string
    if (!session) { redirect('/auth/login'); }
 
    const user = await preRenderService(() => { return userService.get(userId, { includeRelationship: true }); });
+   console.log(user);
    return <ProfilePage initial={ user } />
 }

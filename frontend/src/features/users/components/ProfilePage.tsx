@@ -3,32 +3,30 @@
 import { useState, useRef } from 'react'
 import GrowingText from '@/shared/view/components/GrowingText.component';
 import ImageUploader from '@/features/images/components/ImageUploader';
-import { useRouter } from 'next/navigation';
 import styles from './profilePage.module.scss';
 import { TypeDataHandle } from '@/shared/domain/shared.types';
 import { userService } from '../services/user.service.client';
 import { useAuth } from '@/features/auth/providers/AuthProvider';
-import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
-import { LoadingProvider } from '@/shared/lib/hooks/loadingContext';
-import { ButtonOval, ButtonShielded } from '@/shared/view/components/Button.components';
+import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InputString } from '@/shared/view/components/Input.components';
 import { TypeImageReference } from '@/features/images/domain/image.types';
-import { TypeRelationship, TypeUser } from '../domain/user.types';
+import { TypeUser } from '../domain/user.types';
 import harvestRefsObject from '@/shared/lib/harvestRefCollection';
 import ImageDisplay from '@/features/images/components/ImageDisplay';
-import ReauthenticatePopup from '@/features/auth/view/components/ReauthenticateAction';
-import { authService } from '@/features/auth/services/auth.service.client';
+import StrategyRelationshipInteraction from '@/features/relationships/view/strategy/Interaction.strategy';
+import { EditProvider } from '@/shared/hooks/editContext';
+import { TypeRelationship } from '@/features/relationships/domain/relationship.types';
 
 interface Props {
    initial: TypeUser
 }
 
 export default function ProfilePage({ initial }: Props) {
-   const router = useRouter();
-   const { session, sessionStatus } = useAuth();
 
-   const [sessionStatusOnMount] = useState(sessionStatus);
-   if (sessionStatusOnMount !== 'authenticated') { throw new Error("Attempting to call ProfilePage without a sessionState of authenticated") }
+   console.log(initial);
+
+   const { session, sessionStatus } = useAuth();
+   if (sessionStatus !== 'authenticated') { throw new Error("Attempting to call ProfilePage without an authenticated session"); }
 
    const [user, setUser] = useState<TypeUser>(initial);
 
@@ -38,42 +36,23 @@ export default function ProfilePage({ initial }: Props) {
       imageReference: useRef<TypeDataHandle<TypeImageReference | undefined>>(null),
    }
 
-   const reauthenticateRef = useRef<TypeDataHandle<boolean>>(null);
-
    // ? functions and variables for editing the current user
    const [editMode, setEditMode] = useState<boolean>(false);
-   const userMutator = useServiceMutation(async (): Promise<TypeUser> => { return await userService.update(await harvestRefsObject(refs)) });
 
-   async function saveChanges() {
-      if (!editMode) { return; }
+   const saveMutator = useServiceMutation<never, void>(async () => {
+      const updatedUser = await userService.update(await harvestRefsObject(refs));
+      setUser(updatedUser);
       setEditMode(false);
-      setUser(await userMutator.send());
-   }
-
-   // mutator for setting the relationship.type field of another user
-   const relationshipMutator = useServiceMutation(session?.userId === user._id ? async () => { return null; } 
-      : async (newRelationship: 'none' | 'requestReceived' | 'friend'): Promise<TypeRelationship | null> => {
-         if (newRelationship === 'none') {
-            if (user.relationship?.type === 'friend') { return userService.removeFriend(user.relationship._id); }
-            else if (user.relationship?.type === 'requestReceived' || user.relationship?.type === 'requestSent') { return userService.processFriendRequest(user.relationship._id, { accept: false}); }
-         }
-         if (newRelationship === 'requestReceived' && user.relationship?.type !== null) { return userService.sendFriendRequest(user._id); }
-         if (newRelationship === 'friend' && user.relationship?.type === 'requestSent') { return userService.processFriendRequest(user.relationship._id, { accept: true }); }
-         return null;
-      }
-   );
-
-   async function updateRelationship(newRelationship: 'none' | 'requestReceived' | 'friend') {
-      const mutatedRelationship = await relationshipMutator.send(newRelationship);
-      setUser((previous) => { return { ...previous, relationship: mutatedRelationship } });
-   }
-
-   // handle logout function
-   function handleLogout() {
-      authService.logout();
-   }
+   });
 
    return (
+      <EditProvider 
+         value={ {
+            active: editMode,
+            trigger: () => { setEditMode(true); },
+            saveMutator
+         } }
+      >
       <div className={ styles.userProfile }>
          <GrowingText text={ user.name }/>
          { editMode ? 
@@ -108,46 +87,11 @@ export default function ProfilePage({ initial }: Props) {
          <div> {/* styleDiv, should not contain anything */} </div>
 
          {/* display the appropriate set of two buttons */}
-         <LoadingProvider value={ relationshipMutator.status === 'loading' || userMutator.status === 'loading' }>
-            <div className="splitSpace">
-               { editMode ? (
-                  <>
-                     <ButtonShielded key='save' message='Save Changes' showLoading={ true } onClick={ saveChanges } />
-                     <ButtonShielded key='delete' message='Delete Account' onClick={ () => { reauthenticateRef.current?.setData(true) } }/>
-                  </>
-               ) : session?.userId === user._id ? (
-                  <>
-                     <ButtonOval onClick={ () => { setEditMode(true); } }> edit account </ButtonOval>
-                     <ButtonShielded key='logout' message="logout" onClick={ () => { handleLogout(); } }/>
-                  </>
-               ) : user.relationship === null ? (
-                  <>
-                     <ButtonOval showLoading={ true } onClick={ () => { updateRelationship('requestReceived'); } }>Send friend request</ButtonOval>
-                  </>
-               ) : user.relationship?.type == "friend" ? (
-                  <>
-                     <ButtonShielded message='Remove Friend' showLoading={ true } onClick={ () => { updateRelationship('none') } } />
-                  </>
-               ) : user.relationship?.type == "requestReceived" ? (
-                  <>
-                     <ButtonOval showLoading={ true } onClick={ () => { updateRelationship('none') } }>Cancel friend request</ButtonOval>
-                  </>
-               ) : user.relationship?.type == "requestSent" ? (
-                  <>
-                     <ButtonOval showLoading={ true } onClick={ () => { updateRelationship('friend'); } }>Accept friend request</ButtonOval>
-                     <ButtonOval showLoading={ true } onClick={ () => { updateRelationship('none'); } }>Reject friend request</ButtonOval>
-                  </>
-               ) : user.relationship?.type == "self" ? (
-                  <>
-                     <ButtonOval onClick={ () => { setEditMode(true); } }> edit account </ButtonOval>
-                     <ButtonShielded key='logout' message="logout" onClick={ () => { handleLogout(); } }/>
-                  </>
-               ) : null }
-            </div>
-         </LoadingProvider>
-
-         <ReauthenticatePopup ref={ reauthenticateRef } action={ { description: 'Deleting an account', function: (async (password: string) => { await userService.delete(password); router.push('/') } ) } } />
-
+         <StrategyRelationshipInteraction 
+            relationship={ user.relationship ?? { ownerId: user._id, targetId: session.userId } }
+            updateRelationship={ (relationship: TypeRelationship | null) => { setUser((previous) => { return { ...previous, relationship } }) } }
+         />
       </div >
+      </EditProvider>
    )
 }

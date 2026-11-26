@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { StateLoadingRaw } from '../states/Loading.states';
-import { useLoading } from '@/shared/lib/hooks/loadingContext';
+import { useLoadingContext } from '@/shared/hooks/loadingContext';
 
 
 export type ButtonIconType = React.ComponentPropsWithoutRef<'button'> & {
@@ -19,7 +19,7 @@ interface ButtonIconListProps {
 }
 
 export function ButtonIconList ({ iconList, showLoading = false }: ButtonIconListProps) {
-   const isLoading = showLoading && useLoading();
+   const isLoading = showLoading && useLoadingContext();
    return (
       <div className={isLoading ? 'hidden' : undefined}>
          { iconList.map(({ icon, label, ...rest }) => (
@@ -74,7 +74,7 @@ type ButtonOvalProps = React.ComponentPropsWithoutRef<'button'> & {
 };
 
 export function ButtonOval({ children, className, showLoading = false, ...rest }: ButtonOvalProps) {
-   const isLoading = showLoading && useLoading();
+   const isLoading = showLoading && useLoadingContext();
    return (
       <button className={[styles.buttonOval, isLoading && styles.loadingState, className].filter(Boolean).join(' ') } { ...rest }>
          { isLoading ? <StateLoadingRaw /> : children }

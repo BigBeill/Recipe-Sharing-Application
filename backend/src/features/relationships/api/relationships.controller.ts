@@ -49,15 +49,18 @@ export const relationshipsController = new Elysia({ prefix: '/relationships' })
 
 
 
-   .post( '/processFriendRequest/:_id/:response',
-      async ({ service, params }) => {
-         const{ _id, response } = params;
-         const relationship = await service.processFriendRequest(_id, response);
-         return status(201, relationship);
+   .post( '/processFriendRequest/:_id',
+      async ({ service, params, body, set }) => {
+         const{ _id } = params;
+         const { approve } = body;
+         const relationship = await service.processFriendRequest(_id, approve);
+         set.status = 201;
+         return relationship;
       },
       {
+         body: t.Object({ approve: t.Boolean() }),
          params: ValidatorIncomingUsersProcessFriendRequestBody,
-         response: { 201: t.Union([ValidatorCommonRelationship, t.Void()]) }
+         response: { 201: t.Union([ValidatorCommonRelationship, t.Null()]) }
       }
    )
 

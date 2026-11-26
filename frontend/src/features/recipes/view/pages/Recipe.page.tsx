@@ -12,7 +12,7 @@ import { FullscreenPage } from '@/shared/view/pages/Fullscreen.page';
 import NutritionList from '@/features/ingredients/view/components/NutritionList.component';
 import { ButtonOval, ButtonShielded } from '@/shared/view/components/Button.components';
 import { recipeService } from '../../services/recipes.service.client';
-import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
+import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/features/auth/providers/AuthProvider';
 

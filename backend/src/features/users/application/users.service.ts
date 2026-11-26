@@ -96,9 +96,10 @@ export class UsersService extends AccessControlled {
    async get(_id: Types.ObjectId, { includeRelationship }: GetUserParams): Promise<TypeUser> {
       const [user, relationship] = await Promise.all([
          this.repository.getUser(_id),
-         (includeRelationship ? this.relationshipService.findRelationship({ ownerId: _id, targetId: this.authorization.requireClientId() }) : null),
+         (!includeRelationship ? undefined : this.relationshipService.findRelationship({ ownerId: _id, targetId: this.authorization.requireClientId() })),
       ]);
-      return { ...removeMongooseNoise(user), ...(relationship != null && { relationship }) };
+
+      return { ...removeMongooseNoise(user), relationship };
    }
 
 

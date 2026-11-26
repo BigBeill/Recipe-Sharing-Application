@@ -7,7 +7,7 @@ import UserFilterPage from "./UserFilterPage";
 import NotebookPageListItems from "@/shared/view/components/notebookPageSpecific/ListItems.notebookComponent";
 import combinePaginatedLists from "@/shared/lib/combinePaginatedLists";
 import { userService } from "../services/user.service.client";
-import useServiceState from "@/shared/lib/hooks/useServiceState";
+import useServiceState from "@/shared/hooks/useServiceState";
 import NotebookPage from "@/shared/view/pages/Notebook.page";
 
 const groupSize = 5;

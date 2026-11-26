@@ -3,7 +3,7 @@
 import { IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import IngredientSearch from "@/features/ingredients/view/components/IngredientSearch.component";
 import { TypeDataHandle } from "@/shared/domain/shared.types";
-import { useInteractableList } from "@/shared/lib/hooks/useInteractableList";
+import { useInteractableList } from "@/shared/hooks/useInteractableList";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

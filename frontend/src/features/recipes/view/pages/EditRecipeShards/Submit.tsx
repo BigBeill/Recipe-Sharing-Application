@@ -1,5 +1,5 @@
 
-import { TypeServiceMutator } from "@/shared/lib/hooks/useServiceMutation";
+import { TypeServiceMutator } from "@/shared/hooks/useServiceMutation";
 import { ButtonShielded } from "@/shared/view/components/Button.components";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { StateErrorInsert } from "@/shared/view/states/Error.states";

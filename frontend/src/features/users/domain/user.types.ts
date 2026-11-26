@@ -1,4 +1,5 @@
 import { TypeImageReference, TypeSignedImageUrl } from "@/features/images/domain/image.types";
+import { TypeRelationship } from "@/features/relationships/domain/relationship.types";
 
 export type TypeUser = {
    _id: string;
@@ -16,10 +17,3 @@ export type TypeUserDraft = Omit<TypeUser,
    > & {
       imageReference?: TypeImageReference;
    }
-
-export interface TypeRelationship {
-   _id: string;
-   owner: string;
-   target: string;
-   type: "friend" | "requestReceived" | "requestSent";
-}

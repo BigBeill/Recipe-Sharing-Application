@@ -7,7 +7,7 @@ import { TypeDataHandle } from '@/shared/domain/shared.types';
 import harvestRefsObject from '@/shared/lib/harvestRefCollection';
 import { recipeService } from '../../services/recipes.service.client';
 import { useRouter } from 'next/navigation';
-import { useServiceMutation } from '@/shared/lib/hooks/useServiceMutation';
+import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import NotebookPage from '@/shared/view/pages/Notebook.page';
 import EditRecipeShardSetTitle from './EditRecipeShards/SetTitle';
 import EditRecipeShardSetImage from './EditRecipeShards/SetImage';

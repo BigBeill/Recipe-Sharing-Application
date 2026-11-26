@@ -31,7 +31,7 @@ export class RelationshipsRepository extends AccessControlled {
 
    @Protected
    async deleteFriendRequest(_id: Types.ObjectId) {
-      const deleteResponse = await FriendRequestModel.deleteOne({ $match: { _id, $or: [{ senderId: this.authorization.requireClientId() }, { receiverId: this.authorization.requireClientId() }] } });
+      const deleteResponse = await FriendRequestModel.deleteOne({ _id, $or: [{ senderId: this.authorization.requireClientId() }, { receiverId: this.authorization.requireClientId() }] });
       if (deleteResponse.deletedCount === 0) { throw new AppErrorNotFound(); }
    }
 
@@ -57,8 +57,8 @@ export class RelationshipsRepository extends AccessControlled {
          }).lean();
 
          if (friendRequestRecord !== null) {
-            if (this.authorization.requireClientId().equals(friendRequestRecord.senderId)) { return { _id: friendRequestRecord._id, ownerId: this.authorization.requireClientId(), targetId, type: "requestSent" } }
-            else { return { _id: friendRequestRecord._id, ownerId: this.authorization.requireClientId(), targetId, type: "requestReceived" } } 
+            if (this.authorization.requireClientId().equals(friendRequestRecord.senderId)) { return { _id: friendRequestRecord._id, ownerId: this.authorization.requireClientId(), targetId, type: "requestReceived" } }
+            else { return { _id: friendRequestRecord._id, ownerId: this.authorization.requireClientId(), targetId, type: "requestSent" } } 
          }
       }
 

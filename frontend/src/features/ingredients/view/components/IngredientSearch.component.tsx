@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { InputChooseValue, InputNumber, InputString } from "@/shared/view/components/Input.components";
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import { TypeDataHandle } from "@/shared/domain/shared.types";
-import useServiceState from '@/shared/lib/hooks/useServiceState';
+import useServiceState from '@/shared/hooks/useServiceState';
 import { ButtonIconList } from '@/shared/view/components/Button.components';
 import { IngredientConversionType, IngredientType } from '../../domain/ingredient.types';
 import { ingredientService } from '../../services/ingredient.service.client';

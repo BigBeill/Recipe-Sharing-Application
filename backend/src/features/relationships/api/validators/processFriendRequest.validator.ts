@@ -3,5 +3,4 @@ import { ValidatorCommonMongooseId } from "../../../../common/domain/validators/
 
 export const ValidatorIncomingUsersProcessFriendRequestBody = t.Object({
    _id: ValidatorCommonMongooseId,
-   response: t.Boolean(),
 });

@@ -2,7 +2,7 @@ import { TypeDataHandle } from "@/shared/domain/shared.types";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { KeyboardEvent, Ref, useEffect, useRef } from "react";
-import { useInteractableList } from "@/shared/lib/hooks/useInteractableList";
+import { useInteractableList } from "@/shared/hooks/useInteractableList";
 import { NotebookComponentDefault } from "@/shared/view/components/notebookPageSpecific/default.notebookComponent";
 import { ButtonOval } from "@/shared/view/components/Button.components";
 import { InputString } from "@/shared/view/components/Input.components";
