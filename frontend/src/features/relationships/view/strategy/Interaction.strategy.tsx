@@ -81,10 +81,10 @@ function RequestSentInteraction(relationship: TypeRelationship, updateRelationsh
       updateRelationship(newRelationship);
    });
    return (
-      <>
-         <ButtonOval onClick={ () => { friendRequestMutator.send(true); } } >Accept Friend Request</ButtonOval>
-         <ButtonOval onClick={ () => { friendRequestMutator.send(false); } } >Reject Friend Request</ButtonOval>
-      </>
+      <LoadingProvider value={ friendRequestMutator.status === 'loading' }>
+         <ButtonOval onClick={ () => { friendRequestMutator.send(true); } } showLoading={ true }>Accept Friend Request</ButtonOval>
+         <ButtonOval onClick={ () => { friendRequestMutator.send(false); } } showLoading={ true }>Reject Friend Request</ButtonOval>
+      </LoadingProvider>
    );
 }
 
