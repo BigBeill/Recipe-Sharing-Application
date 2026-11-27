@@ -95,7 +95,10 @@ export function ButtonShielded({ message, onClick, showLoading = false }: Button
 
    function attemptOnClick() {
       if (shielded) { setShielded(false); }
-      else { onClick(); }
+      else { 
+         onClick();
+         setShielded(true);
+      }
    }
 
    return (

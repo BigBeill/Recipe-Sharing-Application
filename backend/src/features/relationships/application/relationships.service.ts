@@ -17,6 +17,8 @@ interface DefinedRelationshipParams {
 export class RelationshipsService extends AccessControlled {
    private readonly repository;
 
+
+
    constructor ({ authorizationService, relationshipsRepository } : {
       authorizationService: AuthorizationService,
       relationshipsRepository: RelationshipsRepository,
@@ -24,6 +26,7 @@ export class RelationshipsService extends AccessControlled {
       super({ authorizationService });
       this.repository = relationshipsRepository;
    }
+
 
 
    async deleteFriendship(_id: Types.ObjectId): Promise<void> {

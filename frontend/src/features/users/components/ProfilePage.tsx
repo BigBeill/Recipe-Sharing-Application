@@ -23,8 +23,6 @@ interface Props {
 
 export default function ProfilePage({ initial }: Props) {
 
-   console.log(initial);
-
    const { session, sessionStatus } = useAuth();
    if (sessionStatus !== 'authenticated') { throw new Error("Attempting to call ProfilePage without an authenticated session"); }
 

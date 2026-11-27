@@ -239,6 +239,7 @@ on screens smaller than 48rem the layout switches to inline with a gap of 0.9rem
 */
 .splitSpace{
    width: 100%;
+   height: fit-content;
    margin: 0rem;
    padding: 0rem;
    display: grid;

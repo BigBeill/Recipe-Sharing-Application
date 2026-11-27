@@ -44,7 +44,11 @@ function NoRelationshipInteraction(relationship: PartialRelationship, updateRela
       const newRelationship = await relationshipService.sendFriendRequest(relationship.ownerId); 
       updateRelationship(newRelationship);
    });
-   return <ButtonOval onClick={ friendRequestMutator.send }>Send Friend Request</ButtonOval>
+   return (
+      <LoadingProvider value={ friendRequestMutator.status === 'loading' }>
+         <ButtonOval onClick={ friendRequestMutator.send } showLoading={ true }>Send Friend Request</ButtonOval>
+      </LoadingProvider>
+   );
 }
 
 function SelfInteraction() {
@@ -53,15 +57,17 @@ function SelfInteraction() {
    const editContext = useEditContext();
    const logoutMutator = useServiceMutation(async () => { await authService.logout(); });
    if (editContext.active) {
-      <LoadingProvider value={ editContext.saveMutator.status === 'loading' }>
-         <ButtonShielded onClick={ editContext.saveMutator.send } message='Save Changes' showLoading={ true } />
-         <ButtonShielded onClick={ () => { reauthenticateRef.current?.setData(true); } } message='Delete Account' />
-         <ReauthenticatePopup ref={ reauthenticateRef } action={ { description: 'Deleting an account', function: (async (password: string) => { await userService.delete(password); router.push('/') } ) } } />
-      </LoadingProvider>
+      return (
+         <LoadingProvider value={ editContext.saveMutator.status === 'loading' }>
+            <ButtonShielded onClick={ editContext.saveMutator.send } message='Save Changes' showLoading={ true } />
+            <ButtonShielded onClick={ () => { reauthenticateRef.current?.setData(true); } } message='Delete Account' />
+            <ReauthenticatePopup ref={ reauthenticateRef } action={ { description: 'Deleting an account', function: (async (password: string) => { await userService.delete(password); router.push('/') } ) } } />
+         </LoadingProvider>
+      )
    }
    else {
       return (
-         <LoadingProvider value={ logoutMutator.status === 'loading' }>
+         <LoadingProvider value={ logoutMutator.status === 'loading' } >
             <ButtonShielded onClick={ editContext.trigger } message='Edit Account'/>
             <ButtonShielded onClick={ logoutMutator.send } message='Logout' showLoading={ true }/>
          </LoadingProvider>
@@ -87,7 +93,11 @@ function RequestReceivedInteraction(relationship: TypeRelationship, updateRelati
       const newRelationship = await relationshipService.processFriendRequest(relationship._id, { approve });
       updateRelationship(newRelationship);
    });
-   return <ButtonOval onClick={ () => { friendRequestMutator.send(false); } } >Cancel Friend Request</ButtonOval>;
+   return ( 
+      <LoadingProvider value={ friendRequestMutator.status === "loading" }>
+         <ButtonOval onClick={ () => { friendRequestMutator.send(false); } } showLoading={ true } >Cancel Friend Request</ButtonOval> 
+      </LoadingProvider>
+   );
 }
 
 function FriendInteraction(relationship: TypeRelationship, updateRelationship: (newRelationship: TypeRelationship | null) => void) {
@@ -95,5 +105,9 @@ function FriendInteraction(relationship: TypeRelationship, updateRelationship: (
       const newRelationship = await relationshipService.removeFriend(relationship._id);
       updateRelationship(newRelationship);
    });
-   return <ButtonShielded onClick={ friendshipMutator.send } message='Remove Friend' />;
+   return (
+      <LoadingProvider value={ friendshipMutator.status === "loading" }>
+         <ButtonShielded onClick={ friendshipMutator.send } message='Remove Friend' showLoading={ true }/>
+      </LoadingProvider>
+   );
 }
