@@ -2,14 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { authService } from '../../services/auth.service.client';
-import { redirectAuthenticatedUser } from '@/shared/lib/redirectConditions';
 import AuthenticationFormLayout, { AuthenticationFormSubmitButton, AuthenticationFormTextBox, AuthenticationFormTitle } from './FormLayout';
 import { TypeDataHandle } from '@/shared/domain/shared.types';
 import { ErrorValidation } from '@/shared/domain/errorClasses';
 import { useRouter } from 'next/navigation';
+import { requireGuestUser } from '@/shared/lib/redirectConditions';
 
 export default function PasswordResetPage() {
-   redirectAuthenticatedUser();
+   requireGuestUser()
    const [token, setToken] = useState<string | null>(null);
 
    useEffect(() => {

@@ -1,21 +1,18 @@
 import { useAuth } from "@/features/auth/providers/AuthProvider";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { TypeSession } from "@/features/auth/server/session";
+import { useState } from "react";
 
-export function redirectAuthenticatedUser() {
-   const router = useRouter();
-   const { sessionStatus } = useAuth();
+export function requireAuthenticatedUser(): TypeSession {
+   const { session, sessionStatus } = useAuth();
 
-   useEffect(() => {
-      if (sessionStatus === 'authenticated') { router.replace('/'); }
-   },[sessionStatus]);
+   const [authOnMount] = useState({ sessionStatus, session });
+   if (authOnMount.sessionStatus !== 'authenticated') { throw new Error("Attempting to call a component that requires the user to be authenticated to use") }
+   else { return authOnMount.session!; }
 }
 
-export function redirectGuestUser() {
-   const router = useRouter();
+export function requireGuestUser() {
    const { sessionStatus } = useAuth();
 
-   useEffect(() => {
-      if (sessionStatus === 'guest') { router.replace('/auth/login'); }
-   },[sessionStatus]);
+   const [sessionStatusOnMount] = useState(sessionStatus);
+   if (sessionStatusOnMount !== 'guest') { throw new Error("Attempting to call a component that requires the user to be un-authenticated to use") }
 }

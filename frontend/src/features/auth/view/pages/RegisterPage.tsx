@@ -1,13 +1,13 @@
 "use client"
 
 import { useRef } from 'react';
-import { redirectAuthenticatedUser } from '@/shared/lib/redirectConditions';
 import AuthenticationFormLayout, { AuthenticationFormSubmitButton, AuthenticationFormTextBox, AuthenticationFormTitle } from './FormLayout';
 import { authService } from '../../services/auth.service.client';
 import { TypeDataHandle } from '@/shared/domain/shared.types';
+import { requireGuestUser } from '@/shared/lib/redirectConditions';
 
 export default function RegisterPage() {
-   redirectAuthenticatedUser();
+   requireGuestUser();
 
    const refCollection = {
       name: useRef<TypeDataHandle<string>>(null),

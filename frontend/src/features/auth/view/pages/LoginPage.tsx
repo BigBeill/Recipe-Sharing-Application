@@ -3,12 +3,12 @@
 import { useRef } from 'react'
 import { authService } from '../../services/auth.service.client';
 import { ErrorNotFound, ErrorUnauthorized, ErrorValidation } from '@/shared/domain/errorClasses';
-import { redirectAuthenticatedUser } from '@/shared/lib/redirectConditions';
 import { TypeDataHandle } from '@/shared/domain/shared.types';
 import AuthenticationFormLayout, { AuthenticationFormCheckBox, AuthenticationFormSubmitButton, AuthenticationFormTextBox, AuthenticationFormTitle } from './FormLayout';
+import { requireGuestUser } from '@/shared/lib/redirectConditions';
 
 export default function LoginPage() {
-   redirectAuthenticatedUser();
+   requireGuestUser();
 
    const refCollection = {
       name: useRef<TypeDataHandle<string>>(null),

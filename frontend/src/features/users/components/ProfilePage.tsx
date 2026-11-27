@@ -6,7 +6,6 @@ import ImageUploader from '@/features/images/components/ImageUploader';
 import styles from './profilePage.module.scss';
 import { TypeDataHandle } from '@/shared/domain/shared.types';
 import { userService } from '../services/user.service.client';
-import { useAuth } from '@/features/auth/providers/AuthProvider';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InputString } from '@/shared/view/components/Input.components';
 import { TypeImageReference } from '@/features/images/domain/image.types';
@@ -16,15 +15,14 @@ import ImageDisplay from '@/features/images/components/ImageDisplay';
 import StrategyRelationshipInteraction from '@/features/relationships/view/strategy/Interaction.strategy';
 import { EditProvider } from '@/shared/hooks/editContext';
 import { TypeRelationship } from '@/features/relationships/domain/relationship.types';
+import { requireAuthenticatedUser } from '@/shared/lib/redirectConditions';
 
 interface Props {
    initial: TypeUser
 }
 
 export default function ProfilePage({ initial }: Props) {
-
-   const { session, sessionStatus } = useAuth();
-   if (sessionStatus !== 'authenticated') { throw new Error("Attempting to call ProfilePage without an authenticated session"); }
+   const session = requireAuthenticatedUser();
 
    const [user, setUser] = useState<TypeUser>(initial);
 
